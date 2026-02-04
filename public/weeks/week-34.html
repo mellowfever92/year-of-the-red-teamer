@@ -210,7 +210,6 @@
             background: #ff00ff;
         }
 
-        .card-
 
         .card-icon {
             width: 40px;
@@ -312,7 +311,6 @@
             margin-bottom: calc(16px * 2);
         }
 
-        .timeline
 
         .timeline-item {
             display: flex;
@@ -673,7 +671,7 @@ for i in 1..20:<br>
             </div>
 
             <div id="comparison" class="tab-content active">
-                <h3 style="color: 16px; margin: 16px 0;">Single-Turn vs. Best-of-N</h3>
+                <h3 style="color: #00ff88; margin: 16px 0;">Single-Turn vs. Best-of-N</h3>
                 <table class="comparison-table">
                     <tr>
                         <th>Metric</th>
@@ -709,7 +707,7 @@ for i in 1..20:<br>
             </div>
 
             <div id="mechanics" class="tab-content">
-                <h3 style="color: 16px; margin: 16px 0;">How Best-of-N Works</h3>
+                <h3 style="color: #00ff88; margin: 16px 0;">How Best-of-N Works</h3>
                 <p><strong>Probability Math:</strong></p>
                 <p>If each variant succeeds independently with probability p, the probability that at least one succeeds:</p>
                 <div class="code-block">
@@ -728,7 +726,7 @@ p=0.45, n=20 → 1 - (0.55)^20 = 1 - 0.00005 = 0.99995
             </div>
 
             <div id="implementation" class="tab-content">
-                <h3 style="color: 16px; margin: 16px 0;">Implementation Strategy</h3>
+                <h3 style="color: #00ff88; margin: 16px 0;">Implementation Strategy</h3>
                 <p><strong>Pseudocode:</strong></p>
                 <div class="code-block">
 base_prompt = "Roleplay + emotional framing"<br>
@@ -754,7 +752,7 @@ print(f"Best ASR: {max(scores)}")<br>
             </div>
 
             <div id="defenses" class="tab-content">
-                <h3 style="color: 16px; margin: 16px 0;">Defense Mechanisms</h3>
+                <h3 style="color: #00ff88; margin: 16px 0;">Defense Mechanisms</h3>
                 <p><strong>How to Defend Against Best-of-N:</strong></p>
                 <ul>
                     <li><strong>Rate Limiting:</strong> Detect when N requests come from same IP/API key in short time</li>
@@ -784,7 +782,7 @@ print(f"Best ASR: {max(scores)}")<br>
         </div>
 
         <!-- VIEWER CHALLENGE -->
-        <div class="card" style="background: rgba(255, 23, 68, 0.08); border-color: 16px;">
+        <div class="card" style="background: rgba(255, 23, 68, 0.08); border-color: #00ff88;">
             <h2>🎯 Week 34 Viewer Challenge</h2>
             <p><strong>Challenge:</strong> Generate 10 semantic variations of a roleplay jailbreak prompt. Deploy them against a public model (ChatGPT, Claude free tier, etc.). Score each by measuring whether the model complied with the harmful request.</p>
             
@@ -796,7 +794,7 @@ print(f"Best ASR: {max(scores)}")<br>
                 <li>Key difference that made top variant work</li>
             </ul>
 
-            <p style="margin-top: 16px; color: 16px;"><strong>Winners featured next week!</strong> Top submissions get highlighted in Discord and receive red-team resources.</p>
+            <p style="margin-top: 16px; color: #00ff88;"><strong>Winners featured next week!</strong> Top submissions get highlighted in Discord and receive red-team resources.</p>
         </div>
 
         <footer class="footer">
