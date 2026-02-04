@@ -11,19 +11,6 @@
             box-sizing: border-box;
         }
 
-        :root {
-            --primary: #00ff88;
-            --secondary: #ff006e;
-            --accent: #00d9ff;
-            --dark-bg: #0a0e27;
-            --card-bg: #1a1f3a;
-            --border: #2a3f5f;
-            --text: #e0e0e0;
-            --danger: #ff4444;
-            --warning: #ffaa00;
-            --success: #00ff88;
-        }
-
         body {
             font-family: 'Courier New', monospace;
             background: linear-gradient(135deg, #0a0e27 0%, #1a1a3e 50%, #0f0f1e 100%);
@@ -136,29 +123,68 @@
             font-size: 1.3em;
         }
 
-        h4 {
-            color: #00d9ff;
-            margin: 12px 0 8px 0;
-            font-size: 1.1em;
-        }
-
         p, li {
             color: #00ff88;
             margin-bottom: 10px;
             line-height: 1.8;
         }
 
+@keyframes slide {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(50px, 50px); }
+        }
+
+        .header-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .info-box {
+            background: rgba(0, 255, 136, 0.1);
+            border: 1px solid #00ff88;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .week-badge {
+            display: inline-block;
+            background: #0a0e27;
+            color: #00ff88;
+            padding: 5px 15px;
+            border-radius: 20px;
+            margin: 10px 0;
+            font-size: 0.8em;
+            border: 2px solid #00ff88;
+            position: relative;
+            z-index: 1;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        h4 {
+            color: #00d9ff;
+            margin: 12px 0 8px 0;
+            font-size: 1.1em;
+        }
+
         .card {
-            background: var(--card-bg);
-            border: 2px solid var(--border);
-            border-radius: 8px;
+            background: #00ff88;
+            border: 2px solid 16px;
+            border-radius: 4px;
             padding: 25px;
             margin-bottom: 25px;
             transition: all 0.3s;
         }
 
         .card:hover {
-            border-color: var(--primary);
+            border-color: 16px;
             box-shadow: 0 0 20px rgba(0,255,136,0.2);
         }
 
@@ -175,7 +201,7 @@
             border: 2px solid #0064ff;
             padding: 20px;
             margin: 15px 0;
-            border-radius: 8px;
+            border-radius: 4px;
         }
 
         .input-field, textarea {
@@ -213,13 +239,13 @@
         }
 
         .btn-primary {
-            background: linear-gradient(90deg, var(--primary) 0%, var(--accent) 100%);
+            background: linear-gradient(90deg, 16px 0%, 16px 100%);
         }
 
         .btn-secondary {
             background: rgba(0, 255, 136, 0.2);
-            border: 1px solid var(--primary);
-            color: var(--primary);
+            border: 1px solid 16px;
+            color: 16px;
         }
 
         .output-box {
@@ -239,15 +265,10 @@
             border: 2px solid #6400ff;
             padding: 20px;
             margin: 20px 0;
-            border-radius: 8px;
+            border-radius: 4px;
         }
 
-        .scenario-header {
-            color: #6400ff;
-            font-weight: bold;
-            font-size: 1.2em;
-            margin-bottom: 10px;
-        }
+        .scenario-
 
         .scenario-item {
             margin: 8px 0;
@@ -305,7 +326,7 @@
             border: 2px solid #0096ff;
             padding: 20px;
             margin: 20px 0;
-            border-radius: 8px;
+            border-radius: 4px;
         }
 
         .code-block {
@@ -364,7 +385,7 @@
             border: 2px solid #00ff88;
             padding: 15px;
             text-align: center;
-            border-radius: 8px;
+            border-radius: 4px;
         }
 
         .stat-value {
