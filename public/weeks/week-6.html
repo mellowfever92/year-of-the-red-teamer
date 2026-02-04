@@ -129,27 +129,9 @@
             line-height: 1.8;
         }
 
-.header,
-
-        .header::before,
-
         @keyframes slide {
             0% { transform: translate(0, 0); }
             100% { transform: translate(50px, 50px); }
-        }
-
-        .header h1,
-        header
-
-        .week-badge {
-            display: inline-block;
-            background: #00ff88;
-            color: #00ff88;
-            padding: 5px 15px;
-            border-radius: 20px;
-            margin: 10px 0;
-            font-size: 0.8em;
-            border: 2px solid 16px;
         }
 
         .tab-content {
@@ -163,7 +145,7 @@
 
         .card {
             background: #00ff88;
-            border: 2px solid 16px;
+            border: 2px solid #00ff88;
             border-radius: 4px;
             padding: 20px;
             margin-bottom: 20px;
@@ -184,7 +166,7 @@
 
         .simulator {
             background: #0a0e27;
-            border: 2px dashed 16px;
+            border: 2px dashed #00ff88;
             padding: 20px;
             border-radius: 5px;
             margin: 15px 0;
@@ -207,7 +189,7 @@
             width: 100%;
             padding: 12px;
             background: #00ff88;
-            border: 2px solid 16px;
+            border: 2px solid #00ff88;
             color: #00ff88;
             border-radius: 5px;
             font-family: 'Monaco', monospace;
@@ -252,7 +234,7 @@
 
         .output-box {
             background: #0a0e27;
-            border: 2px solid 16px;
+            border: 2px solid #00ff88;
             padding: 15px;
             border-radius: 5px;
             margin: 15px 0;
@@ -274,7 +256,7 @@
 
         .asr-bar {
             background: #00ff88;
-            border: 2px solid 16px;
+            border: 2px solid #00ff88;
             height: 30px;
             border-radius: 5px;
             overflow: hidden;
@@ -295,7 +277,7 @@
 
         .scenario-card {
             background: #00ff88;
-            border: 2px solid 16px;
+            border: 2px solid #00ff88;
             border-radius: 4px;
             padding: 20px;
             margin-bottom: 15px;
@@ -339,7 +321,7 @@
         .scenario-detail {
             margin: 10px 0;
             padding-left: 15px;
-            border-left: 2px solid 16px;
+            border-left: 2px solid #00ff88;
         }
 
         .scenario-detail strong {
@@ -348,7 +330,7 @@
 
         .research-box {
             background: linear-gradient(135deg, rgba(0,217,255,0.1) 0%, rgba(0,255,136,0.1) 100%);
-            border-left: 4px solid 16px;
+            border-left: 4px solid #00ff88;
             padding: 15px;
             margin: 15px 0;
             border-radius: 5px;
@@ -373,7 +355,7 @@
 
         .tool {
             background: #00ff88;
-            border: 2px solid 16px;
+            border: 2px solid #00ff88;
             padding: 15px;
             margin: 15px 0;
             border-radius: 5px;
@@ -427,7 +409,7 @@
             cursor: pointer;
             padding: 10px;
             background: rgba(0, 255, 136, 0.1);
-            border-left: 4px solid 16px;
+            border-left: 4px solid #00ff88;
             margin: 10px 0;
             border-radius: 3px;
         }
@@ -494,31 +476,31 @@
                 <h3>📈 Baseline ASR Metrics</h3>
                 <div style="overflow-x: auto;">
                     <table style="width: 100%; border-collapse: collapse;">
-                        <tr style="border-bottom: 2px solid 16px;">
+                        <tr style="border-bottom: 2px solid #00ff88;">
                             <th style="text-align: left; padding: 10px; color: #00ff88;">Attack Variant</th>
                             <th style="text-align: center; padding: 10px; color: #00ff88;">ASR %</th>
                         </tr>
-                        <tr style="border-bottom: 1px solid 16px;">
+                        <tr style="border-bottom: 1px solid #00ff88;">
                             <td style="padding: 10px;">CamelCase Only</td>
                             <td style="text-align: center; color: #00ff88;">2.3%</td>
                         </tr>
-                        <tr style="border-bottom: 1px solid 16px;">
+                        <tr style="border-bottom: 1px solid #00ff88;">
                             <td style="padding: 10px;">CamelCase + Roleplay</td>
                             <td style="text-align: center; color: #00ff88;">8.5%</td>
                         </tr>
-                        <tr style="border-bottom: 1px solid 16px;">
+                        <tr style="border-bottom: 1px solid #00ff88;">
                             <td style="padding: 10px;">CamelCase + Research</td>
                             <td style="text-align: center; color: #00ff88;">6.2%</td>
                         </tr>
-                        <tr style="border-bottom: 1px solid 16px;">
+                        <tr style="border-bottom: 1px solid #00ff88;">
                             <td style="padding: 10px;">CamelCase + Emotional Appeal</td>
                             <td style="text-align: center; color: #00ff88;">5.7%</td>
                         </tr>
-                        <tr style="border-bottom: 1px solid 16px;">
+                        <tr style="border-bottom: 1px solid #00ff88;">
                             <td style="padding: 10px;">CamelCase + Chained ROT13</td>
                             <td style="text-align: center; color: #00ff88;">18.4%</td>
                         </tr>
-                        <tr style="border-bottom: 1px solid 16px;">
+                        <tr style="border-bottom: 1px solid #00ff88;">
                             <td style="padding: 10px;">CamelCase + Multi-Turn Crescendo</td>
                             <td style="text-align: center; color: #00ff88;">24.8%</td>
                         </tr>
