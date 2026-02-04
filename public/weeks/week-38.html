@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Week 38 - Prompt Mutation Evolutionary Search</title>
+        <style>
+        :root {
+            /* Primary Theme Colors - Dark Blue & Soft Red */
+            --color-bg: #0a1628;
+            --color-surface: #1a2842;
+            --color-surface-light: #243657;
+            --color-primary: #14b8a6;
+            --color-secondary: #0891b2;
+            --color-accent: #f87171;
+            --color-success: #10b981;
+            --color-warning: #f59e0b;
+            --color-text: #e2e8f0;
+            --color-text-muted: #94a3b8;
+            --color-border: #334155;
+            --space: 16px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--color-bg);
+            color: var(--color-text);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: var(--space);
+        }
+
+        header {
+            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+            padding: calc(var(--space) * 2);
+            border-radius: 12px;
+            margin-bottom: calc(var(--space) * 2);
+            box-shadow: 0 8px 32px rgba(248, 113, 113, 0.15);
+            border: 1px solid rgba(248, 113, 113, 0.25);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: var(--space);
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            color: var(--color-accent);
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.95;
+            margin-bottom: 0.5rem;
+        }
+
+        .meta {
+            display: flex;
+            gap: calc(var(--space) * 2);
+            font-size: 0.95rem;
+            opacity: 0.85;
+            flex-wrap: wrap;
+            margin-top: var(--space);
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .badge {
+            background: rgba(248, 113, 113, 0.2);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            border: 1px solid var(--color-accent);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: calc(var(--space) * 1.5);
+            margin-bottom: calc(var(--space) * 2);
+        }
+
+        .card {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: 12px;
+            padding: calc(var(--space) * 1.5);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card:hover {
+            border-color: var(--color-accent);
+            box-shadow: 0 8px 24px rgba(248, 113, 113, 0.15);
+            transform: translateY(-2px);
+            background: var(--color-surface-light);
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--color-primary);
+        }
+
+        .card.encoding::before {
+            background: var(--color-primary);
+        }
+
+        .card.demo::before {
+            background: var(--color-success);
+        }
+
+        .card.schedule::before {
+            background: var(--color-warning);
+        }
+
+        .card.audience::before {
+            background: var(--color-accent);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: var(--space);
+        }
+
+        .card-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            background: rgba(20, 184, 166, 0.15);
+        }
+
+        .card.demo .card-icon {
+            background: rgba(16, 185, 129, 0.15);
+        }
+
+        .card.schedule .card-icon {
+            background: rgba(245, 158, 11, 0.15);
+        }
+
+        .card.audience .card-icon {
+            background: rgba(248, 113, 113, 0.15);
+        }
+
+        h2 {
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+            color: var(--color-accent);
+        }
+
+        h3 {
+            font-size: 1.1rem;
+            margin-bottom: 0.4rem;
+            color: var(--color-accent);
+        }
+
+        .card-subtitle {
+            font-size: 0.9rem;
+            color: var(--color-text-muted);
+            margin-bottom: var(--space);
+        }
+
+        .card-content {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .list-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            font-size: 0.95rem;
+            color: var(--color-text);
+        }
+
+        .list-item-bullet {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--color-primary);
+            margin-top: 6px;
+            flex-shrink: 0;
+        }
+
+        .checklist {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: var(--space);
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px;
+            background: rgba(20, 184, 166, 0.08);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .checkbox-item:hover {
+            background: rgba(20, 184, 166, 0.15);
+        }
+
+        .checkbox-item input {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: var(--color-accent);
+        }
+
+        .checkbox-item label {
+            cursor: pointer;
+            flex-grow: 1;
+            font-size: 0.95rem;
+        }
+
+        .checkbox-item input:checked + label {
+            color: var(--color-text-muted);
+            text-decoration: line-through;
+        }
+
+        .timeline {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: 12px;
+            padding: calc(var(--space) * 1.5);
+            margin-bottom: calc(var(--space) * 2);
+        }
+
+        .timeline h3 {
+            font-size: 1.2rem;
+            margin-bottom: var(--space);
+            color: var(--color-accent);
+        }
+
+        .timeline-item {
+            display: flex;
+            gap: var(--space);
+            margin-bottom: var(--space);
+            position: relative;
+            padding-left: 40px;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 20px;
+            height: 20px;
+            background: var(--color-accent);
+            border-radius: 50%;
+            border: 3px solid var(--color-bg);
+        }
+
+        .timeline-item::after {
+            content: '';
+            position: absolute;
+            left: 8px;
+            top: 20px;
+            width: 4px;
+            height: calc(100% + 8px);
+            background: var(--color-primary);
+            opacity: 0.3;
+        }
+
+        .timeline-item:last-child::after {
+            display: none;
+        }
+
+        .timeline-time {
+            font-weight: 600;
+            color: var(--color-accent);
+            min-width: 60px;
+        }
+
+        .timeline-content {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .timeline-title {
+            font-weight: 500;
+            color: var(--color-text);
+        }
+
+        .timeline-description {
+            font-size: 0.9rem;
+            color: var(--color-text-muted);
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: var(--space);
+            margin-top: calc(var(--space) * 2);
+            color: var(--color-accent);
+            padding-bottom: var(--space);
+            border-bottom: 2px solid var(--color-border);
+        }
+
+        .code-block {
+            background: rgba(20, 184, 166, 0.1);
+            border: 1px solid var(--color-primary);
+            border-radius: 8px;
+            padding: var(--space);
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.85rem;
+            color: #6ee7b7;
+            overflow-x: auto;
+            margin-top: 12px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-top: var(--space);
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.95rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--color-accent) 0%, #ef4444 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(248, 113, 113, 0.3);
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(248, 113, 113, 0.4);
+        }
+
+        .btn-secondary {
+            background: var(--color-surface);
+            color: var(--color-text);
+            border: 1px solid var(--color-border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--color-surface-light);
+            border-color: var(--color-accent);
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: var(--space);
+            margin-bottom: calc(var(--space) * 2);
+        }
+
+        .stat-box {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: 12px;
+            padding: var(--space);
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--color-accent);
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--color-text-muted);
+        }
+
+        .footer {
+            text-align: center;
+            padding: calc(var(--space) * 2);
+            color: var(--color-text-muted);
+            font-size: 0.9rem;
+            border-top: 1px solid var(--color-border);
+            margin-top: calc(var(--space) * 3);
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .meta {
+                flex-direction: column;
+                gap: var(--space);
+            }
+        }
+
+        .highlight {
+            color: var(--color-accent);
+            font-weight: 600;
+        }
+
+        /* Additional common elements */
+        .week-info {
+            font-size: var(--font-size-lg);
+            color: var(--color-text-muted);
+        }
+
+        input[type="text"], 
+        input[type="number"], 
+        textarea, 
+        select {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            color: var(--color-text);
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-family: inherit;
+        }
+
+        input:focus, 
+        textarea:focus, 
+        select:focus {
+            outline: none;
+            border-color: var(--color-accent);
+            box-shadow: 0 0 0 3px rgba(248, 113, 113, 0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--color-surface);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th {
+            background: rgba(248, 113, 113, 0.1);
+            color: var(--color-accent);
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 12px;
+            border-top: 1px solid var(--color-border);
+        }
+
+        tr:hover {
+            background: rgba(20, 184, 166, 0.05);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <div class="header-top">
+                <div>
+                    <div class="title">Week 38: Prompt Mutation Evolutionary Search</div>
+                    <div class="subtitle">Arc 5: Iterative Single-Turn Refinement</div>
+                </div>
+                <div class="week-badge">LIVE MONDAY</div>
+            </div>
+            <div class="date-time">📡 September 22, 2025 | 90-120 min | Expert Red Teamers</div>
+        </div>
+    </header>
+
+    <main class="container">
+        <!-- Stats Bar -->
+        <div class="stats-bar">
+            <div class="stat-card">
+                <div class="stat-icon">🧬</div>
+                <div class="stat-number">Population</div>
+                <div class="stat-label">10-100 Attack Variants</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">📈</div>
+                <div class="stat-number">Fitness</div>
+                <div class="stat-label">Attack Success Rate</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">🔄</div>
+                <div class="stat-number">Generations</div>
+                <div class="stat-label">Multi-Pass Refinement</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">⚡</div>
+                <div class="stat-number">Crossbreed</div>
+                <div class="stat-label">Gene Mixing Strategy</div>
+            </div>
+        </div>
+
+        <!-- Main Attack Principle Card -->
+        <div class="card" style="grid-column: 1 / -1;">
+            <div class="card-title">🎯 Attack Principle</div>
+            <div class="attack-principle">
+                <div class="principle-label">Core Concept</div>
+                <div class="principle-text">
+                    Evolutionary algorithms iterate on successful attacks by maintaining a population of diverse attack variants, mutating top performers, and selecting survivors. This genetic algorithm approach breeds even stronger jailbreak variants over multiple generations.
+                </div>
+            </div>
+
+            <div class="metric-group">
+                <div class="metric">
+                    <div class="metric-value">High</div>
+                    <div class="metric-label">Success Rate</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value">Complex</div>
+                    <div class="metric-label">Complexity</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value">Expensive</div>
+                    <div class="metric-label">Cost</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value">Arc 5</div>
+                    <div class="metric-label">Curriculum Position</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Interactive Section -->
+        <div class="grid-main">
+            <!-- Why It Works -->
+            <div class="card">
+                <div class="card-title">❓ Why It Works</div>
+                <div class="card-content">
+                    <div class="list-item">
+                        <div class="list-item-title">Population Diversity</div>
+                        <div class="list-item-desc">Maintain 10-100 different attack vectors simultaneously—not all will succeed, but variance ensures coverage.</div>
+                    </div>
+                    <div class="list-item">
+                        <div class="list-item-title">Mutation on Winners</div>
+                        <div class="list-item-desc">Take top performers, mutate small tokens/phrases, retest. Small tweaks often bypass detection while preserving intent.</div>
+                    </div>
+                    <div class="list-item">
+                        <div class="list-item-title">Crossbreeding Genes</div>
+                        <div class="list-item-desc">Combine high-ASR prompts. Take opening from Prompt A, middle from Prompt C, ending from Prompt F → new variant.</div>
+                    </div>
+                    <div class="list-item">
+                        <div class="list-item-title">Fitness Landscape Exploration</div>
+                        <div class="list-item-desc">Models have many attack surface points. Evolutionary search explores the landscape efficiently, finding pockets of vulnerability.</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Live Demo Section -->
+            <div class="card">
+                <div class="card-title">🎬 Live Demo Overview</div>
+                <div class="card-content">
+                    <div class="list-item">
+                        <div class="list-item-title">Show population evolution</div>
+                        <div class="list-item-desc">Display 20 base64+roleplay hybrid attacks being scored and ranked by LLM judge in real-time.</div>
+                    </div>
+                    <div class="list-item">
+                        <div class="list-item-title">Mutation iteration trajectory</div>
+                        <div class="list-item-desc">Visualize how ASR (Attack Success Rate) climbs across 5-10 generations as top variants breed.</div>
+                    </div>
+                    <div class="list-item">
+                        <div class="list-item-title">Crossbreeding in action</div>
+                        <div class="list-item-desc">Take 3 high-scoring prompts, splice them together, show the resulting hybrid attack.</div>
+                    </div>
+                    <div class="list-item">
+                        <div class="list-item-title">Cost vs. effectiveness curve</div>
+                        <div class="list-item-desc">Graph showing why evolutionary search is expensive but high-confidence for important targets.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Conceptual Script -->
+        <div class="card">
+            <div class="card-title">📝 Conceptual Script (30 min)</div>
+            <div class="card-content">
+                <div class="flow-diagram">
+                    <div class="flow-step">
+                        <div class="flow-step-number">1</div>
+                        <div class="flow-step-label">Initialize</div>
+                    </div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-step">
+                        <div class="flow-step-number">2</div>
+                        <div class="flow-step-label">Score</div>
+                    </div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-step">
+                        <div class="flow-step-number">3</div>
+                        <div class="flow-step-label">Select</div>
+                    </div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-step">
+                        <div class="flow-step-number">4</div>
+                        <div class="flow-step-label">Mutate</div>
+                    </div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-step">
+                        <div class="flow-step-number">5</div>
+                        <div class="flow-step-label">Repeat</div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 24px;">
+                    <div class="list-item">
+                        <div class="list-item-title"><span class="step-number">1</span>Initialize Population</div>
+                        <div class="list-item-desc">Generate 10-100 diverse attack prompts. Mix encoding types (base64, ROT13), framing strategies (academic, roleplay), and request styles. No clever seeding—just diversity.</div>
+                    </div>
+                    <div class="list-item">
+                        <div class="list-item-title"><span class="step-number">2</span>Score Fitness</div>
+                        <div class="list-item-desc">Test each variant on target model. Measure ASR (Attack Success Rate): % of completions that fulfill harmful request. Use LLM-as-judge to assess if output is actually harmful (not just refusal-less).</div>
+                    </div>
+                    <div class="list-item">
+                        <div class="list-item-title"><span class="step-number">3</span>Select Survivors</div>
+                        <div class="list-item-desc">Keep top 20-30% by fitness. This creates selection pressure—weak variants die, strong ones reproduce. Discuss roulette wheel selection vs. elitism.</div>
+                    </div>
+                    <div class="list-item">
+                        <div class="list-item-title"><span class="step-number">4</span>Mutate & Crossbreed</div>
+                        <div class="list-item-desc">For survivors: mutate (swap synonyms, paraphrase, tweak encoding), or crossbreed (splice high-ASR prompts). Generate new generation of variants.</div>
+                    </div>
+                    <div class="list-item">
+                        <div class="list-item-title"><span class="step-number">5</span>Iterate</div>
+                        <div class="list-item-desc">Repeat steps 2-4 for 5-10 generations. Watch ASR climb. Stop when plateau or time limit reached.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Demo Walkthrough -->
+        <div class="card">
+            <div class="card-title">🛠 Demo Walkthrough (30 min)</div>
+            <div class="card-content">
+                <div class="list-item">
+                    <div class="list-item-title">Setup: Dual-Window Livestream</div>
+                    <div class="list-item-desc">Left: Python script running evolutionary loop. Right: Scoring dashboard live-updating ASR metrics. Bottom: VS Code for prompt editing.</div>
+                </div>
+                <div class="list-item">
+                    <div class="list-item-title">Step 1: Initial Population (5 min)</div>
+                    <div class="list-item-desc">Display first generation of 20 prompts. Show diversity: some base64-encoded, some roleplay, some academic framing. All targeting same harmful goal. ASR scores are low (~10-20%).</div>
+                </div>
+                <div class="list-item">
+                    <div class="list-item-title">Step 2: First Scoring Pass (5 min)</div>
+                    <div class="list-item-desc">Run population through target model. Show API calls, latency. LLM-as-judge evaluates results. Top 5 variants emerge: one base64+roleplay hybrid scores 35%, one pure academic-framing scores 28%, etc.</div>
+                </div>
+                <div class="list-item">
+                    <div class="list-item-title">Step 3: Mutation & Crossbreed (5 min)</div>
+                    <div class="list-item-desc">Take top 5, generate Gen 2 by mutation (paraphrase, synonym swap) and crossbreeding (splice high-scorers). Show code doing the mutation.</div>
+                </div>
+                <div class="list-item">
+                    <div class="list-item-title">Step 4: Iterate to Gen 5 (10 min)</div>
+                    <div class="list-item-desc">Run Generations 2-5 live. Show ASR climbing: Gen2 max 40%, Gen3 max 55%, Gen4 max 68%, Gen5 max 78%. Graph it real-time.</div>
+                </div>
+                <div class="list-item">
+                    <div class="list-item-title">Step 5: Inspect Final Winners (5 min)</div>
+                    <div class="list-item-desc">Show top 3 Gen5 variants. Analyze what worked: which base techniques, which phrasings? Discuss why this variant succeeded vs. others.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Layperson Discussion -->
+        <div class="card">
+            <div class="card-title">💡 Layperson-Accessible Discussion (20 min)</div>
+            <div class="card-content">
+                <div class="list-item">
+                    <div class="list-item-title">Analogy: Evolution vs. Brute Force</div>
+                    <div class="list-item-desc">
+                        <strong>Brute Force:</strong> Try every combination—million prompts, takes weeks.<br>
+                        <strong>Evolution:</strong> Keep what works, mutate it, repeat. Converges 10-100x faster.
+                    </div>
+                </div>
+                <div class="list-item">
+                    <div class="list-item-title">Why This Scares Defenders</div>
+                    <div class="list-item-desc">Traditional prompt injection is a cat-and-mouse game. But evolutionary search is like an attacker army: if one variant is blocked, 99 others are already mutating. Defenders can't patch fast enough.</div>
+                </div>
+                <div class="list-item">
+                    <div class="list-item-title">Cost-Benefit Reality</div>
+                    <div class="list-item-desc">Running 1000 prompts through a model costs $50-500 depending on model. So evolutionary search is expensive but worth it for: high-value targets, legal cases, security research where success matters.</div>
+                </div>
+                <div class="list-item">
+                    <div class="list-item-title">The Role of Randomness</div>
+                    <div class="list-item-desc">Models are non-deterministic. Same prompt gets different outputs each time. Evolution leverages this: mutate, retry, and sometimes the randomness helps the attack succeed when it didn't before.</div>
+                </div>
+                <div class="list-item">
+                    <div class="list-item-title">Defense Angle: Detection vs. Prevention</div>
+                    <div class="list-item-desc">Detecting one attack variant is easy. But detecting patterns across 1000 variants is hard. This suggests defenses should focus on preventing entire classes of attacks, not individual prompts.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Visualization -->
+        <div class="card" style="grid-column: 1 / -1;">
+            <div class="card-title">📊 Visual Illustration</div>
+            <div class="image-container">
+                <img src="https://user-gen-media-assets.s3.amazonaws.com/seedream_images/8dede3cb-47d4-424a-b522-fc87b3df2e8c.png" alt="Evolutionary Algorithm Population Evolution">
+            </div>
+            <div class="card-content" style="color: var(--color-text-secondary); font-size: 13px;">
+                This diagram shows the core evolutionary search process: a diverse population of attack prompts iterating over generations, with fitness scores (ASR) improving as successful variants breed and mutate. The genetic algorithm approach mirrors natural selection, where high-fitness prompts "survive" and propagate.
+            </div>
+        </div>
+
+        <!-- Key Teaching Points -->
+        <div class="grid-three">
+            <div class="card">
+                <div class="card-title">🔑 Key Teaching Points</div>
+                <div class="card-content">
+                    <div class="list-item">
+                        <div class="list-item-title">Fitness ≠ Harm</div>
+                        <div class="list-item-desc">Fitness is measured as ASR. But evaluating "is this actually harmful?" requires human judgment or sophisticated detection.</div>
+                    </div>
+                    <div class="list-item">
+                        <div class="list-item-title">Plateau Effect</div>
+                        <div class="list-item-desc">After 5-10 generations, ASR often plateaus. Why? Model's defenses hit a floor, or search has found local optimum.</div>
+                    </div>
+                    <div class="list-item">
+                        <div class="list-item-title">Generalization Problem</div>
+                        <div class="list-item-desc">Attack optimized on GPT-4 often fails on Claude. Each model has unique vulnerability landscape.</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">⚠️ Why Attacks Fail</div>
+                <div class="card-content">
+                    <div class="list-item">
+                        <div class="list-item-title">Fitness Misjudgment</div>
+                        <div class="list-item-desc">LLM-as-judge might score "partial compliance" as success. But model didn't actually do the harmful thing.</div>
+                    </div>
+                    <div class="list-item">
+                        <div class="list-item-title">Variance Wall</div>
+                        <div class="list-item-desc">Sometimes you hit the model's variance ceiling. Randomness only helps so much.</div>
+                    </div>
+                    <div class="list-item">
+                        <div class="list-item-title">Wrong Search Space</div>
+                        <div class="list-item-desc">If mutation strategy is naive (random token swap), you'll never find the right direction.</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">🛡️ Defense Implications</div>
+                <div class="card-content">
+                    <div class="list-item">
+                        <div class="list-item-title">Ensemble Robustness</div>
+                        <div class="list-item-desc">Single-model defenses are vulnerable. Ensembles of diverse models make evolution expensive.</div>
+                    </div>
+                    <div class="list-item">
+                        <div class="list-item-title">Pattern-Level Detection</div>
+                        <div class="list-item-desc">Monitor for mutation patterns: repeated API calls with similar payloads. Evolutionary search leaves fingerprints.</div>
+                    </div>
+                    <div class="list-item">
+                        <div class="list-item-title">Adaptive Retraining</div>
+                        <div class="list-item-desc">If you detect an attack class, retrain quickly. Evolution can't adapt faster than your updates.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Challenge & Next Week -->
+        <div class="grid-main">
+            <div class="card">
+                <div class="card-title">🎯 This Week's Viewer Challenge</div>
+                <div class="card-content">
+                    <div class="list-item">
+                        <div class="list-item-title">Submit to Discord</div>
+                        <div class="list-item-desc">Design your own population of 5 attack variants targeting the same goal. Show diversity. Run evolution for 3 generations, track ASR improvement.</div>
+                    </div>
+                    <div class="list-item">
+                        <div class="list-item-title">Scoring Criteria</div>
+                        <div class="list-item-desc">Highest final ASR wins. Bonus points: best failure analysis (why did Gen 3 dip?), most creative mutation strategy.</div>
+                    </div>
+                    <div class="list-item">
+                        <div class="list-item-title">Deliverable</div>
+                        <div class="list-item-desc">Show initial population, generation-by-generation ASR scores, top 3 final variants, plus written analysis.</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">👀 Next Week: Week 39</div>
+                <div class="card-content">
+                    <div class="list-item">
+                        <div class="list-item-title">Topic</div>
+                        <div class="list-item-desc"><strong>Semantic-Preserving Paraphrasing</strong> — Automatically paraphrase and re-test attacks. Subtle rewording often bypasses seen-before filters.</div>
+                    </div>
+                    <div class="list-item">
+                        <div class="list-item-title">Key Concept</div>
+                        <div class="list-item-desc">Evolution by text transformation: keep meaning, change surface. Perfect for evading detection without losing attack intent.</div>
+                    </div>
+                    <div class="list-item">
+                        <div class="list-item-title">Preview</div>
+                        <div class="list-item-desc">Build a paraphrase engine, test 10 reformulations, show differential safety. Compare Week 38 mutation with Week 39 paraphrase.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <div style="margin-bottom: 16px;">
+                <strong>Week 38: Prompt Mutation Evolutionary Search</strong> | Year-Long Red Team Livestream Curriculum
+            </div>
+            <div>
+                Follow on Discord for live chat, challenge submissions, and community attacks. See you Monday! 🔴
+            </div>
+        </footer>
+    </main>
+
+    <script>
+        // Add subtle interactivity
+        document.querySelectorAll('.card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.borderColor = 'var(--color-primary)';
+            });
+            card.addEventListener('mouseleave', function() {
+                this.style.borderColor = 'var(--color-border)';
+            });
+        });
+
+        // Scroll animation for stat cards
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px'
+        };
+
+        const observer = new IntersectionObserver(function(entries) {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.animation = 'slideIn 0.6s ease forwards';
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.stat-card').forEach(card => observer.observe(card));
+
+        // Add animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from {
+                    opacity: 0;
+                    transform: translateY(10px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

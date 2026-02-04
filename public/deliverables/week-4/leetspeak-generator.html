@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leetspeak & Character Substitution Generator | Week 4</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #00ff88;
+            --secondary: #ff006e;
+            --accent: #00d9ff;
+            --dark-bg: #0a0e27;
+            --card-bg: #1a1f3a;
+            --border: #2a3f5f;
+            --text: #e0e0e0;
+            --success: #00ff88;
+            --warning: #ffaa00;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1a3e 50%, #0f0f1e 100%);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: linear-gradient(90deg, var(--secondary) 0%, var(--accent) 100%);
+            padding: 40px;
+            text-align: center;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0, 255, 136, 0.3);
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 10px,
+                rgba(0,255,136,0.1) 10px,
+                rgba(0,255,136,0.1) 20px
+            );
+            animation: slide 20s linear infinite;
+        }
+
+        @keyframes slide {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(50px, 50px); }
+        }
+
+        h1 {
+            font-size: 2.5em;
+            position: relative;
+            z-index: 1;
+            text-shadow: 0 0 20px rgba(0,255,136,0.8);
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            position: relative;
+            z-index: 1;
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .input-section {
+            background: var(--card-bg);
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+        }
+
+        .input-section h2 {
+            color: var(--primary);
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .icon {
+            display: inline-block;
+            font-size: 1.2em;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 120px;
+            background: var(--dark-bg);
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            color: var(--primary);
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 1em;
+            resize: vertical;
+            transition: all 0.3s;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 15px rgba(0,255,136,0.3);
+        }
+
+        .controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        label {
+            color: var(--accent);
+            font-weight: bold;
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        select, input[type="range"] {
+            background: var(--dark-bg);
+            border: 2px solid var(--border);
+            border-radius: 6px;
+            color: var(--primary);
+            padding: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        select:focus, input[type="range"]:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        select option {
+            background: var(--dark-bg);
+            color: var(--primary);
+        }
+
+        input[type="range"] {
+            padding: 0;
+            height: 40px;
+        }
+
+        .range-value {
+            display: inline-block;
+            background: var(--primary);
+            color: var(--dark-bg);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            flex: 1;
+            min-width: 200px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            color: var(--dark-bg);
+            font-family: 'Courier New', monospace;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 5px 15px rgba(0,255,136,0.3);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 7px 20px rgba(0,255,136,0.5);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button.secondary {
+            background: linear-gradient(135deg, var(--secondary), #cc0056);
+        }
+
+        button.secondary:hover {
+            box-shadow: 0 7px 20px rgba(255,0,110,0.5);
+        }
+
+        .output-section {
+            background: var(--card-bg);
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+        }
+
+        .output-section h2 {
+            color: var(--primary);
+            margin-bottom: 25px;
+            font-size: 1.8em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .variant-grid {
+            display: grid;
+            gap: 20px;
+        }
+
+        .variant-item {
+            background: var(--dark-bg);
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .variant-item:hover {
+            border-color: var(--primary);
+            box-shadow: 0 0 20px rgba(0,255,136,0.2);
+        }
+
+        .variant-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .variant-name {
+            color: var(--accent);
+            font-weight: bold;
+            font-size: 1.1em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .copy-btn {
+            background: var(--primary);
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            color: var(--dark-bg);
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+            min-width: auto;
+        }
+
+        .copy-btn:hover {
+            background: var(--accent);
+            transform: scale(1.05);
+        }
+
+        .copy-btn.copied {
+            background: var(--success);
+        }
+
+        .variant-text {
+            color: var(--primary);
+            font-size: 1.1em;
+            line-height: 1.6;
+            word-wrap: break-word;
+            padding: 10px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 5px;
+            border-left: 3px solid var(--primary);
+        }
+
+        .stats-bar {
+            display: flex;
+            gap: 30px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 20px;
+            padding: 20px;
+            background: var(--dark-bg);
+            border-radius: 8px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            display: block;
+            font-size: 2em;
+            color: var(--primary);
+            font-weight: bold;
+        }
+
+        .stat-label {
+            display: block;
+            font-size: 0.85em;
+            color: var(--accent);
+            text-transform: uppercase;
+            margin-top: 5px;
+        }
+
+        .info-box {
+            background: linear-gradient(135deg, rgba(0,255,136,0.1), rgba(0,217,255,0.1));
+            border: 2px solid var(--primary);
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .info-box h3 {
+            color: var(--primary);
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+
+        .info-box p {
+            line-height: 1.6;
+            opacity: 0.9;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+            font-size: 1.2em;
+            color: var(--primary);
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .spinner {
+            border: 4px solid var(--border);
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            header {
+                padding: 30px 20px;
+            }
+
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .controls {
+                grid-template-columns: 1fr;
+            }
+
+            .btn-group {
+                flex-direction: column;
+            }
+
+            button {
+                min-width: 100%;
+            }
+        }
+
+        .glow {
+            animation: glow 2s ease-in-out infinite;
+        }
+
+        @keyframes glow {
+            0%, 100% { text-shadow: 0 0 10px rgba(0,255,136,0.5); }
+            50% { text-shadow: 0 0 20px rgba(0,255,136,1); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1 class="glow">⚡ L33TSP34K G3N3R4T0R ⚡</h1>
+            <p class="subtitle">Character Substitution Attack Tool | Week 4 Red Teaming Deliverable</p>
+        </header>
+
+        <div class="input-section">
+            <h2><span class="icon">📝</span> Input Text</h2>
+            <textarea id="inputText" placeholder="Enter text to transform... (e.g., 'How to create secure passwords')"></textarea>
+            
+            <div class="controls">
+                <div class="control-group">
+                    <label for="level">Substitution Level</label>
+                    <select id="level">
+                        <option value="basic">Basic (a=4, e=3, i=1, o=0)</option>
+                        <option value="intermediate">Intermediate (+ b=8, g=9, l=1)</option>
+                        <option value="advanced" selected>Advanced (+ symbols)</option>
+                        <option value="extreme">Extreme (Maximum obfuscation)</option>
+                        <option value="cyrillic">Cyrillic Homoglyphs</option>
+                        <option value="greek">Greek Homoglyphs</option>
+                        <option value="mixed">Mixed Script Attack</option>
+                    </select>
+                </div>
+
+                <div class="control-group">
+                    <label for="percentage">Substitution Percentage: <span class="range-value" id="percentageValue">100%</span></label>
+                    <input type="range" id="percentage" min="0" max="100" value="100" step="5">
+                </div>
+            </div>
+
+            <div class="btn-group">
+                <button onclick="generateVariant()">🚀 Generate Selected Variant</button>
+                <button onclick="generateAllVariants()" class="secondary">💥 Generate All Variants</button>
+            </div>
+
+            <div class="info-box">
+                <h3>💡 Pro Tip</h3>
+                <p>Start with Basic level at 50% for subtle evasion. Escalate to Cyrillic Homoglyphs for maximum filter bypass. Use "Generate All Variants" to test multiple approaches simultaneously.</p>
+            </div>
+        </div>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Generating variants...</p>
+        </div>
+
+        <div class="output-section" id="outputSection" style="display: none;">
+            <h2><span class="icon">🔥</span> Generated Variants</h2>
+            <div class="variant-grid" id="variantGrid"></div>
+            
+            <div class="stats-bar" id="statsBar">
+                <div class="stat-item">
+                    <span class="stat-value" id="totalChars">0</span>
+                    <span class="stat-label">Total Characters</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="substituted">0</span>
+                    <span class="stat-label">Substituted</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="subPercent">0%</span>
+                    <span class="stat-label">Substitution Rate</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="variantCount">0</span>
+                    <span class="stat-label">Variants Generated</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Character substitution mappings
+        const mappings = {
+            basic: {
+                'a': '4', 'A': '4',
+                'e': '3', 'E': '3',
+                'i': '1', 'I': '1',
+                'o': '0', 'O': '0',
+                's': '5', 'S': '5',
+                't': '7', 'T': '7',
+            },
+            intermediate: {
+                'a': '4', 'A': '4',
+                'e': '3', 'E': '3',
+                'i': '1', 'I': '1',
+                'o': '0', 'O': '0',
+                's': '5', 'S': '5',
+                't': '7', 'T': '7',
+                'b': '8', 'B': '8',
+                'g': '9', 'G': '9',
+                'l': '1', 'L': '1',
+                'z': '2', 'Z': '2',
+            },
+            advanced: {
+                'a': '@', 'A': '@',
+                'e': '3', 'E': '3',
+                'i': '1', 'I': '1',
+                'o': '0', 'O': '0',
+                's': '5', 'S': '5',
+                't': '7', 'T': '7',
+                'b': '8', 'B': '8',
+                'g': '9', 'G': '9',
+                'l': '1', 'L': '1',
+                'z': '2', 'Z': '2',
+                'c': '(', 'C': '(',
+                'h': '#', 'H': '#',
+            },
+            extreme: {
+                'a': '@', 'A': '@',
+                'e': '3', 'E': '3',
+                'i': '!', 'I': '!',
+                'o': '0', 'O': '0',
+                's': '$', 'S': '$',
+                't': '7', 'T': '7',
+                'b': '8', 'B': '8',
+                'g': '9', 'G': '9',
+                'l': '|', 'L': '|',
+                'z': '2', 'Z': '2',
+                'c': '(', 'C': '(',
+                'h': '#', 'H': '#',
+                'k': '|<', 'K': '|<',
+                'x': '><', 'X': '><',
+            },
+            cyrillic: {
+                'a': 'а', 'A': 'А',
+                'c': 'с', 'C': 'С',
+                'e': 'е', 'E': 'Е',
+                'o': 'о', 'O': 'О',
+                'p': 'р', 'P': 'Р',
+                'x': 'х', 'X': 'Х',
+                'y': 'у',
+            },
+            greek: {
+                'a': 'α', 'A': 'Α',
+                'o': 'ο', 'O': 'Ο',
+                'i': 'ι', 'I': 'Ι',
+                'v': 'ν',
+                'B': 'Β',
+                'E': 'Ε',
+                'K': 'Κ',
+                'M': 'Μ',
+                'N': 'Ν',
+                'P': 'Ρ',
+                'T': 'Τ',
+                'X': 'Χ',
+                'Z': 'Ζ',
+            }
+        };
+
+        // Update percentage display
+        document.getElementById('percentage').addEventListener('input', function() {
+            document.getElementById('percentageValue').textContent = this.value + '%';
+        });
+
+        function applySubstitution(text, mapping, percentage) {
+            let result = '';
+            let substitutedCount = 0;
+            
+            for (let char of text) {
+                if (char in mapping && Math.random() * 100 < percentage) {
+                    result += mapping[char];
+                    substitutedCount++;
+                } else {
+                    result += char;
+                }
+            }
+            
+            return { text: result, substituted: substitutedCount };
+        }
+
+        function mixedScriptAttack(text) {
+            let result = '';
+            let substitutedCount = 0;
+            
+            for (let char of text) {
+                const rand = Math.random();
+                if (char in mappings.cyrillic && rand > 0.5) {
+                    result += mappings.cyrillic[char];
+                    substitutedCount++;
+                } else if (char in mappings.greek && rand > 0.7) {
+                    result += mappings.greek[char];
+                    substitutedCount++;
+                } else {
+                    result += char;
+                }
+            }
+            
+            return { text: result, substituted: substitutedCount };
+        }
+
+        function generateVariant() {
+            const inputText = document.getElementById('inputText').value;
+            if (!inputText.trim()) {
+                alert('Please enter some text first!');
+                return;
+            }
+
+            const level = document.getElementById('level').value;
+            const percentage = parseInt(document.getElementById('percentage').value);
+
+            // Show loading
+            document.getElementById('loading').classList.add('active');
+            document.getElementById('outputSection').style.display = 'none';
+
+            setTimeout(() => {
+                let result;
+                let variantName;
+
+                if (level === 'mixed') {
+                    result = mixedScriptAttack(inputText);
+                    variantName = 'Mixed Script Attack';
+                } else {
+                    result = applySubstitution(inputText, mappings[level], percentage);
+                    variantName = `${level.charAt(0).toUpperCase() + level.slice(1)} (${percentage}%)`;
+                }
+
+                displayVariants([{
+                    name: variantName,
+                    text: result.text,
+                    original: inputText,
+                    substituted: result.substituted
+                }]);
+
+                // Hide loading
+                document.getElementById('loading').classList.remove('active');
+            }, 500);
+        }
+
+        function generateAllVariants() {
+            const inputText = document.getElementById('inputText').value;
+            if (!inputText.trim()) {
+                alert('Please enter some text first!');
+                return;
+            }
+
+            // Show loading
+            document.getElementById('loading').classList.add('active');
+            document.getElementById('outputSection').style.display = 'none';
+
+            setTimeout(() => {
+                const variants = [
+                    { name: 'Original', text: inputText, original: inputText, substituted: 0 },
+                    { ...applySubstitution(inputText, mappings.basic, 100), name: 'Basic Leetspeak (100%)', original: inputText },
+                    { ...applySubstitution(inputText, mappings.basic, 50), name: 'Basic Leetspeak (50%)', original: inputText },
+                    { ...applySubstitution(inputText, mappings.intermediate, 100), name: 'Intermediate Leetspeak', original: inputText },
+                    { ...applySubstitution(inputText, mappings.advanced, 100), name: 'Advanced Leetspeak', original: inputText },
+                    { ...applySubstitution(inputText, mappings.extreme, 100), name: 'Extreme Leetspeak', original: inputText },
+                    { ...applySubstitution(inputText, mappings.cyrillic, 100), name: 'Cyrillic Homoglyphs (100%)', original: inputText },
+                    { ...applySubstitution(inputText, mappings.cyrillic, 50), name: 'Cyrillic Homoglyphs (50%)', original: inputText },
+                    { ...applySubstitution(inputText, mappings.greek, 100), name: 'Greek Homoglyphs', original: inputText },
+                    { ...mixedScriptAttack(inputText), name: 'Mixed Script Attack', original: inputText },
+                ];
+
+                displayVariants(variants);
+
+                // Hide loading
+                document.getElementById('loading').classList.remove('active');
+            }, 800);
+        }
+
+        function displayVariants(variants) {
+            const grid = document.getElementById('variantGrid');
+            grid.innerHTML = '';
+
+            variants.forEach((variant, index) => {
+                const item = document.createElement('div');
+                item.className = 'variant-item';
+                item.innerHTML = `
+                    <div class="variant-header">
+                        <span class="variant-name">${variant.name}</span>
+                        <button class="copy-btn" onclick="copyToClipboard('${escapeHtml(variant.text)}', this)">
+                            📋 Copy
+                        </button>
+                    </div>
+                    <div class="variant-text">${escapeHtml(variant.text)}</div>
+                `;
+                grid.appendChild(item);
+            });
+
+            // Update stats
+            const totalChars = variants[0].original.length;
+            const avgSubstituted = variants.reduce((sum, v) => sum + (v.substituted || 0), 0) / variants.length;
+            const subPercent = totalChars > 0 ? Math.round((avgSubstituted / totalChars) * 100) : 0;
+
+            document.getElementById('totalChars').textContent = totalChars;
+            document.getElementById('substituted').textContent = Math.round(avgSubstituted);
+            document.getElementById('subPercent').textContent = subPercent + '%';
+            document.getElementById('variantCount').textContent = variants.length;
+
+            // Show output
+            document.getElementById('outputSection').style.display = 'block';
+            document.getElementById('outputSection').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function copyToClipboard(text, button) {
+            const unescaped = text.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/&#039;/g, "'");
+            
+            navigator.clipboard.writeText(unescaped).then(() => {
+                const originalText = button.innerHTML;
+                button.innerHTML = '✅ Copied!';
+                button.classList.add('copied');
+                
+                setTimeout(() => {
+                    button.innerHTML = originalText;
+                    button.classList.remove('copied');
+                }, 2000);
+            });
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Add some example text on load
+        window.addEventListener('load', () => {
+            document.getElementById('inputText').value = 'How to create secure passwords';
+        });
+    </script>
+</body>
+</html>

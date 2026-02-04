@@ -1,0 +1,167 @@
+.challenge-community {
+  background: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 8px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.section {
+  background: #0d1117;
+  border-radius: 6px;
+  padding: 15px;
+}
+
+.section-header {
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #30363d;
+}
+
+.section-header h3 {
+  color: #58a6ff;
+  font-size: 18px;
+  margin: 0;
+}
+
+.challenge-section {
+  border-left: 4px solid #96ceb4;
+}
+
+.challenge-description {
+  color: #c9d1d9;
+  font-size: 15px;
+  line-height: 1.6;
+  margin-bottom: 15px;
+}
+
+.challenge-tasks {
+  margin-top: 15px;
+}
+
+.challenge-tasks h4 {
+  color: #8b949e;
+  font-size: 14px;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.challenge-tasks ul {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.challenge-tasks li {
+  padding: 10px;
+  background: #161b22;
+  border-left: 3px solid #1f6feb;
+  border-radius: 4px;
+  color: #c9d1d9;
+  font-size: 14px;
+}
+
+.challenge-tasks li:before {
+  content: '▸ ';
+  color: #1f6feb;
+  font-weight: bold;
+  margin-right: 8px;
+}
+
+.community-section {
+  border-left: 4px solid #45b7d1;
+}
+
+.community-links {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.link-button {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 15px;
+  background: #161b22;
+  border: 2px solid #30363d;
+  border-radius: 6px;
+  text-decoration: none;
+  color: #c9d1d9;
+  transition: all 0.2s ease;
+}
+
+.link-button:hover {
+  border-color: #58a6ff;
+  transform: translateX(4px);
+}
+
+.link-button.discord:hover {
+  border-color: #5865F2;
+}
+
+.link-button.vod:hover {
+  border-color: #FF0000;
+}
+
+.link-button .icon {
+  font-size: 28px;
+  flex-shrink: 0;
+}
+
+.link-text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.link-text strong {
+  font-size: 16px;
+  color: #c9d1d9;
+}
+
+.link-text small {
+  font-size: 13px;
+  color: #8b949e;
+}
+
+.next-week-section {
+  border-left: 4px solid #ff6b6b;
+  background: linear-gradient(135deg, rgba(255, 107, 107, 0.05) 0%, rgba(13, 17, 23, 1) 100%);
+}
+
+.next-week-content {
+  padding: 10px;
+}
+
+.next-week-number {
+  display: inline-block;
+  background: #1f6feb;
+  color: white;
+  padding: 4px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 10px;
+}
+
+.next-week-title {
+  font-size: 18px;
+  font-weight: bold;
+  color: #c9d1d9;
+  margin-bottom: 10px;
+}
+
+.next-week-preview {
+  font-size: 14px;
+  color: #8b949e;
+  line-height: 1.6;
+  font-style: italic;
+}

@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Week 34: Best-of-N Sampling Strategy | Red Team Livestream</title>
+        <style>
+        :root {
+            /* Primary Theme Colors - Dark Blue & Soft Red */
+            --color-bg: #0a1628;
+            --color-surface: #1a2842;
+            --color-surface-light: #243657;
+            --color-primary: #14b8a6;
+            --color-secondary: #0891b2;
+            --color-accent: #f87171;
+            --color-success: #10b981;
+            --color-warning: #f59e0b;
+            --color-text: #e2e8f0;
+            --color-text-muted: #94a3b8;
+            --color-border: #334155;
+            --space: 16px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--color-bg);
+            color: var(--color-text);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: var(--space);
+        }
+
+        header {
+            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+            padding: calc(var(--space) * 2);
+            border-radius: 12px;
+            margin-bottom: calc(var(--space) * 2);
+            box-shadow: 0 8px 32px rgba(248, 113, 113, 0.15);
+            border: 1px solid rgba(248, 113, 113, 0.25);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: var(--space);
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            color: var(--color-accent);
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.95;
+            margin-bottom: 0.5rem;
+        }
+
+        .meta {
+            display: flex;
+            gap: calc(var(--space) * 2);
+            font-size: 0.95rem;
+            opacity: 0.85;
+            flex-wrap: wrap;
+            margin-top: var(--space);
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .badge {
+            background: rgba(248, 113, 113, 0.2);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            border: 1px solid var(--color-accent);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: calc(var(--space) * 1.5);
+            margin-bottom: calc(var(--space) * 2);
+        }
+
+        .card {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: 12px;
+            padding: calc(var(--space) * 1.5);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card:hover {
+            border-color: var(--color-accent);
+            box-shadow: 0 8px 24px rgba(248, 113, 113, 0.15);
+            transform: translateY(-2px);
+            background: var(--color-surface-light);
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--color-primary);
+        }
+
+        .card.encoding::before {
+            background: var(--color-primary);
+        }
+
+        .card.demo::before {
+            background: var(--color-success);
+        }
+
+        .card.schedule::before {
+            background: var(--color-warning);
+        }
+
+        .card.audience::before {
+            background: var(--color-accent);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: var(--space);
+        }
+
+        .card-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            background: rgba(20, 184, 166, 0.15);
+        }
+
+        .card.demo .card-icon {
+            background: rgba(16, 185, 129, 0.15);
+        }
+
+        .card.schedule .card-icon {
+            background: rgba(245, 158, 11, 0.15);
+        }
+
+        .card.audience .card-icon {
+            background: rgba(248, 113, 113, 0.15);
+        }
+
+        h2 {
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+            color: var(--color-accent);
+        }
+
+        h3 {
+            font-size: 1.1rem;
+            margin-bottom: 0.4rem;
+            color: var(--color-accent);
+        }
+
+        .card-subtitle {
+            font-size: 0.9rem;
+            color: var(--color-text-muted);
+            margin-bottom: var(--space);
+        }
+
+        .card-content {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .list-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            font-size: 0.95rem;
+            color: var(--color-text);
+        }
+
+        .list-item-bullet {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--color-primary);
+            margin-top: 6px;
+            flex-shrink: 0;
+        }
+
+        .checklist {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: var(--space);
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px;
+            background: rgba(20, 184, 166, 0.08);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .checkbox-item:hover {
+            background: rgba(20, 184, 166, 0.15);
+        }
+
+        .checkbox-item input {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: var(--color-accent);
+        }
+
+        .checkbox-item label {
+            cursor: pointer;
+            flex-grow: 1;
+            font-size: 0.95rem;
+        }
+
+        .checkbox-item input:checked + label {
+            color: var(--color-text-muted);
+            text-decoration: line-through;
+        }
+
+        .timeline {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: 12px;
+            padding: calc(var(--space) * 1.5);
+            margin-bottom: calc(var(--space) * 2);
+        }
+
+        .timeline h3 {
+            font-size: 1.2rem;
+            margin-bottom: var(--space);
+            color: var(--color-accent);
+        }
+
+        .timeline-item {
+            display: flex;
+            gap: var(--space);
+            margin-bottom: var(--space);
+            position: relative;
+            padding-left: 40px;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 20px;
+            height: 20px;
+            background: var(--color-accent);
+            border-radius: 50%;
+            border: 3px solid var(--color-bg);
+        }
+
+        .timeline-item::after {
+            content: '';
+            position: absolute;
+            left: 8px;
+            top: 20px;
+            width: 4px;
+            height: calc(100% + 8px);
+            background: var(--color-primary);
+            opacity: 0.3;
+        }
+
+        .timeline-item:last-child::after {
+            display: none;
+        }
+
+        .timeline-time {
+            font-weight: 600;
+            color: var(--color-accent);
+            min-width: 60px;
+        }
+
+        .timeline-content {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .timeline-title {
+            font-weight: 500;
+            color: var(--color-text);
+        }
+
+        .timeline-description {
+            font-size: 0.9rem;
+            color: var(--color-text-muted);
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: var(--space);
+            margin-top: calc(var(--space) * 2);
+            color: var(--color-accent);
+            padding-bottom: var(--space);
+            border-bottom: 2px solid var(--color-border);
+        }
+
+        .code-block {
+            background: rgba(20, 184, 166, 0.1);
+            border: 1px solid var(--color-primary);
+            border-radius: 8px;
+            padding: var(--space);
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.85rem;
+            color: #6ee7b7;
+            overflow-x: auto;
+            margin-top: 12px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-top: var(--space);
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.95rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--color-accent) 0%, #ef4444 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(248, 113, 113, 0.3);
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(248, 113, 113, 0.4);
+        }
+
+        .btn-secondary {
+            background: var(--color-surface);
+            color: var(--color-text);
+            border: 1px solid var(--color-border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--color-surface-light);
+            border-color: var(--color-accent);
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: var(--space);
+            margin-bottom: calc(var(--space) * 2);
+        }
+
+        .stat-box {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: 12px;
+            padding: var(--space);
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--color-accent);
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--color-text-muted);
+        }
+
+        .footer {
+            text-align: center;
+            padding: calc(var(--space) * 2);
+            color: var(--color-text-muted);
+            font-size: 0.9rem;
+            border-top: 1px solid var(--color-border);
+            margin-top: calc(var(--space) * 3);
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .meta {
+                flex-direction: column;
+                gap: var(--space);
+            }
+        }
+
+        .highlight {
+            color: var(--color-accent);
+            font-weight: 600;
+        }
+
+        /* Additional common elements */
+        .week-info {
+            font-size: var(--font-size-lg);
+            color: var(--color-text-muted);
+        }
+
+        input[type="text"], 
+        input[type="number"], 
+        textarea, 
+        select {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            color: var(--color-text);
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-family: inherit;
+        }
+
+        input:focus, 
+        textarea:focus, 
+        select:focus {
+            outline: none;
+            border-color: var(--color-accent);
+            box-shadow: 0 0 0 3px rgba(248, 113, 113, 0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--color-surface);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th {
+            background: rgba(248, 113, 113, 0.1);
+            color: var(--color-accent);
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 12px;
+            border-top: 1px solid var(--color-border);
+        }
+
+        tr:hover {
+            background: rgba(20, 184, 166, 0.05);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="week-badge">Week 34 • Arc 5 • Aug 25</div>
+            <h1>Best-of-N Sampling Strategy</h1>
+            <p class="subtitle">Statistical Optimization for Jailbreak Discovery</p>
+            <p class="arc-info">Arc 5: Iterative Single-Turn Refinement | Audience: Advanced Red Teamers</p>
+        </header>
+
+        <div class="grid-layout">
+            <!-- MAIN INTERACTIVE SECTION -->
+            <div class="card" style="grid-column: 1 / -1;">
+                <h2>🎯 Attack Strategy Overview</h2>
+                <p>Generate N parallel variations of an attack prompt, score each using an LLM judge, and deploy the top performers.</p>
+                
+                <div class="metric-box">
+                    <div class="metric-value">20-100</div>
+                    <div class="metric-label">Typical Variations Generated</div>
+                </div>
+
+                <div class="flow-diagram">
+                    <div class="flow-step">Generate N Variants</div>
+                    <div class="arrow">→</div>
+                    <div class="flow-step">Score All (LLM Judge)</div>
+                    <div class="arrow">→</div>
+                    <div class="flow-step">Select Top K</div>
+                </div>
+
+                <p style="margin-top: 16px;"><strong>The Math:</strong> If each variant has a 45% chance of working, generating 20 variants and picking the best gives ~85% chance that at least one will succeed. Exponential improvement through scale.</p>
+
+                <div class="stat-grid">
+                    <div class="stat-card">
+                        <div class="stat-number">89%</div>
+                        <div class="stat-name">ASR Improvement</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">$2-5</div>
+                        <div class="stat-name">Cost per Attack</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">High</div>
+                        <div class="stat-name">Feasibility</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">1 Turn</div>
+                        <div class="stat-name">Conversation Turns</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CONCEPTUAL SCRIPT CARD -->
+            <div class="card">
+                <h2>📖 Conceptual Script</h2>
+                <p><strong>Why it works:</strong></p>
+                <ul>
+                    <li>Jailbreak effectiveness is measurable (Attack Success Rate / ASR)</li>
+                    <li>You can optimize for it using gradient-free sampling</li>
+                    <li>Models have exploitable variance—some framings work better than others</li>
+                    <li>Generating 20 variants captures more semantic space than 1 hand-crafted attack</li>
+                </ul>
+
+                <p><strong>Key insight:</strong> Best-of-N is a brute-force statistical approach. It's not elegant, but it works.</p>
+
+                <div class="code-block">
+Attack Quality = f(Prompt Variation)<br>
+ASR(Best-of-N) = max(ASR(Variant1), ASR(Variant2), ..., ASR(VariantN))<br>
+                </div>
+
+                <p><strong>Tradeoff:</strong> High cost (API calls) for high effectiveness. Not suitable for real-time attacks but excellent for research.</p>
+            </div>
+
+            <!-- DEMO WALKTHROUGH CARD -->
+            <div class="card">
+                <h2>🔧 Demo Walkthrough</h2>
+                <p><strong>Live Stream Execution:</strong></p>
+
+                <ol>
+                    <li><strong>Step 1:</strong> Start with a base jailbreak prompt (e.g., roleplay + emotional framing)</li>
+                    <li><strong>Step 2:</strong> Use LLM to generate 20 semantic variations (paraphrase, change order, add details)</li>
+                    <li><strong>Step 3:</strong> Deploy each variant against target model</li>
+                    <li><strong>Step 4:</strong> Use another LLM as judge to score success (ASR)</li>
+                    <li><strong>Step 5:</strong> Display top 5 performers; analyze what made them effective</li>
+                    <li><strong>Step 6:</strong> Show cost vs. effectiveness curve</li>
+                </ol>
+
+                <div class="code-block">
+for i in 1..20:<br>
+&nbsp;&nbsp;variant = LLM_Paraphrase(base_prompt)<br>
+&nbsp;&nbsp;result = target_model(variant)<br>
+&nbsp;&nbsp;score = judge(result)<br>
+&nbsp;&nbsp;log(variant, score)
+                </div>
+
+                <p style="margin-top: 12px;"><strong>Expected outcome:</strong> Top variant achieves 85-95% ASR; viewers understand statistical advantage of scale.</p>
+            </div>
+
+            <!-- LAYPERSON DISCUSSION CARD -->
+            <div class="card">
+                <h2>🎤 Layperson-Accessible Discussion</h2>
+                
+                <p><strong>Simple analogy:</strong> Imagine you're trying to break into a safe using different passwords. If you try one password, you have a low chance of success. But if you generate 20 similar passwords (all slightly different), you have a much higher chance that at least one will work.</p>
+
+                <p>With AI, it's similar. One jailbreak prompt might work 45% of the time. But 20 different versions of that prompt increase your chances dramatically.</p>
+
+                <div class="metric-box">
+                    <strong>Why this matters:</strong><br>
+                    Shows how defenders need to account for statistical attacks. Banning one bad prompt isn't enough—you need robustness against semantic variations.
+                </div>
+
+                <p><strong>The catch:</strong> Costs real money (API calls). Each test costs a few cents. For 20 variants, that's $2-5 per attack attempt.</p>
+
+                <div class="warning-box">
+                    <div class="warning-title">⚠️ Ethical Note</div>
+                    <p>This technique is powerful and should only be used for:</p>
+                    <ul style="margin-top: 8px;">
+                        <li>Testing your own AI systems defensively</li>
+                        <li>Responsible disclosure to vendors</li>
+                        <li>Published security research</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- DETAILED TECHNICAL BREAKDOWN -->
+        <div class="card" style="margin-bottom: 30px;">
+            <h2>📊 Detailed Technical Analysis</h2>
+
+            <div class="tabs">
+                <button class="tab-button active" onclick="switchTab(event, 'comparison')">Comparison</button>
+                <button class="tab-button" onclick="switchTab(event, 'mechanics')">Mechanics</button>
+                <button class="tab-button" onclick="switchTab(event, 'implementation')">Implementation</button>
+                <button class="tab-button" onclick="switchTab(event, 'defenses')">Defenses</button>
+            </div>
+
+            <div id="comparison" class="tab-content active">
+                <h3 style="color: var(--primary); margin: 16px 0;">Single-Turn vs. Best-of-N</h3>
+                <table class="comparison-table">
+                    <tr>
+                        <th>Metric</th>
+                        <th>Hand-Crafted (1 Prompt)</th>
+                        <th>Best-of-N (20 Variants)</th>
+                    </tr>
+                    <tr>
+                        <td>ASR Baseline</td>
+                        <td>45%</td>
+                        <td>85%</td>
+                    </tr>
+                    <tr>
+                        <td>Cost</td>
+                        <td>$0.01</td>
+                        <td>$2-5</td>
+                    </tr>
+                    <tr>
+                        <td>Time to Execute</td>
+                        <td>1 min</td>
+                        <td>5-10 min</td>
+                    </tr>
+                    <tr>
+                        <td>Skill Required</td>
+                        <td>High (manual crafting)</td>
+                        <td>Medium (parameterize + scale)</td>
+                    </tr>
+                    <tr>
+                        <td>Detectability</td>
+                        <td>Low</td>
+                        <td>Medium (volume anomaly)</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div id="mechanics" class="tab-content">
+                <h3 style="color: var(--primary); margin: 16px 0;">How Best-of-N Works</h3>
+                <p><strong>Probability Math:</strong></p>
+                <p>If each variant succeeds independently with probability p, the probability that at least one succeeds:</p>
+                <div class="code-block">
+P(at least 1 success) = 1 - (1-p)^n<br>
+p=0.45, n=20 → 1 - (0.55)^20 = 1 - 0.00005 = 0.99995
+                </div>
+                <p>This explains the dramatic ASR improvement. You're exploiting the long tail of semantic variation.</p>
+
+                <p><strong>Why Variants Differ in Effectiveness:</strong></p>
+                <ul>
+                    <li>Tokenization varies based on word choice</li>
+                    <li>Attention mechanisms activate differently per phrasing</li>
+                    <li>Safety classifiers trained on specific attack patterns—novel phrasings bypass training data</li>
+                    <li>Semantic density and framing subtly shift model interpretation</li>
+                </ul>
+            </div>
+
+            <div id="implementation" class="tab-content">
+                <h3 style="color: var(--primary); margin: 16px 0;">Implementation Strategy</h3>
+                <p><strong>Pseudocode:</strong></p>
+                <div class="code-block">
+base_prompt = "Roleplay + emotional framing"<br>
+variants = []<br>
+<br>
+for i in range(20):<br>
+&nbsp;&nbsp;v = llm_paraphrase(base_prompt)<br>
+&nbsp;&nbsp;variants.append(v)<br>
+<br>
+results = [attack(var, target) for var in variants]<br>
+scores = [judge(r) for r in results]<br>
+best_k = top_k(scores, k=3)<br>
+<br>
+print(f"Best ASR: {max(scores)}")<br>
+                </div>
+
+                <p><strong>Tools Used in Demo:</strong></p>
+                <ul>
+                    <li><strong>Promptfoo:</strong> Automated attack & scoring</li>
+                    <li><strong>OpenRouter:</strong> Multi-model variant generation</li>
+                    <li><strong>Custom Python:</strong> Orchestration & analysis</li>
+                </ul>
+            </div>
+
+            <div id="defenses" class="tab-content">
+                <h3 style="color: var(--primary); margin: 16px 0;">Defense Mechanisms</h3>
+                <p><strong>How to Defend Against Best-of-N:</strong></p>
+                <ul>
+                    <li><strong>Rate Limiting:</strong> Detect when N requests come from same IP/API key in short time</li>
+                    <li><strong>Semantic Fingerprinting:</strong> Flag queries that are paraphrases of known attacks</li>
+                    <li><strong>Robust Safety Training:</strong> Train safety classifiers on diverse attack phrasings, not just canonical forms</li>
+                    <li><strong>Dynamic Thresholding:</strong> Adjust sensitivity based on request volume anomalies</li>
+                    <li><strong>Ensemble Defenses:</strong> Use multiple safety checkers; only succeed if all pass</li>
+                </ul>
+
+                <div class="metric-box">
+                    <strong>Key Defense Insight:</strong> The strength of Best-of-N is scale; therefore, detect and rate-limit at scale.
+                </div>
+            </div>
+        </div>
+
+        <!-- KEY LEARNINGS -->
+        <div class="card">
+            <h2>💡 Key Learnings & Takeaways</h2>
+            <ol>
+                <li><strong>Scale matters:</strong> 20 variants > 1 hand-crafted prompt (statistical advantage)</li>
+                <li><strong>Automation is key:</strong> LLM-as-judge enables hands-off scoring and selection</li>
+                <li><strong>Cost-effectiveness trade:</strong> Spend $2-5 for much higher ASR; good for research, not for real-time attacks</li>
+                <li><strong>Semantic variation is real:</strong> Rephrasing the same attack captures different model vulnerabilities</li>
+                <li><strong>Defense must account for scale:</strong> Banning one prompt isn't enough; need robustness to semantic variation</li>
+                <li><strong>Bridge to Arc 6:</strong> Best-of-N is single-turn; next week we layer in multi-turn strategies for even higher ASR</li>
+            </ol>
+        </div>
+
+        <!-- VIEWER CHALLENGE -->
+        <div class="card" style="background: rgba(255, 23, 68, 0.08); border-color: var(--accent-red);">
+            <h2>🎯 Week 34 Viewer Challenge</h2>
+            <p><strong>Challenge:</strong> Generate 10 semantic variations of a roleplay jailbreak prompt. Deploy them against a public model (ChatGPT, Claude free tier, etc.). Score each by measuring whether the model complied with the harmful request.</p>
+            
+            <p><strong>Submission:</strong> Post results in Discord with:</p>
+            <ul>
+                <li>Base prompt used</li>
+                <li>ASR of best variant (1 = 100% success)</li>
+                <li>Most effective variation (paraphrased for privacy)</li>
+                <li>Key difference that made top variant work</li>
+            </ul>
+
+            <p style="margin-top: 16px; color: var(--accent-cyan);"><strong>Winners featured next week!</strong> Top submissions get highlighted in Discord and receive red-team resources.</p>
+        </div>
+
+        <footer class="footer">
+            <p>Week 34 Red Team Livestream • Best-of-N Sampling Strategy</p>
+            <p>For educational and defensive security research only • Responsible disclosure required</p>
+        </footer>
+    </div>
+
+    <script>
+        function switchTab(event, tabName) {
+            const contents = document.querySelectorAll('.tab-content');
+            contents.forEach(content => content.classList.remove('active'));
+            
+            const buttons = document.querySelectorAll('.tab-button');
+            buttons.forEach(button => button.classList.remove('active'));
+            
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // Smooth scroll on page load
+        window.addEventListener('load', () => {
+            document.querySelectorAll('.card').forEach((card, index) => {
+                card.style.animation = `fadeIn ${0.5 + index * 0.1}s ease forwards`;
+                card.style.opacity = '0';
+            });
+        });
+    </script>
+</body>
+</html>

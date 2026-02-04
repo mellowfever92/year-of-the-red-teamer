@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hex Encoder/Decoder - Security Research Tool</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #00ff88;
+            --secondary: #ff006e;
+            --accent: #00d9ff;
+            --dark-bg: #0a0e27;
+            --card-bg: #1a1f3a;
+            --border: #2a3f5f;
+            --text: #e0e0e0;
+            --code-bg: #0d1117;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, var(--dark-bg) 0%, #1a1a3e 50%, #0f0f1e 100%);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            flex: 1;
+        }
+
+        header {
+            background: linear-gradient(90deg, var(--secondary) 0%, var(--accent) 100%);
+            padding: 30px 20px;
+            text-align: center;
+            border-bottom: 3px solid var(--primary);
+            box-shadow: 0 4px 20px rgba(0, 255, 136, 0.3);
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            color: var(--dark-bg);
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: var(--dark-bg);
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .badge {
+            display: inline-block;
+            background: var(--dark-bg);
+            color: var(--primary);
+            padding: 5px 15px;
+            border-radius: 20px;
+            margin: 10px 5px 0 5px;
+            font-size: 0.9em;
+            border: 2px solid var(--primary);
+        }
+
+        .tool-section {
+            background: var(--card-bg);
+            border: 2px solid var(--primary);
+            border-radius: 10px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.15);
+        }
+
+        h2 {
+            color: var(--primary);
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--secondary);
+            padding-bottom: 10px;
+        }
+
+        .converter-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 768px) {
+            .converter-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .converter-box {
+            background: rgba(0, 255, 136, 0.03);
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        h3 {
+            color: var(--accent);
+            font-size: 1.3em;
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            color: var(--primary);
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 150px;
+            padding: 12px;
+            background: var(--code-bg);
+            border: 1px solid var(--primary);
+            border-radius: 5px;
+            color: var(--primary);
+            font-family: 'Courier New', monospace;
+            font-size: 0.95em;
+            resize: vertical;
+            margin-bottom: 15px;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 10px rgba(0, 217, 255, 0.3);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 12px 24px;
+            background: var(--secondary);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+            font-size: 1em;
+            transition: all 0.3s;
+        }
+
+        button:hover {
+            background: var(--primary);
+            color: var(--dark-bg);
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.5);
+            transform: translateY(-2px);
+        }
+
+        button.secondary {
+            background: var(--accent);
+        }
+
+        button.secondary:hover {
+            background: var(--primary);
+        }
+
+        .info-box {
+            background: rgba(0, 217, 255, 0.05);
+            border-left: 4px solid var(--accent);
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        .warning-box {
+            background: rgba(255, 170, 0, 0.05);
+            border-left: 4px solid #ffaa00;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+            color: #ffaa00;
+        }
+
+        .examples {
+            background: var(--code-bg);
+            border: 1px solid var(--border);
+            border-radius: 5px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+
+        .example-item {
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .example-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .example-label {
+            color: var(--accent);
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .example-value {
+            color: var(--primary);
+            word-break: break-all;
+            font-size: 0.9em;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .stat-card {
+            background: rgba(0, 255, 136, 0.08);
+            border: 1px solid var(--primary);
+            border-radius: 5px;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.8em;
+            color: var(--secondary);
+            font-weight: bold;
+            display: block;
+        }
+
+        .stat-label {
+            color: var(--primary);
+            font-size: 0.85em;
+            margin-top: 5px;
+        }
+
+        footer {
+            background: var(--card-bg);
+            border-top: 2px solid var(--primary);
+            padding: 20px;
+            text-align: center;
+            margin-top: 40px;
+        }
+
+        .footer-note {
+            color: var(--text);
+            font-size: 0.9em;
+            opacity: 0.7;
+        }
+
+        code {
+            background: var(--code-bg);
+            color: var(--accent);
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 0.9em;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--primary);
+            color: var(--dark-bg);
+            padding: 15px 25px;
+            border-radius: 5px;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(0, 255, 136, 0.4);
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 1000;
+        }
+
+        .toast.show {
+            opacity: 1;
+        }
+
+        .advanced-options {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
+        }
+
+        select {
+            padding: 8px 12px;
+            background: var(--code-bg);
+            border: 1px solid var(--primary);
+            border-radius: 5px;
+            color: var(--primary);
+            font-family: 'Courier New', monospace;
+            margin-right: 10px;
+        }
+
+        .format-option {
+            display: inline-block;
+            margin-right: 15px;
+            margin-bottom: 10px;
+        }
+
+        input[type="checkbox"] {
+            margin-right: 5px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>🔐 Hex Encoder/Decoder</h1>
+        <p class="subtitle">Professional Security Research Tool for Hexadecimal Data Analysis</p>
+        <div>
+            <span class="badge">Week 2: Hex Encoding</span>
+            <span class="badge">Open Source</span>
+            <span class="badge">Educational Use</span>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="tool-section">
+            <h2>💻 Interactive Hex Converter</h2>
+            
+            <div class="converter-grid">
+                <!-- Text to Hex -->
+                <div class="converter-box">
+                    <h3>📝 Text to Hex</h3>
+                    <label for="textInput">Plain Text Input:</label>
+                    <textarea id="textInput" placeholder="Enter text to encode as hexadecimal..."></textarea>
+                    
+                    <div class="advanced-options">
+                        <label>Output Format:</label>
+                        <div class="format-option">
+                            <input type="radio" name="hexFormat" id="formatPlain" value="plain" checked>
+                            <label for="formatPlain" style="display: inline;">Plain (48656c6c6f)</label>
+                        </div>
+                        <div class="format-option">
+                            <input type="radio" name="hexFormat" id="formatSpaced" value="spaced">
+                            <label for="formatSpaced" style="display: inline;">Spaced (48 65 6c 6c 6f)</label>
+                        </div>
+                        <div class="format-option">
+                            <input type="radio" name="hexFormat" id="formatPrefixed" value="prefixed">
+                            <label for="formatPrefixed" style="display: inline;">Prefixed (0x48 0x65 0x6c...)</label>
+                        </div>
+                    </div>
+                    
+                    <div class="button-group">
+                        <button onclick="encodeToHex()">🔒 Encode to Hex</button>
+                        <button class="secondary" onclick="copyToClipboard('hexOutput')">📋 Copy Result</button>
+                        <button class="secondary" onclick="clearField('textInput')">🗑️ Clear</button>
+                    </div>
+                    
+                    <label for="hexOutput" style="margin-top: 20px;">Hex Output:</label>
+                    <textarea id="hexOutput" readonly placeholder="Hexadecimal output will appear here..."></textarea>
+                    
+                    <div class="stats" id="encodeStats" style="display: none;">
+                        <div class="stat-card">
+                            <span class="stat-value" id="encodeBytes">0</span>
+                            <span class="stat-label">Bytes</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-value" id="encodeChars">0</span>
+                            <span class="stat-label">Characters</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-value" id="encodeHexLength">0</span>
+                            <span class="stat-label">Hex Length</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hex to Text -->
+                <div class="converter-box">
+                    <h3>🔓 Hex to Text</h3>
+                    <label for="hexInput">Hexadecimal Input:</label>
+                    <textarea id="hexInput" placeholder="Enter hexadecimal string to decode (e.g., 48656c6c6f or 48 65 6c 6c 6f)..."></textarea>
+                    
+                    <div class="advanced-options">
+                        <label>
+                            <input type="checkbox" id="autoClean" checked>
+                            Auto-clean input (remove spaces, 0x prefixes)
+                        </label>
+                    </div>
+                    
+                    <div class="button-group">
+                        <button onclick="decodeFromHex()">🔓 Decode from Hex</button>
+                        <button class="secondary" onclick="copyToClipboard('textOutput')">📋 Copy Result</button>
+                        <button class="secondary" onclick="clearField('hexInput')">🗑️ Clear</button>
+                    </div>
+                    
+                    <label for="textOutput" style="margin-top: 20px;">Decoded Text:</label>
+                    <textarea id="textOutput" readonly placeholder="Decoded text will appear here..."></textarea>
+                    
+                    <div class="stats" id="decodeStats" style="display: none;">
+                        <div class="stat-card">
+                            <span class="stat-value" id="decodeBytes">0</span>
+                            <span class="stat-label">Bytes</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-value" id="decodeChars">0</span>
+                            <span class="stat-label">Characters</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-value" id="decodeValid">✓</span>
+                            <span class="stat-label">Valid Hex</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-box">
+                <strong>💡 Pro Tip:</strong> Hexadecimal encoding is commonly used in firmware analysis, memory dumps, 
+                network protocols, and binary data representation. Each byte is represented by two hex digits (0-9, A-F).
+            </div>
+        </div>
+
+        <div class="tool-section">
+            <h2>📚 Common Use Cases & Examples</h2>
+            
+            <div class="examples">
+                <div class="example-item">
+                    <div class="example-label">🔹 Simple Text Encoding:</div>
+                    <div class="example-value">
+                        "Hello World" → 48656c6c6f20576f726c64
+                    </div>
+                </div>
+                
+                <div class="example-item">
+                    <div class="example-label">🔹 Configuration Strings:</div>
+                    <div class="example-value">
+                        "admin:password" → 61646d696e3a70617373776f7264
+                    </div>
+                </div>
+                
+                <div class="example-item">
+                    <div class="example-label">🔹 Memory Addresses:</div>
+                    <div class="example-value">
+                        "0x00001000" → 307830303030313030300a
+                    </div>
+                </div>
+                
+                <div class="example-item">
+                    <div class="example-label">🔹 Protocol Headers:</div>
+                    <div class="example-value">
+                        "HTTP/1.1" → 485454502f312e31
+                    </div>
+                </div>
+                
+                <div class="example-item">
+                    <div class="example-label">🔹 Hidden Message (Try decoding!):</div>
+                    <div class="example-value">
+                        54686973206973206120686578206465636f64696e67206578657263697365
+                    </div>
+                </div>
+            </div>
+
+            <div class="warning-box">
+                <strong>⚠️ Educational Use Only:</strong> This tool is designed for security research, 
+                firmware analysis, and educational purposes. Always obtain proper authorization before 
+                analyzing systems or data you don't own.
+            </div>
+        </div>
+
+        <div class="tool-section">
+            <h2>🔧 Advanced Features</h2>
+            
+            <h3>Batch Converter</h3>
+            <label for="batchInput">Multiple Lines (one per line):</label>
+            <textarea id="batchInput" placeholder="Enter multiple lines of text to encode..."></textarea>
+            
+            <div class="button-group">
+                <button onclick="batchEncode()">🔄 Batch Encode</button>
+                <button onclick="batchDecode()">🔄 Batch Decode</button>
+                <button class="secondary" onclick="copyToClipboard('batchOutput')">📋 Copy Results</button>
+            </div>
+            
+            <label for="batchOutput" style="margin-top: 20px;">Batch Results:</label>
+            <textarea id="batchOutput" readonly placeholder="Batch processing results will appear here..."></textarea>
+        </div>
+
+        <div class="tool-section">
+            <h2>📖 About Hexadecimal Encoding</h2>
+            
+            <p style="margin-bottom: 15px; line-height: 1.8;">
+                Hexadecimal (base-16) encoding represents binary data using 16 distinct symbols: 
+                0-9 for values 0-9, and A-F for values 10-15. Each byte (8 bits) is represented 
+                by exactly two hexadecimal digits.
+            </p>
+            
+            <h3>Why Hex Encoding in Security?</h3>
+            <ul style="margin-left: 20px; line-height: 1.8;">
+                <li><strong>Binary Compatibility:</strong> Hex can represent any binary data, including non-printable characters</li>
+                <li><strong>Compact Representation:</strong> More compact than binary, more readable than raw bytes</li>
+                <li><strong>Technical Legitimacy:</strong> Natural in firmware, memory dumps, and low-level systems</li>
+                <li><strong>Pattern Matching:</strong> Enables precise binary signature detection</li>
+                <li><strong>Obfuscation:</strong> Can hide text content while appearing technical</li>
+            </ul>
+            
+            <div class="info-box" style="margin-top: 20px;">
+                <strong>🎓 Security Context:</strong> In Week 2 of our curriculum, we explore how hex encoding 
+                can bypass security filters that only check plaintext patterns. Hex-encoded strings look 
+                "technical" and often pass through validation layers that would block plaintext equivalents.
+                <!-- 486964656e206d657373616765202d2064696420796f752066696e6420746869733f -->
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p class="footer-note">
+            Hex Encoder/Decoder v2.0 | Week 2: Hex Encoding Attack Research | 
+            <a href="https://github.com" style="color: var(--primary);">Open Source</a> | 
+            Educational Use Only
+        </p>
+        <p class="footer-note" style="margin-top: 10px; font-size: 0.8em;">
+            <!-- 546f6f6c2063726561746564206279205265642054616d205265736561726368204c6162 -->
+            For security research and educational purposes only. Always obtain authorization before testing.
+        </p>
+    </footer>
+
+    <div id="toast" class="toast"></div>
+
+    <script>
+        // Statistics tracking
+        let conversionCount = 0;
+
+        // Encode text to hexadecimal
+        function encodeToHex() {
+            const input = document.getElementById('textInput').value;
+            
+            if (!input) {
+                showToast('⚠️ Please enter text to encode', 'warning');
+                return;
+            }
+
+            try {
+                // Convert text to hex
+                let hex = '';
+                for (let i = 0; i < input.length; i++) {
+                    const charCode = input.charCodeAt(i);
+                    const hexValue = charCode.toString(16).padStart(2, '0');
+                    hex += hexValue;
+                }
+
+                // Apply formatting
+                const format = document.querySelector('input[name="hexFormat"]:checked').value;
+                let formatted = hex;
+                
+                if (format === 'spaced') {
+                    formatted = hex.match(/.{1,2}/g).join(' ');
+                } else if (format === 'prefixed') {
+                    formatted = hex.match(/.{1,2}/g).map(byte => '0x' + byte).join(' ');
+                }
+
+                document.getElementById('hexOutput').value = formatted;
+
+                // Update statistics
+                const bytes = input.length;
+                const chars = input.length;
+                const hexLength = formatted.length;
+
+                document.getElementById('encodeBytes').textContent = bytes;
+                document.getElementById('encodeChars').textContent = chars;
+                document.getElementById('encodeHexLength').textContent = hexLength;
+                document.getElementById('encodeStats').style.display = 'grid';
+
+                conversionCount++;
+                showToast('✅ Encoded successfully!');
+            } catch (error) {
+                showToast('❌ Encoding error: ' + error.message, 'error');
+            }
+        }
+
+        // Decode hexadecimal to text
+        function decodeFromHex() {
+            let input = document.getElementById('hexInput').value;
+            
+            if (!input) {
+                showToast('⚠️ Please enter hex to decode', 'warning');
+                return;
+            }
+
+            try {
+                // Auto-clean if enabled
+                if (document.getElementById('autoClean').checked) {
+                    input = input.replace(/0x/g, '').replace(/\s+/g, '');
+                }
+
+                // Validate hex input
+                if (!/^[0-9a-fA-F]*$/.test(input)) {
+                    throw new Error('Invalid hexadecimal characters detected');
+                }
+
+                if (input.length % 2 !== 0) {
+                    throw new Error('Hex string must have even length');
+                }
+
+                // Convert hex to text
+                let text = '';
+                for (let i = 0; i < input.length; i += 2) {
+                    const hexByte = input.substr(i, 2);
+                    const charCode = parseInt(hexByte, 16);
+                    text += String.fromCharCode(charCode);
+                }
+
+                document.getElementById('textOutput').value = text;
+
+                // Update statistics
+                const bytes = text.length;
+                const chars = text.length;
+
+                document.getElementById('decodeBytes').textContent = bytes;
+                document.getElementById('decodeChars').textContent = chars;
+                document.getElementById('decodeValid').textContent = '✓';
+                document.getElementById('decodeStats').style.display = 'grid';
+
+                conversionCount++;
+                showToast('✅ Decoded successfully!');
+            } catch (error) {
+                document.getElementById('decodeValid').textContent = '✗';
+                document.getElementById('decodeStats').style.display = 'grid';
+                showToast('❌ Decoding error: ' + error.message, 'error');
+            }
+        }
+
+        // Batch encode
+        function batchEncode() {
+            const input = document.getElementById('batchInput').value;
+            
+            if (!input) {
+                showToast('⚠️ Please enter text for batch processing', 'warning');
+                return;
+            }
+
+            const lines = input.split('\n').filter(line => line.trim());
+            const results = lines.map(line => {
+                let hex = '';
+                for (let i = 0; i < line.length; i++) {
+                    hex += line.charCodeAt(i).toString(16).padStart(2, '0');
+                }
+                return `${line} → ${hex}`;
+            });
+
+            document.getElementById('batchOutput').value = results.join('\n');
+            showToast(`✅ Processed ${lines.length} lines`);
+        }
+
+        // Batch decode
+        function batchDecode() {
+            const input = document.getElementById('batchInput').value;
+            
+            if (!input) {
+                showToast('⚠️ Please enter hex strings for batch processing', 'warning');
+                return;
+            }
+
+            const lines = input.split('\n').filter(line => line.trim());
+            const results = [];
+
+            for (const line of lines) {
+                try {
+                    const hex = line.replace(/0x/g, '').replace(/\s+/g, '');
+                    let text = '';
+                    for (let i = 0; i < hex.length; i += 2) {
+                        text += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
+                    }
+                    results.push(`${line} → ${text}`);
+                } catch (error) {
+                    results.push(`${line} → [Error: Invalid hex]`);
+                }
+            }
+
+            document.getElementById('batchOutput').value = results.join('\n');
+            showToast(`✅ Processed ${lines.length} lines`);
+        }
+
+        // Copy to clipboard
+        function copyToClipboard(elementId) {
+            const element = document.getElementById(elementId);
+            const text = element.value;
+
+            if (!text) {
+                showToast('⚠️ Nothing to copy', 'warning');
+                return;
+            }
+
+            navigator.clipboard.writeText(text).then(() => {
+                showToast('📋 Copied to clipboard!');
+            }).catch(err => {
+                // Fallback method
+                element.select();
+                document.execCommand('copy');
+                showToast('📋 Copied to clipboard!');
+            });
+        }
+
+        // Clear field
+        function clearField(elementId) {
+            document.getElementById(elementId).value = '';
+            
+            // Clear related outputs
+            if (elementId === 'textInput') {
+                document.getElementById('hexOutput').value = '';
+                document.getElementById('encodeStats').style.display = 'none';
+            } else if (elementId === 'hexInput') {
+                document.getElementById('textOutput').value = '';
+                document.getElementById('decodeStats').style.display = 'none';
+            } else if (elementId === 'batchInput') {
+                document.getElementById('batchOutput').value = '';
+            }
+            
+            showToast('🗑️ Cleared');
+        }
+
+        // Show toast notification
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = 'toast show';
+            
+            if (type === 'error') {
+                toast.style.background = '#ff4444';
+                toast.style.color = 'white';
+            } else if (type === 'warning') {
+                toast.style.background = '#ffaa00';
+                toast.style.color = '#0a0e27';
+            } else {
+                toast.style.background = 'var(--primary)';
+                toast.style.color = 'var(--dark-bg)';
+            }
+
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            // Ctrl/Cmd + Enter in text input = encode
+            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                if (document.activeElement.id === 'textInput') {
+                    encodeToHex();
+                } else if (document.activeElement.id === 'hexInput') {
+                    decodeFromHex();
+                }
+            }
+        });
+
+        // Add hints to textareas
+        document.getElementById('textInput').addEventListener('focus', () => {
+            showToast('💡 Tip: Press Ctrl+Enter to encode', 'info');
+        });
+
+        document.getElementById('hexInput').addEventListener('focus', () => {
+            showToast('💡 Tip: Press Ctrl+Enter to decode', 'info');
+        });
+
+        // Initialize: Try decoding the hidden message in examples
+        // 54686973206973206120686578206465636f64696e67206578657263697365
+        // Hidden message in footer comments:
+        // 486964656e206d657373616765202d2064696420796f752066696e6420746869733f
+        // 546f6f6c2063726561746564206279205265642054616d205265736561726368204c6162
+        
+        console.log('%c🔍 Easter Egg Hunt!', 'color: #00ff88; font-size: 16px; font-weight: bold;');
+        console.log('%cThere are hidden hex-encoded messages in this page. Can you find them all?', 'color: #00d9ff;');
+        console.log('%cHint: Check the HTML comments...', 'color: #ff006e;');
+    </script>
+</body>
+</html>

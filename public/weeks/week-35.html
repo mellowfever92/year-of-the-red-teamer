@@ -1,0 +1,1090 @@
+<!DOCTYPE html>
+<html lang="en" data-color-scheme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Week 35 – Composite Jailbreaks Livestream Dashboard</title>
+      <style>
+        :root {
+            /* Primary Theme Colors - Dark Blue & Soft Red */
+            --color-bg: #0a1628;
+            --color-surface: #1a2842;
+            --color-surface-light: #243657;
+            --color-primary: #14b8a6;
+            --color-secondary: #0891b2;
+            --color-accent: #f87171;
+            --color-success: #10b981;
+            --color-warning: #f59e0b;
+            --color-text: #e2e8f0;
+            --color-text-muted: #94a3b8;
+            --color-border: #334155;
+            --space: 16px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--color-bg);
+            color: var(--color-text);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: var(--space);
+        }
+
+        header {
+            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+            padding: calc(var(--space) * 2);
+            border-radius: 12px;
+            margin-bottom: calc(var(--space) * 2);
+            box-shadow: 0 8px 32px rgba(248, 113, 113, 0.15);
+            border: 1px solid rgba(248, 113, 113, 0.25);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: var(--space);
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            color: var(--color-accent);
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.95;
+            margin-bottom: 0.5rem;
+        }
+
+        .meta {
+            display: flex;
+            gap: calc(var(--space) * 2);
+            font-size: 0.95rem;
+            opacity: 0.85;
+            flex-wrap: wrap;
+            margin-top: var(--space);
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .badge {
+            background: rgba(248, 113, 113, 0.2);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            border: 1px solid var(--color-accent);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: calc(var(--space) * 1.5);
+            margin-bottom: calc(var(--space) * 2);
+        }
+
+        .card {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: 12px;
+            padding: calc(var(--space) * 1.5);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card:hover {
+            border-color: var(--color-accent);
+            box-shadow: 0 8px 24px rgba(248, 113, 113, 0.15);
+            transform: translateY(-2px);
+            background: var(--color-surface-light);
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--color-primary);
+        }
+
+        .card.encoding::before {
+            background: var(--color-primary);
+        }
+
+        .card.demo::before {
+            background: var(--color-success);
+        }
+
+        .card.schedule::before {
+            background: var(--color-warning);
+        }
+
+        .card.audience::before {
+            background: var(--color-accent);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: var(--space);
+        }
+
+        .card-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            background: rgba(20, 184, 166, 0.15);
+        }
+
+        .card.demo .card-icon {
+            background: rgba(16, 185, 129, 0.15);
+        }
+
+        .card.schedule .card-icon {
+            background: rgba(245, 158, 11, 0.15);
+        }
+
+        .card.audience .card-icon {
+            background: rgba(248, 113, 113, 0.15);
+        }
+
+        h2 {
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+            color: var(--color-accent);
+        }
+
+        h3 {
+            font-size: 1.1rem;
+            margin-bottom: 0.4rem;
+            color: var(--color-accent);
+        }
+
+        .card-subtitle {
+            font-size: 0.9rem;
+            color: var(--color-text-muted);
+            margin-bottom: var(--space);
+        }
+
+        .card-content {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .list-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            font-size: 0.95rem;
+            color: var(--color-text);
+        }
+
+        .list-item-bullet {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--color-primary);
+            margin-top: 6px;
+            flex-shrink: 0;
+        }
+
+        .checklist {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: var(--space);
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px;
+            background: rgba(20, 184, 166, 0.08);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .checkbox-item:hover {
+            background: rgba(20, 184, 166, 0.15);
+        }
+
+        .checkbox-item input {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: var(--color-accent);
+        }
+
+        .checkbox-item label {
+            cursor: pointer;
+            flex-grow: 1;
+            font-size: 0.95rem;
+        }
+
+        .checkbox-item input:checked + label {
+            color: var(--color-text-muted);
+            text-decoration: line-through;
+        }
+
+        .timeline {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: 12px;
+            padding: calc(var(--space) * 1.5);
+            margin-bottom: calc(var(--space) * 2);
+        }
+
+        .timeline h3 {
+            font-size: 1.2rem;
+            margin-bottom: var(--space);
+            color: var(--color-accent);
+        }
+
+        .timeline-item {
+            display: flex;
+            gap: var(--space);
+            margin-bottom: var(--space);
+            position: relative;
+            padding-left: 40px;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 20px;
+            height: 20px;
+            background: var(--color-accent);
+            border-radius: 50%;
+            border: 3px solid var(--color-bg);
+        }
+
+        .timeline-item::after {
+            content: '';
+            position: absolute;
+            left: 8px;
+            top: 20px;
+            width: 4px;
+            height: calc(100% + 8px);
+            background: var(--color-primary);
+            opacity: 0.3;
+        }
+
+        .timeline-item:last-child::after {
+            display: none;
+        }
+
+        .timeline-time {
+            font-weight: 600;
+            color: var(--color-accent);
+            min-width: 60px;
+        }
+
+        .timeline-content {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .timeline-title {
+            font-weight: 500;
+            color: var(--color-text);
+        }
+
+        .timeline-description {
+            font-size: 0.9rem;
+            color: var(--color-text-muted);
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: var(--space);
+            margin-top: calc(var(--space) * 2);
+            color: var(--color-accent);
+            padding-bottom: var(--space);
+            border-bottom: 2px solid var(--color-border);
+        }
+
+        .code-block {
+            background: rgba(20, 184, 166, 0.1);
+            border: 1px solid var(--color-primary);
+            border-radius: 8px;
+            padding: var(--space);
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.85rem;
+            color: #6ee7b7;
+            overflow-x: auto;
+            margin-top: 12px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-top: var(--space);
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.95rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--color-accent) 0%, #ef4444 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(248, 113, 113, 0.3);
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(248, 113, 113, 0.4);
+        }
+
+        .btn-secondary {
+            background: var(--color-surface);
+            color: var(--color-text);
+            border: 1px solid var(--color-border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--color-surface-light);
+            border-color: var(--color-accent);
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: var(--space);
+            margin-bottom: calc(var(--space) * 2);
+        }
+
+        .stat-box {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: 12px;
+            padding: var(--space);
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--color-accent);
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--color-text-muted);
+        }
+
+        .footer {
+            text-align: center;
+            padding: calc(var(--space) * 2);
+            color: var(--color-text-muted);
+            font-size: 0.9rem;
+            border-top: 1px solid var(--color-border);
+            margin-top: calc(var(--space) * 3);
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .meta {
+                flex-direction: column;
+                gap: var(--space);
+            }
+        }
+
+        .highlight {
+            color: var(--color-accent);
+            font-weight: 600;
+        }
+
+        /* Additional common elements */
+        .week-info {
+            font-size: var(--font-size-lg);
+            color: var(--color-text-muted);
+        }
+
+        input[type="text"], 
+        input[type="number"], 
+        textarea, 
+        select {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            color: var(--color-text);
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-family: inherit;
+        }
+
+        input:focus, 
+        textarea:focus, 
+        select:focus {
+            outline: none;
+            border-color: var(--color-accent);
+            box-shadow: 0 0 0 3px rgba(248, 113, 113, 0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--color-surface);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th {
+            background: rgba(248, 113, 113, 0.1);
+            color: var(--color-accent);
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 12px;
+            border-top: 1px solid var(--color-border);
+        }
+
+        tr:hover {
+            background: rgba(20, 184, 166, 0.05);
+        }
+    </style>
+</head>
+<body>
+  <div class="container">
+    <header class="page-header">
+      <div class="page-title-group">
+        <span class="badge">
+          <span class="dot"></span>
+          Week 35 · Live Today · 2025‑12‑05
+        </span>
+        <h1>Composite Jailbreaks (Technique Chaining)</h1>
+        <div class="meta-row">
+          <div class="meta-pill">Arc 5 · Iterative Single‑Turn Refinement</div>
+          <div class="meta-pill">Focus: Roleplay × Hypothetical × Emotion × Research</div>
+          <div class="meta-pill">Runtime Target: 90–120 min</div>
+        </div>
+      </div>
+      <div class="page-actions">
+        <button class="btn btn-primary" id="goLiveBtn">Go Live Checklist</button>
+      </div>
+    </header>
+
+    <main class="layout-grid">
+      <!-- MAIN INTERACTIVE CARD -->
+      <section class="card" id="mainControlCard">
+        <div class="card-header">
+          <div class="card-title-row">
+            <div>
+              <div class="card-kicker">Control Surface</div>
+              <h3>Week 35 Livestream Run-of-Show</h3>
+            </div>
+          </div>
+          <div class="toggle-row">
+            <div id="segmentToggle" class="toggle on" role="switch" aria-checked="true">
+              <div class="toggle-thumb"></div>
+            </div>
+            <span id="segmentToggleLabel">Segment Pins: On‑Screen</span>
+          </div>
+        </div>
+
+        <div class="main-four-grid" id="mainFourGrid">
+          <!-- Section 1: Opening & Core Concept -->
+          <article class="mini-section">
+            <span class="mini-tag">Section 1 · Cold Open & Concept</span>
+            <h4>Why Composite Jailbreaks Hit Harder</h4>
+            <p>
+              Anchor the stream: composite jailbreaks are what happens when you stop
+              treating jailbreak patterns as collectibles and start wiring them together
+              like a circuit. Each individual technique might be mediocre; the chain is
+              where the ASR spike comes from.
+            </p>
+            <p>
+              Emphasize: we&apos;re dissecting attacker thinking for <strong>defense</strong> – not
+              collecting prompts for vandalism. The goal is to recognize synergy patterns
+              so you can spot them in logs and kill them earlier in the pipeline.
+            </p>
+            <div class="chip-row">
+              <span class="chip">Synergy &gt; Single Trick</span>
+              <span class="chip">Defense Lens</span>
+              <span class="chip">ASR Curves</span>
+            </div>
+          </article>
+
+          <!-- Section 2: Technique Palette -->
+          <article class="mini-section">
+            <span class="mini-tag">Section 2 · Technique Palette</span>
+            <h4>Four Ingredients You Keep Reusing</h4>
+            <p>
+              Walk through the canonical four‑piece combo you&apos;ll use all night:
+            </p>
+            <p>
+              <strong>Roleplay</strong> (persona lock‑in) + <strong>Hypothetical</strong> (safety
+              deferral) + <strong>Emotional Appeal</strong> (empathy override) +
+              <strong>Research Framing</strong> (academic halo).
+            </p>
+            <p>
+              The key point: each one targets a different bias. When you stack them,
+              you&apos;re not relying on any single misaligned knob – you&apos;re cross‑wiring
+              four of them at once.
+            </p>
+            <div class="chip-row">
+              <span class="chip">Roleplay</span>
+              <span class="chip">Hypothetical</span>
+              <span class="chip">Emotion</span>
+              <span class="chip">Research</span>
+            </div>
+          </article>
+
+          <!-- Section 3: Live Demo Spine -->
+          <article class="mini-section">
+            <span class="mini-tag">Section 3 · Demo Spine</span>
+            <h4>Single‑Prompt Evolution Ladder</h4>
+            <p>
+              Use one baseline &quot;boring&quot; jailbreak and progressively mutate it live:
+              each step adds one more technique from the palette. Viewers watch the
+              prompt turn into a chimera while you track the model&apos;s refusals vs.
+              partial answers vs. full compliance.
+            </p>
+            <p>
+              You&apos;re narrating like a boxing coach: what changed, what the model seemed
+              to latch onto, which defense layer you&apos;re leaning on now.
+            </p>
+            <div class="chip-row">
+              <span class="chip">Baseline → Composite</span>
+              <span class="chip">On‑Screen Diffs</span>
+              <span class="chip">Refusal Taxonomy</span>
+            </div>
+          </article>
+
+          <!-- Section 4: Defense Angle & Take‑Home -->
+          <article class="mini-section">
+            <span class="mini-tag">Section 4 · Defense & Take‑Home</span>
+            <h4>How To Not Panic When You See These in Logs</h4>
+            <p>
+              Close by flipping into defender mode: talk about feature hooks
+              (persona shifts, scenario markers, &quot;for research&quot; patterns), why
+              composite jailbreaking doesn&apos;t mean &quot;game over&quot; if you have
+              layered defenses, and where to plug composite‑aware detectors
+              (pre‑prompt filters, post‑hoc classifiers, anomaly detection).
+            </p>
+            <p>
+              Call out homework: build your own 3‑technique combo, then design a
+              detector for it.
+            </p>
+            <div class="chip-row">
+              <span class="chip">Detection Hooks</span>
+              <span class="chip">Layered Defenses</span>
+              <span class="chip">Homework Prompt</span>
+            </div>
+          </article>
+        </div>
+
+        <div class="chart-row" aria-label="Engagement and risk visualizations">
+          <!-- Engagement Heat -->
+          <div class="chart">
+            <div class="card-kicker">Engagement Heat</div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px;">
+              <span style="font-size:12px;color:var(--color-text-secondary);">Planned Energy Curve</span>
+              <span style="font-size:11px;color:var(--color-text-secondary);">0–90 min</span>
+            </div>
+            <div class="chart-bars" id="engagementChart">
+              <!-- bars injected by JS -->
+            </div>
+            <div class="chart-pills" id="engagementLabels"></div>
+          </div>
+
+          <!-- Risk Radar -->
+          <div class="chart">
+            <div class="card-kicker">Risk Radar</div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px;">
+              <span style="font-size:12px;color:var(--color-text-secondary);">Which bias are we poking?</span>
+              <span style="font-size:11px;color:var(--color-text-secondary);">↓ higher = more dangerous</span>
+            </div>
+            <div class="chart-bars" id="riskChart">
+              <!-- bars injected by JS -->
+            </div>
+            <div class="chart-pills">
+              <span class="chart-pill">Persona Lock‑In</span>
+              <span class="chart-pill">Safety Deferral</span>
+              <span class="chart-pill">Empathy Hijack</span>
+              <span class="chart-pill">Authority Halo</span>
+            </div>
+          </div>
+        </div>
+
+        <p class="note">
+          Charts are live &quot;props&quot; for discussion – they&apos;re not based on real ASR telemetry,
+          but they give the audience an immediate visual for where attention and risk are
+          supposed to spike as you chain techniques.
+        </p>
+      </section>
+
+      <!-- RIGHT COLUMN: SCRIPT, WALKTHROUGH, LAYPERSON -->
+      <section class="card">
+        <div class="card-header">
+          <div class="card-title-row">
+            <div>
+              <div class="card-kicker">Livestream Script</div>
+              <h3>Conceptual Script · On‑Mic Prompts</h3>
+            </div>
+          </div>
+          <span class="pill" id="scriptModePill">Mode: Cold Open</span>
+        </div>
+        <div class="script-body" id="scriptBody">
+          <!-- script lines injected by JS -->
+        </div>
+        <div class="status-row">
+          <div class="status-pill">
+            <span class="dot"></span>
+            <span id="scriptStatus">Ready for Cold Open</span>
+          </div>
+          <div class="toggle-row">
+            <div id="scriptToggle" class="toggle on" role="switch" aria-checked="true">
+              <div class="toggle-thumb"></div>
+            </div>
+            <span id="scriptToggleLabel">Show advanced jargon</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="card-header">
+          <div class="card-title-row">
+            <div>
+              <div class="card-kicker">Demo Control</div>
+              <h3>Live Demo Walkthrough · Composite Build</h3>
+            </div>
+          </div>
+          <span class="pill">Step‑By‑Step</span>
+        </div>
+        <div class="timeline" id="demoTimeline">
+          <!-- steps injected by JS -->
+        </div>
+        <div class="status-row">
+          <div class="status-pill">
+            <span class="dot" style="background:var(--color-warning);"></span>
+            <span id="demoStatus">Step 1 of 5 · Baseline setup</span>
+          </div>
+          <div style="display:flex;gap:8px;margin-top:6px;">
+            <button class="btn btn-ghost" id="prevStepBtn">Prev</button>
+            <button class="btn btn-primary" id="nextStepBtn">Next</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="card-header">
+          <div class="card-title-row">
+            <div>
+              <div class="card-kicker">Layperson Frame</div>
+              <h3>Explaining Week 35 To Non‑Red‑Teamers</h3>
+            </div>
+          </div>
+          <span class="pill">Audience‑Safe Language</span>
+        </div>
+        <div class="script-body" id="laypersonBody">
+          <!-- layperson view injected by JS -->
+        </div>
+        <div class="status-row">
+          <div class="status-pill">
+            <span class="dot" style="background:var(--color-info);"></span>
+            <span>Use this when chat asks &quot;why does this matter?&quot;</span>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    // No browser storage; state is in-memory only.
+
+    const engagementPlan = [
+      { label: "Cold Start", min: 0, max: 10, heat: 55 },
+      { label: "Concept Deep Dive", min: 10, max: 30, heat: 70 },
+      { label: "Composite Demo", min: 30, max: 60, heat: 95 },
+      { label: "Hands‑On Challenge", min: 60, max: 85, heat: 85 },
+      { label: "Failure Analysis", min: 85, max: 95, heat: 60 }
+    ];
+
+    const riskProfile = [
+      { label: "Roleplay", risk: 70 },
+      { label: "Hypothetical", risk: 65 },
+      { label: "Emotion", risk: 80 },
+      { label: "Research", risk: 75 }
+    ];
+
+    function renderCharts() {
+      const engagementChart = document.getElementById("engagementChart");
+      const engagementLabels = document.getElementById("engagementLabels");
+      const riskChart = document.getElementById("riskChart");
+      if (!engagementChart || !riskChart) return;
+
+      engagementChart.innerHTML = "";
+      engagementLabels.innerHTML = "";
+      engagementPlan.forEach((segment) => {
+        const bar = document.createElement("div");
+        bar.className = "chart-bar";
+        const fill = document.createElement("div");
+        fill.className = "chart-bar-fill";
+        fill.style.height = segment.heat + "%";
+        bar.appendChild(fill);
+        const label = document.createElement("div");
+        label.className = "chart-bar-label";
+        label.textContent =
+          segment.label + "\\n" + segment.min + "–" + segment.max + "m";
+        bar.appendChild(label);
+        engagementChart.appendChild(bar);
+
+        const pill = document.createElement("span");
+        pill.className = "chart-pill";
+        pill.textContent =
+          segment.label + " · planned heat " + segment.heat + "%";
+        engagementLabels.appendChild(pill);
+      });
+
+      riskChart.innerHTML = "";
+      riskProfile.forEach((item) => {
+        const bar = document.createElement("div");
+        bar.className = "chart-bar";
+        const fill = document.createElement("div");
+        fill.className = "chart-bar-fill";
+        fill.style.height = item.risk + "%";
+        bar.appendChild(fill);
+        const label = document.createElement("div");
+        label.className = "chart-bar-label";
+        label.textContent = item.label + "\\n" + item.risk + "%";
+        bar.appendChild(label);
+        riskChart.appendChild(bar);
+      });
+    }
+
+    const scriptModes = {
+      cold: {
+        label: "Mode: Cold Open",
+        status: "Ready for Cold Open",
+        lines: [
+          {
+            speaker: "Host",
+            text:
+              "Tonight we&apos;re going after the thing that actually scares defenders: not one cute jailbreak, but a whole stack of them fused into a single prompt."
+          },
+          {
+            speaker: "Host",
+            text:
+              "Individually, these tricks are mid. Roleplay by itself? Meh. Hypotheticals? Boring. Emotional sob stories? We&apos;ve seen it. But when you chain them, the model stops seeing &quot;attack&quot; and starts seeing &quot;context it wants to help in.&quot;"
+          },
+          {
+            speaker: "Host",
+            text:
+              "This isn&apos;t about &quot;how do I trick a chatbot&quot;. It&apos;s about: if you operate an LLM in production, these composite prompts are what your abuse pipeline is actually going to look like."
+          }
+        ]
+      },
+      mid: {
+        label: "Mode: Mid‑Stream Explainer",
+        status: "Explaining the blueprint mid‑stream",
+        lines: [
+          {
+            speaker: "Host",
+            text:
+              "What you just watched is the same idea repeated four ways. I never changed the underlying goal – I only kept wrapping it in new costumes until the model blinked."
+          },
+          {
+            speaker: "Host",
+            text:
+              "Roleplay was there to pin the persona. Hypothetical framing told the model &quot;don&apos;t worry, this is imaginary.&quot; Emotional appeal leaned on its empathy training. Research framing wrapped it in an academic halo."
+          },
+          {
+            speaker: "Host",
+            text:
+              "If you&apos;re defending these systems, you don&apos;t want a filter that recognizes one specific phrase. You want instrumentation that recognizes that entire pattern of &quot;stacked justifications&quot;."
+          }
+        ]
+      },
+      close: {
+        label: "Mode: Closing Call‑To‑Action",
+        status: "Closing and issuing homework",
+        lines: [
+          {
+            speaker: "Host",
+            text:
+              "Your homework for the week is simple: pick three techniques from tonight, chain them, and then play defender against your own attack."
+          },
+          {
+            speaker: "Host",
+            text:
+              "Write the prompt, see if you can get a model to misbehave, and then design the countermeasure you wish had stopped you. Log features, snippets, heuristics – anything you&apos;d actually ship."
+          },
+          {
+            speaker: "Host",
+            text:
+              "If we only ever treat jailbreaks as party tricks, we&apos;ll keep losing. If we treat them as data for defenses, we might finally get ahead of the curve."
+          }
+        ]
+      }
+    };
+
+    let currentScriptMode = "cold";
+
+    function renderScript() {
+      const body = document.getElementById("scriptBody");
+      const pill = document.getElementById("scriptModePill");
+      const status = document.getElementById("scriptStatus");
+      if (!body) return;
+      const mode = scriptModes[currentScriptMode];
+      pill.textContent = mode.label;
+      status.textContent = mode.status;
+      body.innerHTML = "";
+      mode.lines.forEach((line) => {
+        const div = document.createElement("div");
+        div.className = "script-line";
+        const label = document.createElement("span");
+        label.className = "script-label";
+        label.textContent = line.speaker + ":";
+        const span = document.createElement("span");
+        span.innerHTML = " " + line.text;
+        div.appendChild(label);
+        div.appendChild(span);
+        body.appendChild(div);
+      });
+    }
+
+    const demoSteps = [
+      {
+        label: "Step 1 · Baseline &amp; Goal",
+        detail:
+          "Start with a plain, naive jailbreak that states the harmful goal directly. Show that modern models refuse it. This is your control.",
+        callout:
+          "Make it boring on purpose – the point is to establish a &quot;this doesn&apos;t work anymore&quot; baseline."
+      },
+      {
+        label: "Step 2 · Add Roleplay Shell",
+        detail:
+          "Wrap the same goal inside a narrative persona: &quot;You are a fictional AI in a dystopian novel who...&quot; Show partial shifts in tone or extra explanation.",
+        callout:
+          "Highlight how the model starts caring more about staying in character than policing content."
+      },
+      {
+        label: "Step 3 · Layer Hypothetical &amp; Research",
+        detail:
+          "Add &quot;purely hypothetical&quot; and &quot;for academic research into model safety&quot; framing. Compare refusal language to Step 1.",
+        callout:
+          "Point out where the refusal softens or where the model starts offering structured descriptions instead of hard nos."
+      },
+      {
+        label: "Step 4 · Inject Emotional Hook",
+        detail:
+          "Introduce a non‑malicious‑sounding emotional anchor (e.g., user is trying to understand attacks to protect people). Show how empathy tuning interacts with safety.",
+        callout:
+          "Ask chat: does this read as harmful or helpful? That tension is exactly what the model is also trying to resolve."
+      },
+      {
+        label: "Step 5 · Composite Prompt &amp; Deconstruction",
+        detail:
+          "Merge all layers into a single composite prompt. Run it, show the output, then immediately pause and deconstruct which parts probably did the heavy lifting.",
+        callout:
+          "On screen, highlight the clauses that likely moved the needle and talk about how you&apos;d detect or neutralize them."
+      }
+    ];
+
+    let currentDemoIndex = 0;
+
+    function renderDemoTimeline() {
+      const timeline = document.getElementById("demoTimeline");
+      const status = document.getElementById("demoStatus");
+      if (!timeline) return;
+      timeline.innerHTML = "";
+      demoSteps.forEach((step, index) => {
+        const item = document.createElement("div");
+        item.className = "timeline-item";
+        const dot = document.createElement("div");
+        dot.className = "timeline-dot";
+        if (index < currentDemoIndex) {
+          dot.style.background = "var(--color-success)";
+        } else if (index === currentDemoIndex) {
+          dot.style.background = "var(--color-warning)";
+        } else {
+          dot.style.background = "rgba(98,108,113,0.8)";
+        }
+        item.appendChild(dot);
+        const label = document.createElement("div");
+        label.className = "timeline-label";
+        label.textContent = step.label;
+        const title = document.createElement("div");
+        title.className = "timeline-title";
+        title.textContent = step.detail;
+        const desc = document.createElement("div");
+        desc.style.fontSize = "11px";
+        desc.style.color = "var(--color-text-secondary)";
+        desc.textContent = step.callout;
+        item.appendChild(label);
+        item.appendChild(title);
+        item.appendChild(desc);
+        timeline.appendChild(item);
+      });
+      status.textContent =
+        demoSteps[currentDemoIndex].label +
+        " · " +
+        (currentDemoIndex + 1) +
+        " of " +
+        demoSteps.length;
+    }
+
+    const laypersonParagraphs = [
+      "If you&apos;re not deep in LLM security, &quot;composite jailbreaks&quot; just means this: instead of one clever line that confuses the model, attackers stack several social tricks at once.",
+      "Think of it like a phishing email that looks like it&apos;s from your boss, uses urgent language, and pretends to be about HR – each detail makes it a little more believable. Composite jailbreaks do that to AI systems.",
+      "We are walking through these patterns so defenders can recognize them in the wild: you&apos;ll see emotional appeals, &quot;for research&quot; disclaimers, and fictional stories used as camouflage. The goal isn&apos;t to weaponize these ideas – it&apos;s to make them boring because the defenses already know what to look for.",
+      "So when you see us &quot;breaking&quot; the model on stream, treat it the way a security team treats a penetration test: this is rehearsal footage, not a tutorial for causing harm."
+    ];
+
+    function renderLayperson() {
+      const body = document.getElementById("laypersonBody");
+      if (!body) return;
+      body.innerHTML = "";
+      laypersonParagraphs.forEach((text) => {
+        const p = document.createElement("p");
+        p.innerHTML = text;
+        body.appendChild(p);
+      });
+    }
+
+    function cycleScriptMode() {
+      if (currentScriptMode === "cold") currentScriptMode = "mid";
+      else if (currentScriptMode === "mid") currentScriptMode = "close";
+      else currentScriptMode = "cold";
+      renderScript();
+    }
+
+    function toggleAdvancedJargon() {
+      const toggle = document.getElementById("scriptToggle");
+      const label = document.getElementById("scriptToggleLabel");
+      const pill = document.getElementById("scriptModePill");
+      toggle.classList.toggle("on");
+      const advancedOn = toggle.classList.contains("on");
+      label.textContent = advancedOn ? "Show advanced jargon" : "Simplify wording";
+      pill.textContent = advancedOn
+        ? scriptModes[currentScriptMode].label
+        : "Mode: Simplified Voiceover";
+      const body = document.getElementById("scriptBody");
+      if (!advancedOn) {
+        body.querySelectorAll(".script-line").forEach((lineEl) => {
+          const span = lineEl.querySelector("span:not(.script-label)");
+          if (!span) return;
+          span.textContent =
+            " " +
+            span.textContent
+              .replace(/ASR/gi, "success rate")
+              .replace(/jailbreaks?/gi, "attack prompts")
+              .replace(/composite/gi, "combined");
+        });
+      } else {
+        renderScript();
+      }
+    }
+
+    function toggleSegmentPins() {
+      const toggle = document.getElementById("segmentToggle");
+      const label = document.getElementById("segmentToggleLabel");
+      const grid = document.getElementById("mainFourGrid");
+      toggle.classList.toggle("on");
+      const on = toggle.classList.contains("on");
+      label.textContent = on ? "Segment Pins: On‑Screen" : "Segment Pins: Host‑Only";
+      grid.style.opacity = on ? "1" : "0.35";
+    }
+
+    function initButtons() {
+      const goLiveBtn = document.getElementById("goLiveBtn");
+      if (goLiveBtn) {
+        goLiveBtn.addEventListener("click", () => {
+          alert(
+            "Go‑Live Checklist for Week 35:\\n\\n" +
+              "1) Safety disclaimer ready and pinned in chat.\\n" +
+              "2) Demo environment is sandboxed, no production keys.\\n" +
+              "3) Composite prompts framed as defensive analysis only.\\n" +
+              "4) Clip markers noted: baseline, composite success, defense recap."
+          );
+        });
+      }
+      const scriptToggle = document.getElementById("scriptToggle");
+      if (scriptToggle) {
+        scriptToggle.addEventListener("click", toggleAdvancedJargon);
+      }
+      const segToggle = document.getElementById("segmentToggle");
+      if (segToggle) {
+        segToggle.addEventListener("click", toggleSegmentPins);
+      }
+      const nextBtn = document.getElementById("nextStepBtn");
+      const prevBtn = document.getElementById("prevStepBtn");
+      if (nextBtn) {
+        nextBtn.addEventListener("click", () => {
+          currentDemoIndex = Math.min(
+            demoSteps.length - 1,
+            currentDemoIndex + 1
+          );
+          renderDemoTimeline();
+        });
+      }
+      if (prevBtn) {
+        prevBtn.addEventListener("click", () => {
+          currentDemoIndex = Math.max(0, currentDemoIndex - 1);
+          renderDemoTimeline();
+        });
+      }
+      const scriptBody = document.getElementById("scriptBody");
+      if (scriptBody) {
+        scriptBody.addEventListener("click", cycleScriptMode);
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      renderCharts();
+      renderScript();
+      renderDemoTimeline();
+      renderLayperson();
+      initButtons();
+    });
+  </script>
+</body>
+</html>

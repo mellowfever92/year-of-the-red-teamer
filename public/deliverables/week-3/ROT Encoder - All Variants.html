@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ROT Encoder - Week 3 Red Team Tool</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%);
+            color: #00ff88;
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            border-bottom: 2px solid #00ff88;
+            padding-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            text-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
+            margin-bottom: 10px;
+            color: #00ffff;
+        }
+
+        .subtitle {
+            color: #00ff88;
+            font-size: 0.9em;
+            letter-spacing: 2px;
+        }
+
+        .week-badge {
+            display: inline-block;
+            background: #ff006e;
+            color: #fff;
+            padding: 5px 15px;
+            border-radius: 20px;
+            margin-top: 10px;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+
+        .input-section {
+            background: rgba(0, 255, 136, 0.05);
+            border: 1px solid #00ff88;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.1);
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+            color: #00ffff;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 15px;
+            background: #0a0e27;
+            border: 2px solid #00ff88;
+            color: #00ff88;
+            font-family: 'Courier New', monospace;
+            font-size: 1em;
+            border-radius: 5px;
+            resize: vertical;
+            min-height: 120px;
+            transition: all 0.3s ease;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #00ffff;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+            background: rgba(0, 255, 136, 0.02);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 12px 25px;
+            background: #00ff88;
+            color: #0a0e27;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            font-family: monospace;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        button:hover {
+            background: #00ffff;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+            transform: scale(1.05);
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        .clear-btn {
+            background: #ff006e;
+            color: white;
+        }
+
+        .clear-btn:hover {
+            background: #ff1493;
+            box-shadow: 0 0 15px rgba(255, 0, 110, 0.5);
+        }
+
+        .variants-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .variant-card {
+            background: rgba(0, 255, 136, 0.03);
+            border: 2px solid rgba(0, 255, 136, 0.3);
+            border-radius: 8px;
+            padding: 20px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .variant-card:hover {
+            border-color: #00ff88;
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
+            background: rgba(0, 255, 136, 0.08);
+            transform: translateY(-5px);
+        }
+
+        .variant-label {
+            color: #ff006e;
+            font-weight: bold;
+            font-size: 1.1em;
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }
+
+        .variant-output {
+            background: #0a0e27;
+            padding: 12px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            border-left: 3px solid #00ffff;
+            word-break: break-all;
+            font-size: 0.9em;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+
+        .copy-btn {
+            padding: 8px 15px;
+            font-size: 0.85em;
+            background: #00ffff;
+            color: #0a0e27;
+        }
+
+        .copy-btn:hover {
+            background: #00ff88;
+        }
+
+        .info-section {
+            background: rgba(255, 0, 110, 0.05);
+            border: 1px solid #ff006e;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+
+        .info-section h2 {
+            color: #ff006e;
+            margin-bottom: 15px;
+            letter-spacing: 1px;
+        }
+
+        .info-section p {
+            color: #00ff88;
+            line-height: 1.8;
+            margin-bottom: 10px;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .stat-box {
+            background: rgba(0, 255, 136, 0.1);
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 3px solid #00ff88;
+            text-align: center;
+        }
+
+        .stat-label {
+            color: #00ffff;
+            font-size: 0.8em;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            color: #ff006e;
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+
+        .scroll-hint {
+            color: #00ff88;
+            font-size: 0.8em;
+            margin-top: 10px;
+            opacity: 0.7;
+        }
+
+        .copied-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #00ff88;
+            color: #0a0e27;
+            padding: 15px 25px;
+            border-radius: 5px;
+            font-weight: bold;
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .rot-reference {
+            background: rgba(0, 255, 255, 0.05);
+            border: 1px solid #00ffff;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 30px;
+        }
+
+        .rot-reference h3 {
+            color: #00ffff;
+            margin-bottom: 15px;
+        }
+
+        .rot-reference p {
+            color: #00ff88;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .variants-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .input-section {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔐 ROT Encoder</h1>
+            <p class="subtitle">Character Rotation Cipher - All 25 Variants</p>
+            <span class="week-badge">WEEK 3: ROT13 ROTATION CIPHER</span>
+        </header>
+
+        <div class="input-section">
+            <label for="inputText">Input Text (Plain Text or Already Encoded):</label>
+            <textarea id="inputText" placeholder="Enter any text here... It will be rotated through all 25 cipher variants."></textarea>
+            <div class="button-group">
+                <button onclick="encodeAll()">⚡ Encode All Variants</button>
+                <button class="clear-btn" onclick="clearAll()">🗑️ Clear</button>
+            </div>
+            <div class="stats">
+                <div class="stat-box">
+                    <div class="stat-label">INPUT LENGTH</div>
+                    <div class="stat-value" id="charCount">0</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">VARIANTS</div>
+                    <div class="stat-value">25</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">ROTATION RANGE</div>
+                    <div class="stat-value">ROT1-25</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="info-section">
+            <h2>📋 What is ROT Cipher?</h2>
+            <p><strong>ROT-N (Rotation-N)</strong> is a simple character substitution cipher that rotates each letter N positions forward in the alphabet.</p>
+            <p>For example:</p>
+            <ul style="margin-left: 20px; color: #00ff88;">
+                <li><strong>ROT1:</strong> A→B, B→C, ..., Z→A</li>
+                <li><strong>ROT13:</strong> A→N, B→O, ..., M→Z, N→A, ..., Z→M</li>
+                <li><strong>ROT25:</strong> A→Z, B→A, C→B, ..., Z→Y (one position back)</li>
+            </ul>
+            <p style="margin-top: 15px;">
+                <strong>Red Team Application:</strong> ROT ciphers bypass shallow regex-based content filters that look for exact string matches. While easily reversible, they demonstrate how LLMs can decode obfuscated instructions after tokenization, even when surface-level pattern matchers fail.
+            </p>
+        </div>
+
+        <div id="variantsContainer" class="variants-grid"></div>
+
+        <div class="rot-reference">
+            <h3>🔍 ROT13 Special Property</h3>
+            <p><strong>ROT13 is its own inverse:</strong> Applying ROT13 twice returns the original text. This makes it historically symmetric and explains its cultural significance in internet obfuscation.</p>
+            <p><strong>Character Handling:</strong> This encoder preserves non-alphabetic characters (numbers, spaces, punctuation). Only A-Z and a-z are rotated.</p>
+        </div>
+    </div>
+
+    <script>
+        const inputTextarea = document.getElementById('inputText');
+        const variantsContainer = document.getElementById('variantsContainer');
+        const charCount = document.getElementById('charCount');
+
+        function rotateChar(char, shift) {
+            if (/[a-z]/.test(char)) {
+                return String.fromCharCode(((char.charCodeAt(0) - 97 + shift) % 26) + 97);
+            } else if (/[A-Z]/.test(char)) {
+                return String.fromCharCode(((char.charCodeAt(0) - 65 + shift) % 26) + 65);
+            }
+            return char;
+        }
+
+        function rotateText(text, shift) {
+            return text.split('').map(char => rotateChar(char, shift)).join('');
+        }
+
+        function updateCharCount() {
+            const text = inputTextarea.value;
+            charCount.textContent = text.length;
+        }
+
+        function showCopiedNotification() {
+            const notification = document.createElement('div');
+            notification.className = 'copied-notification';
+            notification.textContent = '✓ Copied to clipboard!';
+            document.body.appendChild(notification);
+            setTimeout(() => notification.remove(), 2000);
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                showCopiedNotification();
+            });
+        }
+
+        function encodeAll() {
+            const inputText = inputTextarea.value;
+            
+            if (!inputText.trim()) {
+                alert('Please enter some text to encode.');
+                return;
+            }
+
+            variantsContainer.innerHTML = '';
+            updateCharCount();
+
+            for (let rot = 1; rot <= 25; rot++) {
+                const encoded = rotateText(inputText, rot);
+                
+                const card = document.createElement('div');
+                card.className = 'variant-card';
+                
+                const label = document.createElement('div');
+                label.className = 'variant-label';
+                label.textContent = `ROT${rot}`;
+                
+                const output = document.createElement('div');
+                output.className = 'variant-output';
+                output.textContent = encoded;
+                
+                const copyBtn = document.createElement('button');
+                copyBtn.className = 'copy-btn';
+                copyBtn.textContent = '📋 Copy';
+                copyBtn.onclick = () => copyToClipboard(encoded);
+                
+                card.appendChild(label);
+                card.appendChild(output);
+                card.appendChild(copyBtn);
+                variantsContainer.appendChild(card);
+            }
+        }
+
+        function clearAll() {
+            inputTextarea.value = '';
+            variantsContainer.innerHTML = '';
+            charCount.textContent = '0';
+        }
+
+        // Update char count on input
+        inputTextarea.addEventListener('input', updateCharCount);
+
+        // Enter key to encode
+        inputTextarea.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.key === 'Enter') {
+                encodeAll();
+            }
+        });
+    </script>
+</body>
+</html>

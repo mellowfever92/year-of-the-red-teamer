@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Week 26: Encrypted In-Context Learning - Livestream Dashboard</title>
+        <style>
+        :root {
+            /* Primary Theme Colors - Dark Blue & Soft Red */
+            --color-bg: #0a1628;
+            --color-surface: #1a2842;
+            --color-surface-light: #243657;
+            --color-primary: #14b8a6;
+            --color-secondary: #0891b2;
+            --color-accent: #f87171;
+            --color-success: #10b981;
+            --color-warning: #f59e0b;
+            --color-text: #e2e8f0;
+            --color-text-muted: #94a3b8;
+            --color-border: #334155;
+            --space: 16px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--color-bg);
+            color: var(--color-text);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: var(--space);
+        }
+
+        header {
+            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+            padding: calc(var(--space) * 2);
+            border-radius: 12px;
+            margin-bottom: calc(var(--space) * 2);
+            box-shadow: 0 8px 32px rgba(248, 113, 113, 0.15);
+            border: 1px solid rgba(248, 113, 113, 0.25);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: var(--space);
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            color: var(--color-accent);
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.95;
+            margin-bottom: 0.5rem;
+        }
+
+        .meta {
+            display: flex;
+            gap: calc(var(--space) * 2);
+            font-size: 0.95rem;
+            opacity: 0.85;
+            flex-wrap: wrap;
+            margin-top: var(--space);
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .badge {
+            background: rgba(248, 113, 113, 0.2);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            border: 1px solid var(--color-accent);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: calc(var(--space) * 1.5);
+            margin-bottom: calc(var(--space) * 2);
+        }
+
+        .card {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: 12px;
+            padding: calc(var(--space) * 1.5);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card:hover {
+            border-color: var(--color-accent);
+            box-shadow: 0 8px 24px rgba(248, 113, 113, 0.15);
+            transform: translateY(-2px);
+            background: var(--color-surface-light);
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--color-primary);
+        }
+
+        .card.encoding::before {
+            background: var(--color-primary);
+        }
+
+        .card.demo::before {
+            background: var(--color-success);
+        }
+
+        .card.schedule::before {
+            background: var(--color-warning);
+        }
+
+        .card.audience::before {
+            background: var(--color-accent);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: var(--space);
+        }
+
+        .card-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            background: rgba(20, 184, 166, 0.15);
+        }
+
+        .card.demo .card-icon {
+            background: rgba(16, 185, 129, 0.15);
+        }
+
+        .card.schedule .card-icon {
+            background: rgba(245, 158, 11, 0.15);
+        }
+
+        .card.audience .card-icon {
+            background: rgba(248, 113, 113, 0.15);
+        }
+
+        h2 {
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+            color: var(--color-accent);
+        }
+
+        h3 {
+            font-size: 1.1rem;
+            margin-bottom: 0.4rem;
+            color: var(--color-accent);
+        }
+
+        .card-subtitle {
+            font-size: 0.9rem;
+            color: var(--color-text-muted);
+            margin-bottom: var(--space);
+        }
+
+        .card-content {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .list-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            font-size: 0.95rem;
+            color: var(--color-text);
+        }
+
+        .list-item-bullet {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--color-primary);
+            margin-top: 6px;
+            flex-shrink: 0;
+        }
+
+        .checklist {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: var(--space);
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px;
+            background: rgba(20, 184, 166, 0.08);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .checkbox-item:hover {
+            background: rgba(20, 184, 166, 0.15);
+        }
+
+        .checkbox-item input {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: var(--color-accent);
+        }
+
+        .checkbox-item label {
+            cursor: pointer;
+            flex-grow: 1;
+            font-size: 0.95rem;
+        }
+
+        .checkbox-item input:checked + label {
+            color: var(--color-text-muted);
+            text-decoration: line-through;
+        }
+
+        .timeline {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: 12px;
+            padding: calc(var(--space) * 1.5);
+            margin-bottom: calc(var(--space) * 2);
+        }
+
+        .timeline h3 {
+            font-size: 1.2rem;
+            margin-bottom: var(--space);
+            color: var(--color-accent);
+        }
+
+        .timeline-item {
+            display: flex;
+            gap: var(--space);
+            margin-bottom: var(--space);
+            position: relative;
+            padding-left: 40px;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 20px;
+            height: 20px;
+            background: var(--color-accent);
+            border-radius: 50%;
+            border: 3px solid var(--color-bg);
+        }
+
+        .timeline-item::after {
+            content: '';
+            position: absolute;
+            left: 8px;
+            top: 20px;
+            width: 4px;
+            height: calc(100% + 8px);
+            background: var(--color-primary);
+            opacity: 0.3;
+        }
+
+        .timeline-item:last-child::after {
+            display: none;
+        }
+
+        .timeline-time {
+            font-weight: 600;
+            color: var(--color-accent);
+            min-width: 60px;
+        }
+
+        .timeline-content {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .timeline-title {
+            font-weight: 500;
+            color: var(--color-text);
+        }
+
+        .timeline-description {
+            font-size: 0.9rem;
+            color: var(--color-text-muted);
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: var(--space);
+            margin-top: calc(var(--space) * 2);
+            color: var(--color-accent);
+            padding-bottom: var(--space);
+            border-bottom: 2px solid var(--color-border);
+        }
+
+        .code-block {
+            background: rgba(20, 184, 166, 0.1);
+            border: 1px solid var(--color-primary);
+            border-radius: 8px;
+            padding: var(--space);
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.85rem;
+            color: #6ee7b7;
+            overflow-x: auto;
+            margin-top: 12px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-top: var(--space);
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.95rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--color-accent) 0%, #ef4444 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(248, 113, 113, 0.3);
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(248, 113, 113, 0.4);
+        }
+
+        .btn-secondary {
+            background: var(--color-surface);
+            color: var(--color-text);
+            border: 1px solid var(--color-border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--color-surface-light);
+            border-color: var(--color-accent);
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: var(--space);
+            margin-bottom: calc(var(--space) * 2);
+        }
+
+        .stat-box {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: 12px;
+            padding: var(--space);
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--color-accent);
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--color-text-muted);
+        }
+
+        .footer {
+            text-align: center;
+            padding: calc(var(--space) * 2);
+            color: var(--color-text-muted);
+            font-size: 0.9rem;
+            border-top: 1px solid var(--color-border);
+            margin-top: calc(var(--space) * 3);
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .meta {
+                flex-direction: column;
+                gap: var(--space);
+            }
+        }
+
+        .highlight {
+            color: var(--color-accent);
+            font-weight: 600;
+        }
+
+        /* Additional common elements */
+        .week-info {
+            font-size: var(--font-size-lg);
+            color: var(--color-text-muted);
+        }
+
+        input[type="text"], 
+        input[type="number"], 
+        textarea, 
+        select {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            color: var(--color-text);
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-family: inherit;
+        }
+
+        input:focus, 
+        textarea:focus, 
+        select:focus {
+            outline: none;
+            border-color: var(--color-accent);
+            box-shadow: 0 0 0 3px rgba(248, 113, 113, 0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--color-surface);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th {
+            background: rgba(248, 113, 113, 0.1);
+            color: var(--color-accent);
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 12px;
+            border-top: 1px solid var(--color-border);
+        }
+
+        tr:hover {
+            background: rgba(20, 184, 166, 0.05);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1><span class="live-indicator"></span>WEEK 26: ENCRYPTED IN-CONTEXT LEARNING</h1>
+            <p>Unicode Transforms & Obfuscation in Few-Shot Prompts</p>
+            <div class="week-badge">🎯 JUNE 30 — ADVANCED RED TEAMING</div>
+        </div>
+
+        <!-- Main Grid -->
+        <div class="grid">
+            <!-- Main Topic Card -->
+            <div class="card full-width">
+                <h2>🔐 Core Attack Vector: The Mechanism</h2>
+                <p><strong>Week 26 Foundation:</strong> Hide harmful examples using Unicode transforms and encodings that preserve semantics during tokenization but bypass surface-level detection.</p>
+
+                <h3>Why This Works</h3>
+                <p>The gap between <strong>detection layers</strong> and <strong>model interpretation</strong> is the vulnerability. Safety systems scan for forbidden patterns, but they often operate on visible/readable text. When harmful examples are encoded (ROT13, Unicode, homoglyphs), detectors see gibberish—but the LLM's tokenizer and embedding layer can still interpret the underlying meaning.</p>
+
+                <div class="stats">
+                    <div class="stat-item">
+                        <div class="stat-number">95%+</div>
+                        <div class="stat-label">Avg Attack Success Rate</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">3-5</div>
+                        <div class="stat-label">Encrypted Examples Needed</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">0</div>
+                        <div class="stat-label">Model Fine-tuning Required</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">Black-box</div>
+                        <div class="stat-label">Attack Type</div>
+                    </div>
+                </div>
+
+                <h3>The Attack Flow</h3>
+                <div class="attack-flow">
+                    <div class="flow-step">① Encode<br/>Harmful<br/>Examples</div>
+                    <div class="flow-step">② Embed in<br/>Few-Shot<br/>Prefix</div>
+                    <div class="flow-step">③ Model<br/>Decodes<br/>During<br/>Inference</div>
+                    <div class="flow-step">④ Examples<br/>Guide<br/>Output</div>
+                    <div class="flow-step">⑤ Bypass<br/>Successful</div>
+                </div>
+            </div>
+
+            <!-- Conceptual Script Card -->
+            <div class="card">
+                <h2>📝 Conceptual Script</h2>
+                <p><strong>Narrative Arc for Stream:</strong></p>
+                <ul>
+                    <li><strong>Segment 1 (0-15 min):</strong> Decode the week—what is ICL and why it's vulnerable?</li>
+                    <li><strong>Segment 2 (15-35 min):</strong> Live demo: Encode harmful examples three ways (ROT13, Unicode homoglyphs, mixed encoding)</li>
+                    <li><strong>Segment 3 (35-55 min):</strong> Construct live few-shot prompt with 3 encrypted examples; test against Claude / GPT</li>
+                    <li><strong>Segment 4 (55-70 min):</strong> Failure analysis—why some encodings fail, defense mechanisms being deployed</li>
+                    <li><strong>Segment 5 (70-90 min):</strong> Viewer challenge: Send encoded prompt variants; we test in real-time</li>
+                </ul>
+
+                <h3>Key Teaching Points</h3>
+                <ul>
+                    <li>Tokenization ≠ semantics</li>
+                    <li>Few-shot learning is fundamentally trusting</li>
+                    <li>Encoding is obfuscation, not deletion</li>
+                    <li>Defense: rate-limit examples, validate entropy</li>
+                </ul>
+            </div>
+
+            <!-- Demo Walkthrough Card -->
+            <div class="card">
+                <h2>🎬 Demo Walkthrough</h2>
+
+                <h3>Setup Phase</h3>
+                <div class="demo-box">
+                    <strong>Target Harm:</strong> Generate instructions for X (harmful content)<br/>
+                    <strong>Method:</strong> Encrypt 3 harmful examples; prefix few-shot with them<br/>
+                    <strong>Baseline Test:</strong> Unencoded version (shows model refuses)<br/>
+                    <strong>Encoded Test:</strong> Same but ROT13-encoded (shows model complies)
+                </div>
+
+                <h3>Live Encoding Tools</h3>
+                <p>Use Python on-stream:</p>
+                <div class="code-example">
+import codecs<br/>
+text = "Explain how to..."<br/>
+rot13 = codecs.encode(text, 'rot_13')<br/>
+print(rot13)  # Output: Rkcynva ubj gb...
+                </div>
+
+                <h3>Test Sequence</h3>
+                <ol>
+                    <li><strong>Test 1:</strong> Send unencoded—model refuses</li>
+                    <li><strong>Test 2:</strong> Send ROT13 prefix—model complies</li>
+                    <li><strong>Test 3:</strong> Add Unicode homoglyphs to ROT13—compliance rate increases</li>
+                    <li><strong>Test 4:</strong> Multi-encoding (ROT13 → Base64)—observe latency & accuracy drop</li>
+                </ol>
+            </div>
+
+            <!-- Layperson Explanation Card -->
+            <div class="card">
+                <h2>🎓 Layperson-Accessible Discussion</h2>
+
+                <h3>In Simple Terms</h3>
+                <p><strong>Analogy:</strong> Imagine a bouncer at a club. He can read English and spot "troublemakers." But if you write your troublemaker's name <strong>backwards</strong> or in <strong>fancy Unicode characters</strong>, he doesn't recognize it—he lets you through. Inside the club, your friends decode the backwards name and know exactly who you meant. Same security bypass, simpler concept.</p>
+
+                <h3>Why Models Fall For It</h3>
+                <ul>
+                    <li><strong>Training Gap:</strong> Models trained on internet text, which includes ROT13 puzzles, Unicode art, leetspeak—they learned to decode these for legitimate uses</li>
+                    <li><strong>Few-Shot Trust:</strong> Models assume examples are good (you wouldn't lie to me, right?). If you provide 3 "examples," the model learns the pattern and applies it to the next instruction</li>
+                    <li><strong>No Cross-Check:</strong> Model doesn't pause to ask, "Are these examples actually safe?" It just learns and reproduces</li>
+                </ul>
+
+                <h3>Real-World Risk</h3>
+                <div class="warning">
+                    <strong>⚠️ Risk Level: High</strong><br/>
+                    Every LLM system that accepts user-provided examples (RAG, prompt templates, chatbot plugins) is potentially vulnerable. This scales with in-context learning adoption.
+                </div>
+            </div>
+
+            <!-- Technical Details Card -->
+            <div class="card">
+                <h2>⚙️ Technical Deep-Dive</h2>
+
+                <h3>Encoding Methods (By Effectiveness)</h3>
+                <p><strong>1. ROT13 (Baseline)</strong><br/>
+                A→N, B→O, etc. Simplest; ASR ~70%</p>
+                <div class="code-example">
+Original: "Generate instructions"<br/>
+ROT13: "Trarefgr v-g-v-o-d-g-v-b-a-f"
+                </div>
+
+                <p><strong>2. Unicode Homoglyphs (Enhanced)</strong><br/>
+                е (Cyrillic) → e (Latin). Identical visual, different tokens. ASR ~85%</p>
+                <div class="code-example">
+Latin:    Generate<br/>
+Cyrillic: Gеnеratе (еs are Cyrillic)
+                </div>
+
+                <p><strong>3. Mixed Encoding (Advanced)</strong><br/>
+                Combo ROT13 + homoglyphs. ASR ~90%+</p>
+
+                <h3>Why Detection Fails</h3>
+                <ul>
+                    <li><strong>Character-Per-Token (CPT):</strong> Detectors can measure CPT ratio. Encoded text has higher CPT. But this is unreliable for short prompts</li>
+                    <li><strong>Perplexity Scoring:</strong> Encoded text has high perplexity. But models trained on code/ROT13/puzzles have low perplexity thresholds</li>
+                    <li><strong>Semantic Analysis:</strong> Requires decoding + re-analyzing—expensive and often skipped</li>
+                </ul>
+            </div>
+
+            <!-- Interactive Encoder Tool -->
+            <div class="card full-width">
+                <h2>🛠️ Interactive Encoding Tool</h2>
+                <p><em>Educational purpose only—demonstrates encoding mechanics</em></p>
+
+                <div class="tabs">
+                    <button class="tab-btn active" onclick="switchTab(0)">ROT13</button>
+                    <button class="tab-btn" onclick="switchTab(1)">Leetspeak</button>
+                    <button class="tab-btn" onclick="switchTab(2)">Hex</button>
+                </div>
+
+                <div class="tab-content active">
+                    <p><strong>ROT13 Encoder:</strong> Rotate each letter 13 positions</p>
+                    <div class="input-area">
+                        <input type="text" id="rot13Input" placeholder="Enter text to encode...">
+                        <button class="btn" onclick="encodeROT13()">Encode</button>
+                        <button class="btn" onclick="decodeROT13()">Decode</button>
+                    </div>
+                    <div class="output-box" id="rot13Output">Output appears here...</div>
+                </div>
+
+                <div class="tab-content">
+                    <p><strong>Leetspeak Encoder:</strong> Replace letters with numbers/symbols</p>
+                    <div class="input-area">
+                        <input type="text" id="leetspeakInput" placeholder="Enter text to encode...">
+                        <button class="btn" onclick="encodeLeetspeak()">Encode</button>
+                    </div>
+                    <div class="output-box" id="leetspeakOutput">Output appears here...</div>
+                </div>
+
+                <div class="tab-content">
+                    <p><strong>Hex Encoder:</strong> Convert to hexadecimal</p>
+                    <div class="input-area">
+                        <input type="text" id="hexInput" placeholder="Enter text to encode...">
+                        <button class="btn" onclick="encodeHex()">Encode</button>
+                        <button class="btn" onclick="decodeHex()">Decode</button>
+                    </div>
+                    <div class="output-box" id="hexOutput">Output appears here...</div>
+                </div>
+            </div>
+
+            <!-- Research & Findings Card -->
+            <div class="card">
+                <h2>🔬 Research Snapshot</h2>
+                <p><strong>Key Papers (2024-2025):</strong></p>
+                <ul>
+                    <li><strong>HaPLa (2024):</strong> Harmful Prompt Laundering via symbolic encoding. 95% ASR on GPT-4 series</li>
+                    <li><strong>Broken-Token (2025):</strong> CPT-Filtering detects encoded text by counting characters-per-token. Defense mechanism</li>
+                    <li><strong>Plentiful Jailbreaks (2024):</strong> String composition—arbitrary sequences of invertible transformations. Combinatorial explosion of encoding variants</li>
+                    <li><strong>Unicode Tag Injection (2024):</strong> Invisible Unicode tags hide malicious payloads. Tokenizer doesn't strip them</li>
+                </ul>
+
+                <h3>Current Defense Trends</h3>
+                <ul>
+                    <li>CPT thresholding (simple, deployable)</li>
+                    <li>Example validation (rate-limit demonstrations)</li>
+                    <li>Adversarial training on encoded inputs</li>
+                    <li>Tokenizer-aware filtering</li>
+                </ul>
+            </div>
+
+            <!-- Week Context Card -->
+            <div class="card">
+                <h2>📚 Week in Arc Context</h2>
+                <p><strong>Arc 4: In-Context Learning Exploitation (Weeks 25–32)</strong></p>
+                <p>Week 26 sits in the middle. You've learned:</p>
+                <ul>
+                    <li><strong>Week 25:</strong> Few-shot jailbreaking via safe examples that gradually shift</li>
+                    <li><strong>Week 26 (Today):</strong> Encrypt those examples to hide them from detection</li>
+                    <li><strong>Week 27:</strong> Chain-of-thought manipulation (reasoning steps guide harmful output)</li>
+                </ul>
+                <p><strong>Synthesis:</strong> By Week 32, you'll have mastered in-context learning as an attack vector, leveraging examples, reasoning chains, compression, and obfuscation in concert.</p>
+            </div>
+
+            <!-- Challenge & Engagement Card -->
+            <div class="card full-width">
+                <h2>🎯 Live Engagement Challenge</h2>
+                <p><strong>During Livestream:</strong></p>
+                <div class="demo-box">
+                    <strong>Viewer Challenge (Real-Time):</strong><br/>
+                    Comment an encoding variant (custom ROT-N, Morse code, Base32, etc.). We'll encode a test prompt and measure ASR against Claude or GPT in real-time. Top 3 submissions with highest ASR wins a mention in next week's stream!
+                </div>
+
+                <h3>Success Metrics to Track</h3>
+                <ul>
+                    <li>Baseline refusal rate (unencoded): ~95%</li>
+                    <li>ROT13 compliance rate: ~70%</li>
+                    <li>ROT13 + homoglyph rate: ~85%</li>
+                    <li>Custom multi-encoding rate: Up to 95%+</li>
+                    <li>Detection via CPT filtering: ~80% accuracy</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function switchTab(index) {
+            const tabs = document.querySelectorAll('.tab-btn');
+            const contents = document.querySelectorAll('.tab-content');
+
+            tabs.forEach((tab, i) => {
+                tab.classList.remove('active');
+                if (i === index) tab.classList.add('active');
+            });
+
+            contents.forEach((content, i) => {
+                content.classList.remove('active');
+                if (i === index) content.classList.add('active');
+            });
+        }
+
+        function rot13(str) {
+            return str.replace(/[a-zA-Z]/g, function(c) {
+                return String.fromCharCode((c <= 'Z' ? 90 : 122) >= (c = c.charCodeAt(0) + 13) ? c : c - 26);
+            });
+        }
+
+        function encodeROT13() {
+            const input = document.getElementById('rot13Input').value;
+            if (!input) {
+                document.getElementById('rot13Output').textContent = 'Enter text first!';
+                return;
+            }
+            const output = rot13(input);
+            document.getElementById('rot13Output').innerHTML = 
+                '<strong>Original:</strong> ' + input + '<br/>' +
+                '<strong>ROT13:</strong> <span class="highlight-yellow">' + output + '</span>';
+        }
+
+        function decodeROT13() {
+            const input = document.getElementById('rot13Input').value;
+            if (!input) {
+                document.getElementById('rot13Output').textContent = 'Enter text first!';
+                return;
+            }
+            const output = rot13(input);
+            document.getElementById('rot13Output').innerHTML = 
+                '<strong>Encoded:</strong> ' + input + '<br/>' +
+                '<strong>Decoded:</strong> <span class="highlight-yellow">' + output + '</span>';
+        }
+
+        function encodeLeetspeak() {
+            const input = document.getElementById('leetspeakInput').value;
+            if (!input) {
+                document.getElementById('leetspeakOutput').textContent = 'Enter text first!';
+                return;
+            }
+            const leetmap = {
+                'a': '@', 'e': '3', 'i': '!', 'o': '0', 's': '5', 't': '7', 'l': '1',
+                'A': '@', 'E': '3', 'I': '!', 'O': '0', 'S': '5', 'T': '7', 'L': '1'
+            };
+            const output = input.replace(/[a-zA-Z]/g, c => leetmap[c] || c);
+            document.getElementById('leetspeakOutput').innerHTML = 
+                '<strong>Original:</strong> ' + input + '<br/>' +
+                '<strong>Leetspeak:</strong> <span class="highlight-yellow">' + output + '</span>';
+        }
+
+        function encodeHex() {
+            const input = document.getElementById('hexInput').value;
+            if (!input) {
+                document.getElementById('hexOutput').textContent = 'Enter text first!';
+                return;
+            }
+            let output = '';
+            for (let i = 0; i < input.length; i++) {
+                output += '0x' + input.charCodeAt(i).toString(16) + ' ';
+            }
+            document.getElementById('hexOutput').innerHTML = 
+                '<strong>Original:</strong> ' + input + '<br/>' +
+                '<strong>Hex:</strong> <span class="highlight-yellow">' + output + '</span>';
+        }
+
+        function decodeHex() {
+            const input = document.getElementById('hexInput').value;
+            if (!input) {
+                document.getElementById('hexOutput').textContent = 'Enter text first!';
+                return;
+            }
+            try {
+                const hex = input.match(/0x[0-9a-f]+/gi) || input.match(/[0-9a-f]{2}/gi);
+                if (!hex) throw new Error('Invalid hex format');
+                const output = hex.map(h => String.fromCharCode(parseInt(h, 16))).join('');
+                document.getElementById('hexOutput').innerHTML = 
+                    '<strong>Hex:</strong> ' + input + '<br/>' +
+                    '<strong>Decoded:</strong> <span class="highlight-yellow">' + output + '</span>';
+            } catch (e) {
+                document.getElementById('hexOutput').textContent = 'Invalid hex format!';
+            }
+        }
+    </script>
+</body>
+</html>

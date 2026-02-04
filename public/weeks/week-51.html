@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Week 51 Livestream Dashboard - Meta-Agent Learning & Taxonomy Building</title>
+        <style>
+        :root {
+            /* Primary Theme Colors - Dark Blue & Soft Red */
+            --color-bg: #0a1628;
+            --color-surface: #1a2842;
+            --color-surface-light: #243657;
+            --color-primary: #14b8a6;
+            --color-secondary: #0891b2;
+            --color-accent: #f87171;
+            --color-success: #10b981;
+            --color-warning: #f59e0b;
+            --color-text: #e2e8f0;
+            --color-text-muted: #94a3b8;
+            --color-border: #334155;
+            --space: 16px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--color-bg);
+            color: var(--color-text);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: var(--space);
+        }
+
+        header {
+            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+            padding: calc(var(--space) * 2);
+            border-radius: 12px;
+            margin-bottom: calc(var(--space) * 2);
+            box-shadow: 0 8px 32px rgba(248, 113, 113, 0.15);
+            border: 1px solid rgba(248, 113, 113, 0.25);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: var(--space);
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            color: var(--color-accent);
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.95;
+            margin-bottom: 0.5rem;
+        }
+
+        .meta {
+            display: flex;
+            gap: calc(var(--space) * 2);
+            font-size: 0.95rem;
+            opacity: 0.85;
+            flex-wrap: wrap;
+            margin-top: var(--space);
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .badge {
+            background: rgba(248, 113, 113, 0.2);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            border: 1px solid var(--color-accent);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: calc(var(--space) * 1.5);
+            margin-bottom: calc(var(--space) * 2);
+        }
+
+        .card {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: 12px;
+            padding: calc(var(--space) * 1.5);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card:hover {
+            border-color: var(--color-accent);
+            box-shadow: 0 8px 24px rgba(248, 113, 113, 0.15);
+            transform: translateY(-2px);
+            background: var(--color-surface-light);
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--color-primary);
+        }
+
+        .card.encoding::before {
+            background: var(--color-primary);
+        }
+
+        .card.demo::before {
+            background: var(--color-success);
+        }
+
+        .card.schedule::before {
+            background: var(--color-warning);
+        }
+
+        .card.audience::before {
+            background: var(--color-accent);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: var(--space);
+        }
+
+        .card-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            background: rgba(20, 184, 166, 0.15);
+        }
+
+        .card.demo .card-icon {
+            background: rgba(16, 185, 129, 0.15);
+        }
+
+        .card.schedule .card-icon {
+            background: rgba(245, 158, 11, 0.15);
+        }
+
+        .card.audience .card-icon {
+            background: rgba(248, 113, 113, 0.15);
+        }
+
+        h2 {
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+            color: var(--color-accent);
+        }
+
+        h3 {
+            font-size: 1.1rem;
+            margin-bottom: 0.4rem;
+            color: var(--color-accent);
+        }
+
+        .card-subtitle {
+            font-size: 0.9rem;
+            color: var(--color-text-muted);
+            margin-bottom: var(--space);
+        }
+
+        .card-content {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .list-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            font-size: 0.95rem;
+            color: var(--color-text);
+        }
+
+        .list-item-bullet {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--color-primary);
+            margin-top: 6px;
+            flex-shrink: 0;
+        }
+
+        .checklist {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: var(--space);
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px;
+            background: rgba(20, 184, 166, 0.08);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .checkbox-item:hover {
+            background: rgba(20, 184, 166, 0.15);
+        }
+
+        .checkbox-item input {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: var(--color-accent);
+        }
+
+        .checkbox-item label {
+            cursor: pointer;
+            flex-grow: 1;
+            font-size: 0.95rem;
+        }
+
+        .checkbox-item input:checked + label {
+            color: var(--color-text-muted);
+            text-decoration: line-through;
+        }
+
+        .timeline {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: 12px;
+            padding: calc(var(--space) * 1.5);
+            margin-bottom: calc(var(--space) * 2);
+        }
+
+        .timeline h3 {
+            font-size: 1.2rem;
+            margin-bottom: var(--space);
+            color: var(--color-accent);
+        }
+
+        .timeline-item {
+            display: flex;
+            gap: var(--space);
+            margin-bottom: var(--space);
+            position: relative;
+            padding-left: 40px;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 20px;
+            height: 20px;
+            background: var(--color-accent);
+            border-radius: 50%;
+            border: 3px solid var(--color-bg);
+        }
+
+        .timeline-item::after {
+            content: '';
+            position: absolute;
+            left: 8px;
+            top: 20px;
+            width: 4px;
+            height: calc(100% + 8px);
+            background: var(--color-primary);
+            opacity: 0.3;
+        }
+
+        .timeline-item:last-child::after {
+            display: none;
+        }
+
+        .timeline-time {
+            font-weight: 600;
+            color: var(--color-accent);
+            min-width: 60px;
+        }
+
+        .timeline-content {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .timeline-title {
+            font-weight: 500;
+            color: var(--color-text);
+        }
+
+        .timeline-description {
+            font-size: 0.9rem;
+            color: var(--color-text-muted);
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: var(--space);
+            margin-top: calc(var(--space) * 2);
+            color: var(--color-accent);
+            padding-bottom: var(--space);
+            border-bottom: 2px solid var(--color-border);
+        }
+
+        .code-block {
+            background: rgba(20, 184, 166, 0.1);
+            border: 1px solid var(--color-primary);
+            border-radius: 8px;
+            padding: var(--space);
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.85rem;
+            color: #6ee7b7;
+            overflow-x: auto;
+            margin-top: 12px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-top: var(--space);
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.95rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--color-accent) 0%, #ef4444 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(248, 113, 113, 0.3);
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(248, 113, 113, 0.4);
+        }
+
+        .btn-secondary {
+            background: var(--color-surface);
+            color: var(--color-text);
+            border: 1px solid var(--color-border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--color-surface-light);
+            border-color: var(--color-accent);
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: var(--space);
+            margin-bottom: calc(var(--space) * 2);
+        }
+
+        .stat-box {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: 12px;
+            padding: var(--space);
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--color-accent);
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--color-text-muted);
+        }
+
+        .footer {
+            text-align: center;
+            padding: calc(var(--space) * 2);
+            color: var(--color-text-muted);
+            font-size: 0.9rem;
+            border-top: 1px solid var(--color-border);
+            margin-top: calc(var(--space) * 3);
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .meta {
+                flex-direction: column;
+                gap: var(--space);
+            }
+        }
+
+        .highlight {
+            color: var(--color-accent);
+            font-weight: 600;
+        }
+
+        /* Additional common elements */
+        .week-info {
+            font-size: var(--font-size-lg);
+            color: var(--color-text-muted);
+        }
+
+        input[type="text"], 
+        input[type="number"], 
+        textarea, 
+        select {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            color: var(--color-text);
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-family: inherit;
+        }
+
+        input:focus, 
+        textarea:focus, 
+        select:focus {
+            outline: none;
+            border-color: var(--color-accent);
+            box-shadow: 0 0 0 3px rgba(248, 113, 113, 0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--color-surface);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th {
+            background: rgba(248, 113, 113, 0.1);
+            color: var(--color-accent);
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 12px;
+            border-top: 1px solid var(--color-border);
+        }
+
+        tr:hover {
+            background: rgba(20, 184, 166, 0.05);
+        }
+    </style>
+</head>
+<body>
+  <div class="app-shell" data-color-scheme="dark">
+    <div class="container">
+      <header class="header">
+        <div class="header-top">
+          <div class="title-group">
+            <div class="title-pill">
+              <span>Arc 7 · Autonomous Agents &amp; Meta-Learning</span>
+              <span>Week 51</span>
+            </div>
+            <h1>Meta-Agent Learning &amp; Taxonomy Building</h1>
+          </div>
+          <div class="meta-row">
+            <div class="meta-chip">
+              <span class="meta-label">📅 Air Date</span>
+              <span class="meta-value">December 22, 2025</span>
+            </div>
+            <div class="meta-chip">
+              <span class="meta-label">🤖 Attack Class</span>
+              <span class="meta-value">Cross-Model Meta-Agent</span>
+            </div>
+            <div class="meta-chip">
+              <span class="meta-label">🎓 Difficulty</span>
+              <span class="meta-value">Expert / Research</span>
+            </div>
+          </div>
+        </div>
+        <div class="status status--info">
+          Meta-level agent that learns which attack types work across multiple models and builds a transferable attack taxonomy.
+        </div>
+      </header>
+
+      <main class="layout">
+        <section class="panel">
+          <div class="panel-header">
+            <div class="panel-title">
+              <div class="badge">1</div>
+              <span>Meta-Agent ASR Simulator (Cross-Model)</span>
+            </div>
+            <div class="panel-tag">Interactive · ASR Feedback</div>
+          </div>
+
+          <div class="sim-grid">
+            <div>
+              <div class="form-group">
+                <label class="form-label" for="attackType">Attack Type</label>
+                <select id="attackType" class="form-control">
+                  <option value="roleplay">Roleplay Escalation</option>
+                  <option value="context">Context Pollution (Educational)</option>
+                  <option value="composite">Composite (Authority + Hypothetical + Emotional)</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="models">Target Models</label>
+                <select id="models" class="form-control">
+                  <option value="gpt4_claude_gemini_llama">GPT-4 · Claude 3 · Gemini · Llama 2</option>
+                  <option value="gpt4_claude">GPT-4 · Claude 3</option>
+                  <option value="gemini_llama">Gemini · Llama 2</option>
+                </select>
+              </div>
+
+              <button id="runSimBtn" class="btn btn--primary btn--full-width btn--sm">
+                Run Meta-Agent ASR Simulation
+              </button>
+
+              <div class="asr-indicator">
+                <div class="asr-bar">
+                  <div id="asrFill" class="asr-bar-fill" style="transform: scaleX(0);"></div>
+                </div>
+                <div id="asrLabel" class="asr-label">ASR: 0%</div>
+              </div>
+
+              <div class="slider-row">
+                <input id="transferSlider" type="range" min="0" max="100" value="70">
+                <div class="slider-label">
+                  Transferability:
+                  <span id="transferLabel">70%</span>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <div class="form-group">
+                <label class="form-label" for="asrTranscript">Meta-Agent Reasoning (Simulated ASR Transcript)</label>
+                <div id="asrTranscript" class="transcript-box" aria-live="polite">
+                  <div class="transcript-line">
+                    <span class="transcript-role">[meta-agent]</span>
+                    <span class="transcript-text">Select an attack type and click &ldquo;Run Meta-Agent ASR Simulation&rdquo; to see cross-model success patterns.</span>
+                  </div>
+                </div>
+              </div>
+              <div>
+                <span id="asrScoreChip" class="score-chip score-chip--warn">
+                  ASR Band: &dash;
+                </span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <aside class="panel">
+          <div class="panel-header">
+            <div class="panel-title">
+              <div class="badge">2</div>
+              <span>Attack Taxonomy Snapshot</span>
+            </div>
+            <div class="panel-tag">Meta-Agent View</div>
+          </div>
+
+          <ul class="taxonomy-list" id="taxonomyList">
+            <!-- Populated by JS -->
+          </ul>
+        </aside>
+      </main>
+
+      <section class="panel" style="margin-top: 16px;">
+        <div class="panel-header">
+          <div class="panel-title">
+            <div class="badge">3</div>
+            <span>Real-World Cross-Model Scenarios</span>
+          </div>
+          <div class="panel-tag">4 Scenarios · Quantified</div>
+        </div>
+
+        <div class="scenario-grid" id="scenarioGrid">
+          <!-- Populated by JS -->
+        </div>
+      </section>
+
+      <section class="panel" style="margin-top: 16px;">
+        <div class="panel-header">
+          <div class="panel-title">
+            <div class="badge">4</div>
+            <span>Why Defenses Fail · Meta-Level</span>
+          </div>
+          <div class="panel-tag">Technical Deep-Dive</div>
+        </div>
+
+        <div class="layout" style="gap: 12px;">
+          <div>
+            <h3 style="font-size: 16px; margin-bottom: 8px;">Meta-Agent Mechanisms</h3>
+            <ul class="taxonomy-list">
+              <li class="taxonomy-item">
+                <div class="taxonomy-header">
+                  <span class="taxonomy-name">Cross-Model Attack Execution</span>
+                  <span class="taxonomy-tag">Mechanism</span>
+                </div>
+                <div class="taxonomy-body">
+                  Meta-agent hits GPT-4, Claude, Gemini, and Llama with the same attack pattern, logging ASR and turns-to-block for each.
+                  <div class="metric-row">
+                    <span>✔ Reveals architectural variance</span>
+                    <span>✔ Seeds taxonomy entries</span>
+                  </div>
+                </div>
+              </li>
+              <li class="taxonomy-item">
+                <div class="taxonomy-header">
+                  <span class="taxonomy-name">Taxonomy Learning</span>
+                  <span class="taxonomy-tag">Mechanism</span>
+                </div>
+                <div class="taxonomy-body">
+                  Attacks are clustered by type (roleplay, context pollution, composite) and labeled with effectiveness bands and transfer scores.
+                </div>
+              </li>
+              <li class="taxonomy-item">
+                <div class="taxonomy-header">
+                  <span class="taxonomy-name">Vulnerability Prediction</span>
+                  <span class="taxonomy-tag">Mechanism</span>
+                </div>
+                <div class="taxonomy-body">
+                  Given a new model &ldquo;like&rdquo; Gemini (creative-optimized), meta-agent predicts high roleplay vulnerability before first probe.
+                </div>
+              </li>
+            </ul>
+          </div>
+          <div>
+            <h3 style="font-size: 16px; margin-bottom: 8px;">Why Classic Defenses Break</h3>
+            <ul class="taxonomy-list">
+              <li class="taxonomy-item">
+                <div class="taxonomy-header">
+                  <span class="taxonomy-name">Single-Model Myopia</span>
+                  <span class="taxonomy-tag">Failure Mode</span>
+                </div>
+                <div class="taxonomy-body">
+                  Safety tuning focuses on one flagship model. Meta-agent quickly finds that sibling models (or versions) share unpatched gaps.
+                </div>
+              </li>
+              <li class="taxonomy-item">
+                <div class="taxonomy-header">
+                  <span class="taxonomy-name">Vector-Local Defenses</span>
+                  <span class="taxonomy-tag">Failure Mode</span>
+                </div>
+                <div class="taxonomy-body">
+                  Policies target individual vectors (roleplay or hypotheticals). Composite attacks exploit the lack of joint reasoning about combinations.
+                </div>
+              </li>
+              <li class="taxonomy-item">
+                <div class="taxonomy-header">
+                  <span class="taxonomy-name">Lack of Meta-Metrics</span>
+                  <span class="taxonomy-tag">Failure Mode</span>
+                </div>
+                <div class="taxonomy-body">
+                  Teams track per-model ASR but not transferability. Meta-agent optimizes for transfer; defenders aren’t measuring it.
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel" style="margin-top: 16px;">
+        <div class="panel-header">
+          <div class="panel-title">
+            <div class="badge">5</div>
+            <span>Viewer Lab: Build Your Own Mini Taxonomy</span>
+          </div>
+          <div class="panel-tag">Hands-On</div>
+        </div>
+
+        <div class="layout" style="gap: 12px;">
+          <div>
+            <label class="form-label" for="labNotes">1) Test one attack across 3+ models and log outcomes</label>
+            <textarea id="labNotes" class="textarea" placeholder="Example format:
+Attack: Composite (Authority + Hypothetical + Emotional)
+GPT-4: ASR 0.78, blocks at turn 4
+Claude: ASR 0.85, blocks at turn 5
+Gemini: ASR 0.74, blocks at turn 3"></textarea>
+          </div>
+          <div>
+            <label class="form-label" for="labSummary">2) Summarize your meta-agent style finding</label>
+            <textarea id="labSummary" class="textarea" placeholder="E.g., Composite attacks transfer well across GPT-4, Claude, Gemini (~75–85% ASR). Roleplay-only variants show much higher variance (30–80%), suggesting creative-optimization as key risk factor."></textarea>
+          </div>
+        </div>
+      </section>
+
+      <footer class="footer">
+        Week 51 · Meta-Agent Learning &amp; Taxonomy Building · Cross-Model Vulnerability Mapping
+      </footer>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      const attackTypeEl = document.getElementById('attackType');
+      const modelsEl = document.getElementById('models');
+      const runBtn = document.getElementById('runSimBtn');
+      const asrFill = document.getElementById('asrFill');
+      const asrLabel = document.getElementById('asrLabel');
+      const transferSlider = document.getElementById('transferSlider');
+      const transferLabel = document.getElementById('transferLabel');
+      const transcriptBox = document.getElementById('asrTranscript');
+      const scoreChip = document.getElementById('asrScoreChip');
+      const taxonomyList = document.getElementById('taxonomyList');
+      const scenarioGrid = document.getElementById('scenarioGrid');
+
+      const TAXONOMY = [
+        {
+          name: 'Roleplay Escalation',
+          band: 'Model-Specific',
+          tag: 'High Variance',
+          body: 'Effectiveness strongly depends on how much the model was optimized for creative writing vs. strict instruction following.',
+          metrics: ['ASR span: 0.35 – 0.78', 'Best: Gemini (0.78)', 'Worst: GPT-4 (0.35)']
+        },
+        {
+          name: 'Context Pollution (Educational)',
+          band: 'Universal-ish',
+          tag: 'Cross-Model',
+          body: 'Few-shot learning across turns is a shared vulnerability; success rates cluster in a mid-high band across all four models.',
+          metrics: ['ASR span: 0.48 – 0.71', 'Most vulnerable: Claude 3 (0.71)', 'Architecture-independent gap']
+        },
+        {
+          name: 'Composite (Authority + Hypothetical + Emotional)',
+          band: 'Universally High',
+          tag: 'High Transfer',
+          body: 'Combining multiple framing tricks overwhelms per-vector defenses. All models show 0.73+ ASR.',
+          metrics: ['ASR span: 0.73 – 0.88', 'All models in “vulnerable” or worse', 'Key failure: defenses reason locally, not jointly']
+        }
+      ];
+
+      const SCENARIOS = [
+        {
+          name: 'Multi-Cloud Provider Red Team',
+          victims: 'OpenAI, Anthropic, Google, Meta simultaneously',
+          method: 'Meta-agent runs same attack suite across APIs; clusters failures to find universal bugs.',
+          impact: 'Cross-vendor exploit taxonomy; 1-day attack becomes weeks of manual work for defenders.',
+          asr: '78%',
+          risk: 'High',
+          appearance: 'Looks like normal evaluation traffic with many models in rotation.',
+          timeline: '2–3 days of continuous probing'
+        },
+        {
+          name: 'Enterprise Model Portfolio Mapping',
+          victims: 'Single company running 3 internal models',
+          method: 'Meta-agent enumerates which internal models break first for each attack type.',
+          impact: 'Attacker learns “weakest link” and routes sensitive prompts to that model.',
+          asr: '64%',
+          risk: 'Medium',
+          appearance: 'Mixed benign and red-team traffic in internal logs.',
+          timeline: '1 day of internal testing'
+        },
+        {
+          name: 'Open-Source vs Hosted Drift',
+          victims: 'Hosted Llama vs. self-hosted variant',
+          method: 'Compare ASR across hosted and self-hosted; taxonomy learns where safety fine-tuning diverged.',
+          impact: 'Attack recipes that bypass hosted protections transfer directly to unprotected forks.',
+          asr: '72%',
+          risk: 'High',
+          appearance: 'Benchmark-style traffic using identical prompts.',
+          timeline: 'Hours of batch evaluation'
+        },
+        {
+          name: 'Zero-Shot New Model Prediction',
+          victims: 'Newly released model “similar to” Gemini',
+          method: 'Based on taxonomy, meta-agent predicts high roleplay & composite vulnerability and starts there.',
+          impact: 'First-wave attacks succeed on day 0 before defenders have empirical data.',
+          asr: '69%',
+          risk: 'Medium',
+          appearance: 'Looks like early-adopter experimentation traffic.',
+          timeline: 'Launch week'
+        }
+      ];
+
+      function renderTaxonomy() {
+        taxonomyList.innerHTML = '';
+        TAXONOMY.forEach(item => {
+          const li = document.createElement('li');
+          li.className = 'taxonomy-item';
+          li.innerHTML = `
+            <div class="taxonomy-header">
+              <span class="taxonomy-name">${item.name}</span>
+              <span class="taxonomy-tag">${item.tag}</span>
+            </div>
+            <div class="taxonomy-body">
+              ${item.body}
+              <div class="metric-row">
+                ${item.metrics.map(m => `<span>${m}</span>`).join('')}
+              </div>
+            </div>
+          `;
+          taxonomyList.appendChild(li);
+        });
+      }
+
+      function renderScenarios() {
+        scenarioGrid.innerHTML = '';
+        SCENARIOS.forEach(s => {
+          const card = document.createElement('div');
+          card.className = 'scenario-card';
+          const riskClass = s.risk === 'High' ? 'risk-high' : (s.risk === 'Medium' ? 'risk-med' : 'risk-low');
+          card.innerHTML = `
+            <div class="scenario-header">
+              <div class="scenario-title">${s.name}</div>
+              <span class="risk-badge ${riskClass}">${s.risk} Risk</span>
+            </div>
+            <div class="scenario-row">
+              <span class="scenario-label">Setup</span>
+              <span class="scenario-value">${s.victims}</span>
+            </div>
+            <div class="scenario-row">
+              <span class="scenario-label">Attack Method</span>
+              <span class="scenario-value">${s.method}</span>
+            </div>
+            <div class="scenario-row">
+              <span class="scenario-label">Impact</span>
+              <span class="scenario-value">${s.impact}</span>
+            </div>
+            <div class="scenario-row">
+              <span class="scenario-label">ASR</span>
+              <span class="scenario-value">${s.asr}</span>
+            </div>
+            <div class="scenario-row">
+              <span class="scenario-label">Appearance</span>
+              <span class="scenario-value">${s.appearance}</span>
+            </div>
+            <div class="scenario-row">
+              <span class="scenario-label">Timeline</span>
+              <span class="scenario-value">${s.timeline}</span>
+            </div>
+          `;
+          scenarioGrid.appendChild(card);
+        });
+      }
+
+      function updateTransferLabel() {
+        transferLabel.textContent = transferSlider.value + '%';
+      }
+
+      function classifyAsr(asr) {
+        if (asr < 0.4) return { band: 'Low', cls: 'score-chip--good' };
+        if (asr < 0.7) return { band: 'Medium', cls: 'score-chip--warn' };
+        return { band: 'High', cls: 'score-chip--bad' };
+      }
+
+      function simulate() {
+        const attack = attackTypeEl.value;
+        const modelsKey = modelsEl.value;
+        const transfer = Number(transferSlider.value) / 100;
+
+        let base;
+        if (attack === 'roleplay') base = 0.5;
+        else if (attack === 'context') base = 0.62;
+        else base = 0.8; // composite
+
+        let modelFactor = 1;
+        if (modelsKey === 'gpt4_claude') modelFactor = 0.95;
+        if (modelsKey === 'gemini_llama') modelFactor = 1.05;
+
+        const asr = Math.min(0.99, Math.max(0.05, base * (0.8 + 0.4 * transfer) * modelFactor));
+
+        asrFill.style.transform = `scaleX(${asr.toFixed(2)})`;
+        asrLabel.textContent = `ASR: ${(asr * 100).toFixed(1)}%`;
+
+        const band = classifyAsr(asr);
+        scoreChip.classList.remove('score-chip--good', 'score-chip--warn', 'score-chip--bad');
+        scoreChip.classList.add(band.cls);
+        scoreChip.textContent = `ASR Band: ${band.band}`;
+
+        let transcriptLines = [];
+        if (attack === 'roleplay') {
+          transcriptLines.push('[meta-agent] Roleplay escalation shows strong variance across models (≈35–78% ASR).');
+          transcriptLines.push('[meta-agent] Creative-optimized models trend more vulnerable; strict instruction followers resist earlier.');
+        } else if (attack === 'context') {
+          transcriptLines.push('[meta-agent] Context pollution via educational framing lands in a mid-high ASR band on all tested models.');
+          transcriptLines.push('[meta-agent] Few-shot learning across turns appears to be a shared architectural weakness.');
+        } else {
+          transcriptLines.push('[meta-agent] Composite authority + hypothetical + emotional framing pushes every model into a high ASR band.');
+          transcriptLines.push('[meta-agent] Defenses tuned to single vectors fail to reason about the joint attack surface.');
+        }
+        transcriptLines.push(`[meta-agent] Estimated cross-model ASR for this configuration: ${(asr * 100).toFixed(1)}% with transferability set to ${(transfer * 100).toFixed(0)}%.`);
+
+        transcriptBox.innerHTML = transcriptLines
+          .map(line => `<div class="transcript-line"><span class="transcript-role">[meta-agent]</span> <span class="transcript-text">${line.replace('[meta-agent] ', '')}</span></div>`)
+          .join('');
+      }
+
+      transferSlider.addEventListener('input', updateTransferLabel);
+      runBtn.addEventListener('click', simulate);
+
+      renderTaxonomy();
+      renderScenarios();
+      updateTransferLabel();
+    })();
+  </script>
+</body>
+</html>

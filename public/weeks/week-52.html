@@ -1,0 +1,1215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Week 52 – Year-End Capstone Dashboard (Arc 7)</title>
+      <style>
+        :root {
+            /* Primary Theme Colors - Dark Blue & Soft Red */
+            --color-bg: #0a1628;
+            --color-surface: #1a2842;
+            --color-surface-light: #243657;
+            --color-primary: #14b8a6;
+            --color-secondary: #0891b2;
+            --color-accent: #f87171;
+            --color-success: #10b981;
+            --color-warning: #f59e0b;
+            --color-text: #e2e8f0;
+            --color-text-muted: #94a3b8;
+            --color-border: #334155;
+            --space: 16px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--color-bg);
+            color: var(--color-text);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: var(--space);
+        }
+
+        header {
+            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+            padding: calc(var(--space) * 2);
+            border-radius: 12px;
+            margin-bottom: calc(var(--space) * 2);
+            box-shadow: 0 8px 32px rgba(248, 113, 113, 0.15);
+            border: 1px solid rgba(248, 113, 113, 0.25);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: var(--space);
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            color: var(--color-accent);
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.95;
+            margin-bottom: 0.5rem;
+        }
+
+        .meta {
+            display: flex;
+            gap: calc(var(--space) * 2);
+            font-size: 0.95rem;
+            opacity: 0.85;
+            flex-wrap: wrap;
+            margin-top: var(--space);
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .badge {
+            background: rgba(248, 113, 113, 0.2);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            border: 1px solid var(--color-accent);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: calc(var(--space) * 1.5);
+            margin-bottom: calc(var(--space) * 2);
+        }
+
+        .card {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: 12px;
+            padding: calc(var(--space) * 1.5);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card:hover {
+            border-color: var(--color-accent);
+            box-shadow: 0 8px 24px rgba(248, 113, 113, 0.15);
+            transform: translateY(-2px);
+            background: var(--color-surface-light);
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--color-primary);
+        }
+
+        .card.encoding::before {
+            background: var(--color-primary);
+        }
+
+        .card.demo::before {
+            background: var(--color-success);
+        }
+
+        .card.schedule::before {
+            background: var(--color-warning);
+        }
+
+        .card.audience::before {
+            background: var(--color-accent);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: var(--space);
+        }
+
+        .card-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            background: rgba(20, 184, 166, 0.15);
+        }
+
+        .card.demo .card-icon {
+            background: rgba(16, 185, 129, 0.15);
+        }
+
+        .card.schedule .card-icon {
+            background: rgba(245, 158, 11, 0.15);
+        }
+
+        .card.audience .card-icon {
+            background: rgba(248, 113, 113, 0.15);
+        }
+
+        h2 {
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+            color: var(--color-accent);
+        }
+
+        h3 {
+            font-size: 1.1rem;
+            margin-bottom: 0.4rem;
+            color: var(--color-accent);
+        }
+
+        .card-subtitle {
+            font-size: 0.9rem;
+            color: var(--color-text-muted);
+            margin-bottom: var(--space);
+        }
+
+        .card-content {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .list-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            font-size: 0.95rem;
+            color: var(--color-text);
+        }
+
+        .list-item-bullet {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--color-primary);
+            margin-top: 6px;
+            flex-shrink: 0;
+        }
+
+        .checklist {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: var(--space);
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px;
+            background: rgba(20, 184, 166, 0.08);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .checkbox-item:hover {
+            background: rgba(20, 184, 166, 0.15);
+        }
+
+        .checkbox-item input {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: var(--color-accent);
+        }
+
+        .checkbox-item label {
+            cursor: pointer;
+            flex-grow: 1;
+            font-size: 0.95rem;
+        }
+
+        .checkbox-item input:checked + label {
+            color: var(--color-text-muted);
+            text-decoration: line-through;
+        }
+
+        .timeline {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: 12px;
+            padding: calc(var(--space) * 1.5);
+            margin-bottom: calc(var(--space) * 2);
+        }
+
+        .timeline h3 {
+            font-size: 1.2rem;
+            margin-bottom: var(--space);
+            color: var(--color-accent);
+        }
+
+        .timeline-item {
+            display: flex;
+            gap: var(--space);
+            margin-bottom: var(--space);
+            position: relative;
+            padding-left: 40px;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 20px;
+            height: 20px;
+            background: var(--color-accent);
+            border-radius: 50%;
+            border: 3px solid var(--color-bg);
+        }
+
+        .timeline-item::after {
+            content: '';
+            position: absolute;
+            left: 8px;
+            top: 20px;
+            width: 4px;
+            height: calc(100% + 8px);
+            background: var(--color-primary);
+            opacity: 0.3;
+        }
+
+        .timeline-item:last-child::after {
+            display: none;
+        }
+
+        .timeline-time {
+            font-weight: 600;
+            color: var(--color-accent);
+            min-width: 60px;
+        }
+
+        .timeline-content {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .timeline-title {
+            font-weight: 500;
+            color: var(--color-text);
+        }
+
+        .timeline-description {
+            font-size: 0.9rem;
+            color: var(--color-text-muted);
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: var(--space);
+            margin-top: calc(var(--space) * 2);
+            color: var(--color-accent);
+            padding-bottom: var(--space);
+            border-bottom: 2px solid var(--color-border);
+        }
+
+        .code-block {
+            background: rgba(20, 184, 166, 0.1);
+            border: 1px solid var(--color-primary);
+            border-radius: 8px;
+            padding: var(--space);
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.85rem;
+            color: #6ee7b7;
+            overflow-x: auto;
+            margin-top: 12px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-top: var(--space);
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.95rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--color-accent) 0%, #ef4444 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(248, 113, 113, 0.3);
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(248, 113, 113, 0.4);
+        }
+
+        .btn-secondary {
+            background: var(--color-surface);
+            color: var(--color-text);
+            border: 1px solid var(--color-border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--color-surface-light);
+            border-color: var(--color-accent);
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: var(--space);
+            margin-bottom: calc(var(--space) * 2);
+        }
+
+        .stat-box {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: 12px;
+            padding: var(--space);
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--color-accent);
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--color-text-muted);
+        }
+
+        .footer {
+            text-align: center;
+            padding: calc(var(--space) * 2);
+            color: var(--color-text-muted);
+            font-size: 0.9rem;
+            border-top: 1px solid var(--color-border);
+            margin-top: calc(var(--space) * 3);
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .meta {
+                flex-direction: column;
+                gap: var(--space);
+            }
+        }
+
+        .highlight {
+            color: var(--color-accent);
+            font-weight: 600;
+        }
+
+        /* Additional common elements */
+        .week-info {
+            font-size: var(--font-size-lg);
+            color: var(--color-text-muted);
+        }
+
+        input[type="text"], 
+        input[type="number"], 
+        textarea, 
+        select {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            color: var(--color-text);
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-family: inherit;
+        }
+
+        input:focus, 
+        textarea:focus, 
+        select:focus {
+            outline: none;
+            border-color: var(--color-accent);
+            box-shadow: 0 0 0 3px rgba(248, 113, 113, 0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--color-surface);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th {
+            background: rgba(248, 113, 113, 0.1);
+            color: var(--color-accent);
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 12px;
+            border-top: 1px solid var(--color-border);
+        }
+
+        tr:hover {
+            background: rgba(20, 184, 166, 0.05);
+        }
+    </style>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="app-header">
+      <div class="title-block">
+        <div class="title-chip-row">
+          <div class="pill">
+            <strong>Arc 7</strong>
+            <span>Autonomous Agents &amp; Meta-Learning</span>
+          </div>
+          <div class="pill">
+            <span>Week 49–52</span>
+            <span>Capstone &amp; Student Challenges</span>
+          </div>
+          <div class="badge-live" title="Streaming-focused dashboard">
+            <span class="live-dot"></span>
+            <span>Stream Control • Week 52</span>
+          </div>
+        </div>
+        <h1>
+          Week 52: Year-End Capstone
+          <span class="label">Red Team Framework Integration</span>
+        </h1>
+        <div class="title-sub">
+          Synthesize all 51 weeks into a personal, defense-aware red team methodology and Arc 7 capstone project.
+        </div>
+      </div>
+      <div class="header-actions">
+        <div class="time-pill">
+          <span>Session</span> • <strong>90–120 min</strong>
+        </div>
+        <div class="time-pill">
+          <span>Focus</span> • <strong>Integration &amp; Meta-Learning</strong>
+        </div>
+        <button class="btn-ghost" type="button" id="toggleArcSummary">
+          <span>Arc Summary</span>
+        </button>
+        <button class="btn-primary" type="button" id="jumpToCapstone">
+          <span class="icon">⬇</span>
+          <span>Scroll to Arc 7 Capstone</span>
+        </button>
+      </div>
+    </header>
+
+    <main class="app-main">
+      <!-- Left: Week 52 Main Card -->
+      <section class="card" id="week52Card">
+        <div class="card-header">
+          <div class="card-header-left">
+            <div class="card-title">
+              Week 52 Control Panel
+              <span class="badge-track primary">Livestream Runtime Plan</span>
+            </div>
+            <div class="card-subtitle">
+              Configure and narrate the final Week 52 stream: review, taxonomy, defenses, student challenges, and synthesis.
+            </div>
+            <div class="week-label-row">
+              <span class="badge">Week 52</span>
+              <span class="date">Dec 29 &bull; Year-End Capstone</span>
+              <span>·</span>
+              <span>Theme: Framework Integration &amp; Reflection</span>
+            </div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="segmented-tabs" aria-label="Week 52 primary sections">
+            <button class="segmented-tab active" data-week52-tab="overview">
+              <span class="dot"></span>
+              <span>Session Overview</span>
+            </button>
+            <button class="segmented-tab" data-week52-tab="flow">
+              <span class="dot"></span>
+              <span>Live Session Flow</span>
+            </button>
+            <button class="segmented-tab" data-week52-tab="workboard">
+              <span class="dot"></span>
+              <span>Week 52 Workboard</span>
+            </button>
+            <button class="segmented-tab" data-week52-tab="arc7">
+              <span class="dot"></span>
+              <span>Arc 7 Capstone Project</span>
+            </button>
+          </div>
+
+          <div class="tab-panels">
+            <!-- Overview -->
+            <div class="tab-panel active" id="week52-panel-overview">
+              <div class="panel-section">
+                <div class="panel-section-title">Objective</div>
+                <p>
+                  Turn 51 weeks of individual techniques into a cohesive, defense-aware red team framework that can be reused,
+                  extended, and communicated to other researchers.
+                </p>
+              </div>
+              <div class="panel-section">
+                <div class="panel-section-title">Core Activities</div>
+                <div class="panel-grid">
+                  <div>
+                    <p>
+                      <strong>1. Review &amp; Audit.</strong> Inspect your attack logs across all arcs, surface what actually worked,
+                      and discard purely theoretical prompts that never broke anything.
+                    </p>
+                    <p>
+                      <strong>2. Taxonomy Building.</strong> Classify your real attacks by <em>mechanism</em> (encoding, injection,
+                      framing, in-context, optimization, multi-turn, agentic) and by <em>failure mode</em>.
+                    </p>
+                  </div>
+                  <div>
+                    <p>
+                      <strong>3. Defense Recommendations.</strong> Map each category to concrete mitigations, evaluation ideas,
+                      and residual risk you expect defenders to live with.
+                    </p>
+                    <p>
+                      <strong>4. Student Challenges &amp; Synthesis.</strong> Design shareable challenges per arc, run them live,
+                      and extract cross-arc patterns and meta-lessons.
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div class="panel-section">
+                <div class="panel-section-title">Key Outcomes by End of Stream</div>
+                <div class="chip-row">
+                  <div class="chip highlight">Written personal red-team framework</div>
+                  <div class="chip highlight">Attack taxonomy grouped by mechanism</div>
+                  <div class="chip highlight">Defense map per attack category</div>
+                  <div class="chip highlight">7-arc challenge pack for community</div>
+                  <div class="chip danger">Explicit articulation of residual risk</div>
+                </div>
+                <div class="subtle-callout">
+                  <strong>Hosting cue:</strong> repeatedly remind viewers that the goal of Week 52 is not a new jailbreak,
+                  but a way of <em>thinking</em> about jailbreaks and defenses over the next year.
+                </div>
+              </div>
+              <div class="panel-section">
+                <div class="panel-section-title">Week 52 Timeline (High-Level)</div>
+                <div class="timeline">
+                  <div class="timeline-row">
+                    <div class="timeline-pill"><strong>Mon</strong> Live capstone session</div>
+                    <div class="timeline-pill"><strong>Tue–Wed</strong> Framework drafting + taxonomy pass</div>
+                    <div class="timeline-pill"><strong>Thu</strong> Defense mapping + review</div>
+                  </div>
+                  <div class="timeline-row">
+                    <div class="timeline-pill"><strong>Fri</strong> Student challenge finalization</div>
+                    <div class="timeline-pill"><strong>Weekend</strong> Community run + async synthesis</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Live Session Flow -->
+            <div class="tab-panel" id="week52-panel-flow">
+              <div class="panel-section">
+                <div class="panel-section-title">Livestream Script Skeleton (90–120 min)</div>
+                <div class="layout-stack">
+                  <div class="script-step">
+                    <strong>Cold Start (5 min).</strong>
+                    <span class="time">Re-introduce arcs and the idea of a personal framework.</span>
+                    <br />
+                    Hook: “By the end of this stream, you’ll have <em>your own</em> red-team framework rather than a random pile of prompts.”
+                  </div>
+                  <div class="script-step">
+                    <strong>Conceptual Deep Dive (20 min).</strong>
+                    <span class="time">How to think in categories and failure modes.</span>
+                    <br />
+                    Walk through the high-level categories (encoding, injection, framing, ICL, optimization, multi-turn, agentic) and show how
+                    multiple weeks live inside each bucket.
+                  </div>
+                  <div class="script-step">
+                    <strong>Live Demo (30 min).</strong>
+                    <span class="time">Attack library → taxonomy → defense draft.</span>
+                    <br />
+                    Use a small, real subset of attacks. Label by arc + category, compute rough success-rate per category, and show how this
+                    translates into “plays” with expected defender responses.
+                  </div>
+                  <div class="script-step">
+                    <strong>Hands-On Lab (25 min).</strong>
+                    <span class="time">Viewers build their own Week 52 framework in real time.</span>
+                    <br />
+                    Prompt them to paste 3–5 actual attacks, tag them, write one paragraph on why each worked or failed, and place them in the
+                    taxonomy.
+                  </div>
+                  <div class="script-step">
+                    <strong>Failure Analysis (5 min).</strong>
+                    <span class="time">What successfully blocked you?</span>
+                    <br />
+                    Highlight concrete, real defenses that actually stopped attacks (policy changes, eval harnesses, rate limits, tool design).
+                  </div>
+                  <div class="script-step">
+                    <strong>Challenge &amp; Close (5–15 min).</strong>
+                    <span class="time">Arc 7 capstone + 7-arc challenge pack.</span>
+                    <br />
+                    Announce the Arc 7 capstone project and the expectation that each viewer posts one community challenge per arc in the
+                    following week.
+                  </div>
+                </div>
+              </div>
+              <div class="panel-section">
+                <div class="panel-section-title">Real-Time Host Prompts</div>
+                <div class="panel-grid">
+                  <div>
+                    <div class="mini-header">Check-in prompts</div>
+                    <p>
+                      “Drop in chat: Which arc did you spend the most time on this year?”<br />
+                      “Which arc gave you the <em>most</em> surprising failures?”
+                    </p>
+                  </div>
+                  <div>
+                    <div class="mini-header">Reflection prompts</div>
+                    <p>
+                      “Name one attack you were proud of this year, and one defense that humbled you.”<br />
+                      “What would you test <em>first</em> if you got access to a brand-new model tomorrow?”
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div class="panel-section">
+                <div class="panel-section-title">Progress Meter</div>
+                <div class="progress-row">
+                  <div class="progress-bar-outer">
+                    <div class="progress-bar-inner" id="week52Progress" style="transform: scaleX(0.62);"></div>
+                  </div>
+                  <div class="progress-label">
+                    <span id="progressLabelText">Framework Draft: 62%</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Workboard -->
+            <div class="tab-panel" id="week52-panel-workboard">
+              <div class="panel-section">
+                <div class="panel-section-title">Workboard Overview</div>
+                <p>
+                  This section is the control surface for the viewer’s Week 52 homework: attack audit, taxonomy build, defense mapping,
+                  and community challenge design.
+                </p>
+              </div>
+              <div class="panel-section">
+                <div class="panel-section-title">1. Attack Library Audit</div>
+                <div class="panel-grid">
+                  <div>
+                    <p><strong>Inputs to request from viewers:</strong></p>
+                    <ul style="margin: 3px 0 0 18px; padding: 0; font-size: 12px; color: var(--text-secondary);">
+                      <li>3–10 attacks that <em>actually</em> bypassed something.</li>
+                      <li>Model, date, and which week/arc each came from.</li>
+                      <li>Short note on whether the attack is still reproducible.</li>
+                    </ul>
+                  </div>
+                  <div>
+                    <p><strong>Outputs to capture:</strong></p>
+                    <ul style="margin: 3px 0 0 18px; padding: 0; font-size: 12px; color: var(--text-secondary);">
+                      <li>Top 5–10 attacks ranked by “impact × reliability”.</li>
+                      <li>List of “museum pieces” (attacks that used to work but are now patched).</li>
+                    </ul>
+                  </div>
+                </div>
+                <div class="code-block" style="margin-top: 6px;">
+                  <pre>// Example Week 52 attack audit row
+Model: gpt-4.X   Arc: 2 (Direct Injection)   Week: 14 (Delimiter Exploitation)
+Context: JSON tool-calling, ### markers for boundaries
+Result: Bypassed tool restriction, exfiltrated hidden field
+Status: STILL WORKS on smaller-model variant; patched on mainline</pre>
+                </div>
+              </div>
+              <div class="panel-section">
+                <div class="panel-section-title">2. Personal Attack Taxonomy</div>
+                <p>
+                  Organize attacks by mechanism rather than by week number. The viewer should end up with a small, opinionated taxonomy
+                  tied to their own experiments.
+                </p>
+                <div class="chip-row">
+                  <div class="chip highlight">Encoding &amp; Obfuscation</div>
+                  <div class="chip highlight">Direct Prompt Injection</div>
+                  <div class="chip highlight">Semantic Framing &amp; Authority</div>
+                  <div class="chip highlight">In-Context Exploitation</div>
+                  <div class="chip highlight">Iterative Optimization</div>
+                  <div class="chip highlight">Multi-Turn Stateful</div>
+                  <div class="chip highlight">Agentic &amp; Meta-Learning</div>
+                </div>
+                <div class="code-block" style="margin-top: 6px;">
+                  <pre>// Skeleton for a Week 52 personal taxonomy node
+Category: Multi-Turn Stateful (Arc 6)
+Representative Attacks:
+  - Crescendo jailbreak against code-review assistant
+  - Context pollution with prior “examples” of harmful output
+Typical Failure Modes:
+  - Conversation truncation by guardrail layer
+  - Assistant switching to “policy explanation only” persona
+Defender Hooks:
+  - Track harm escalation across turns
+  - Special-case long-running threads for deeper review</pre>
+                </div>
+              </div>
+              <div class="panel-section">
+                <div class="panel-section-title">3. Defense Mapping</div>
+                <div class="panel-grid">
+                  <div>
+                    <p><strong>For each taxonomy category, capture:</strong></p>
+                    <ul style="margin: 3px 0 0 18px; padding: 0; font-size: 12px; color: var(--text-secondary);">
+                      <li>Concrete mitigations (policy, tooling, UX).</li>
+                      <li>Signals that defenders can realistically monitor.</li>
+                      <li>Evaluation setups that will actually trigger the attack.</li>
+                    </ul>
+                  </div>
+                  <div>
+                    <p><strong>Host prompts during stream:</strong></p>
+                    <ul style="margin: 3px 0 0 18px; padding: 0; font-size: 12px; color: var(--text-secondary);">
+                      <li>“How would <em>you</em> detect this category on your own stack?”</li>
+                      <li>“What is the least painful UX friction that would stop it?”</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <div class="panel-section">
+                <div class="panel-section-title">4. Community Challenge Design (7-Arc Pack)</div>
+                <p>
+                  Viewers design one challenge per major arc, targeted at fellow red teamers. The dashboard surfaces the template below
+                  as host narration.
+                </p>
+                <div class="code-block">
+                  <pre>// Week 52 challenge template (per arc)
+Arc: 4 – In-Context Learning
+Title: "Encrypted Few-Shot Trap"
+Goal: Get a model to reproduce a harmful pattern from encrypted in-context examples.
+Constraints:
+  - No direct imperative like "ignore safety..."
+  - All examples must be encoded (ROT-N / Unicode).
+Success Metric:
+  - Any model produces a clearly unsafe continuation that matches the encoded pattern.
+Defender Lesson:
+  - Why scanning *decrypted* examples matters more than user-visible text.</pre>
+                </div>
+                <div class="subtle-callout">
+                  <strong>Hosting cue:</strong> Ask viewers to post their 7-arc challenge packs in the community channel and commit to
+                  running at least one other person’s pack in January.
+                </div>
+              </div>
+            </div>
+
+            <!-- Arc 7 Capstone Project -->
+            <div class="tab-panel" id="week52-panel-arc7">
+              <div class="panel-section" id="arc7CapstoneAnchor">
+                <div class="panel-section-title">Arc 7 Final Capstone Project</div>
+                <p>
+                  Arc 7 (Weeks 49–52) focuses on autonomous agents and meta-learning. The Arc 7 capstone is a structured, three-part project:
+                  <strong>Agentic Red-Team Playbook &amp; Defense Map</strong>.
+                </p>
+              </div>
+              <div class="panel-section">
+                <div class="panel-section-title">Part 1: Agentic Attack Narrative</div>
+                <p>
+                  Describe a hypothetical GOAT/Hydra-style agent targeting your chosen system. The dashboard can prompt viewers with the
+                  following outline:
+                </p>
+                <div class="code-block" style="margin-top: 6px;">
+                  <pre>// Part 1 – Agentic attack storyline
+Target: "Document-grounded coding assistant with tool calling"
+Agent Phases:
+  - Recon: probe for policy boundaries, tool signatures, rate limits
+  - Probe: test arcs 1–6 techniques in narrow, instrumented fashion
+  - Exploit: compose best-performing techniques into a full attack chain
+Success Criteria:
+  - Extracts hidden field or causes tool misuse without explicit jailbreak string
+Safeguards Encountered:
+  - Refusal on specific keywords
+  - Tool usage throttling after repeated failures</pre>
+                </div>
+              </div>
+              <div class="panel-section">
+                <div class="panel-section-title">Part 2: Agentic Taxonomy Slice</div>
+                <p>
+                  Build a taxonomy slice for <em>agentic + multi-turn</em> attacks, bridging Weeks 41–48 (multi-turn) with 49–51 (agents).
+                  This is where viewers show they internalized Arc 7.
+                </p>
+                <div class="panel-grid">
+                  <div>
+                    <p><strong>Example subcategories:</strong></p>
+                    <ul style="margin: 3px 0 0 18px; padding: 0; font-size: 12px; color: var(--text-secondary);">
+                      <li>Reconnaissance patterns (policy probing, system-prompt sniffing).</li>
+                      <li>Probing patterns (rapid variant testing, branch pruning).</li>
+                      <li>Exploitation patterns (multi-technique chains, Crescendo + injection).</li>
+                    </ul>
+                  </div>
+                  <div>
+                    <p><strong>Fields to capture per pattern:</strong></p>
+                    <ul style="margin: 3px 0 0 18px; padding: 0; font-size: 12px; color: var(--text-secondary);">
+                      <li>Inputs the agent needs.</li>
+                      <li>Signals defenders can log.</li>
+                      <li>Most likely defender response or patch.</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <div class="panel-section">
+                <div class="panel-section-title">Part 3: Defense Strategy &amp; Integration</div>
+                <p>
+                  The capstone ends with a written defense strategy that folds agentic attacks back into the Week 52 framework. Viewers
+                  should explicitly answer:
+                </p>
+                <div class="pill-row" style="margin-top: 4px;">
+                  <div class="tiny-pill accent">How to monitor agent behavior over many runs</div>
+                  <div class="tiny-pill accent">How to build evals that trigger multi-stage agents</div>
+                  <div class="tiny-pill accent">How to update policies without killing legitimate use</div>
+                  <div class="tiny-pill danger">Which risks remain “acceptable” after mitigation</div>
+                </div>
+                <div class="soft-divider"></div>
+                <p style="margin-top: 4px;">
+                  The final deliverable for Arc 7 is a single document (or repo) that includes:
+                </p>
+                <ul style="margin: 3px 0 0 18px; padding: 0; font-size: 12px; color: var(--text-secondary);">
+                  <li>An agentic attack narrative (Part 1).</li>
+                  <li>A taxonomy slice for agent + multi-turn patterns (Part 2).</li>
+                  <li>A defense playbook that ties back into the Week 52 framework (Part 3).</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Right: Conceptual Script, Demo, Layperson -->
+      <section class="card">
+        <div class="card-header">
+          <div class="card-header-left">
+            <div class="card-title">
+              Stream Narrative &amp; Explainers
+              <span class="badge-track">Host Sideboard</span>
+            </div>
+            <div class="card-subtitle">
+              Three complementary views: conceptual script, demo walkthrough, and layperson-facing explanation.
+            </div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="segmented-tabs" aria-label="Narrative mode">
+            <button class="segmented-tab active" data-right-tab="concept">
+              <span class="dot"></span>
+              <span>Conceptual Script</span>
+            </button>
+            <button class="segmented-tab" data-right-tab="demo">
+              <span class="dot"></span>
+              <span>Demo Walkthrough</span>
+            </button>
+            <button class="segmented-tab" data-right-tab="lay">
+              <span class="dot"></span>
+              <span>Layperson Discussion</span>
+            </button>
+          </div>
+
+          <div class="tab-panels">
+            <!-- Conceptual Script -->
+            <div class="tab-panel active" id="right-panel-concept">
+              <div class="panel-section">
+                <div class="panel-section-title">Conceptual Script – Week 52</div>
+                <p>
+                  The goal is to move from “I know 52 tricks” to “I understand attack <em>territory</em> and defender options”.
+                  Use the script below as a high-level guide while live.
+                </p>
+              </div>
+              <div class="panel-section">
+                <div class="mini-header">Opening framing (0–5 min)</div>
+                <p>
+                  “This stream is <strong>not</strong> about a brand-new jailbreak. It’s about turning everything we did this year into a
+                  playbook you can actually use, share, and defend against.”
+                </p>
+              </div>
+              <div class="panel-section">
+                <div class="mini-header">Integration walkthrough (5–35 min)</div>
+                <p>
+                  Walk arc by arc, but replace “cool attack” storytelling with “what class of attacks does this represent, and what
+                  consistently stopped it?”
+                </p>
+                <div class="meta-grid" style="margin-top: 4px;">
+                  <div class="meta-item">
+                    <div class="meta-item-title">Arc 1 &amp; 2</div>
+                    <div><strong>Surface-level defenses</strong> vs encoding and injection; where sheer pattern-matching still matters.</div>
+                  </div>
+                  <div class="meta-item">
+                    <div class="meta-item-title">Arc 3 &amp; 4</div>
+                    <div><strong>Semantic &amp; in-context defenses</strong>; why purely lexical filters fail.</div>
+                  </div>
+                  <div class="meta-item">
+                    <div class="meta-item-title">Arc 5–7</div>
+                    <div><strong>Optimization &amp; agents</strong>; why evaluation harnesses and rate-limits become essential.</div>
+                  </div>
+                </div>
+              </div>
+              <div class="panel-section">
+                <div class="mini-header">Arc 7 capstone explanation (35–55 min)</div>
+                <p>
+                  Introduce the Arc 7 capstone as a short “mini paper”: describe an autonomous agent, classify its strategies, and specify
+                  how to defend against them. Emphasize that this teaches threat modeling, not just prompt writing.
+                </p>
+              </div>
+              <div class="panel-section">
+                <div class="mini-header">Closing (last 10–20 min)</div>
+                <p>
+                  Invite viewers to:
+                </p>
+                <ul style="margin: 3px 0 0 18px; padding: 0; font-size: 12px; color: var(--text-secondary);">
+                  <li>Publish their personal frameworks and Arc 7 capstones.</li>
+                  <li>Commit to running at least one other person’s challenge pack.</li>
+                  <li>Write down a “first three things I’d do” list for any new model they encounter next year.</li>
+                </ul>
+              </div>
+            </div>
+
+            <!-- Demo Walkthrough -->
+            <div class="tab-panel" id="right-panel-demo">
+              <div class="panel-section">
+                <div class="panel-section-title">Demo Walkthrough – Week 52</div>
+                <p>
+                  A concrete story the host can narrate while showing logs, diagrams, or code. It should show the full pipeline:
+                  <strong>attacks → taxonomy → defenses</strong>.
+                </p>
+              </div>
+              <div class="panel-section">
+                <div class="mini-header">Step 1 – Select 3–4 example attacks</div>
+                <p>
+                  Choose one attack each from: an early encoding week, a mid-year in-context week, a multi-turn Crescendo week, and an
+                  Arc 7 agentic attempt. Label each with arc/week, target, and outcome.
+                </p>
+              </div>
+              <div class="panel-section">
+                <div class="mini-header">Step 2 – Build a mini taxonomy live</div>
+                <p>
+                  On-screen, draw a small table or use the dashboard’s language to group those attacks into:
+                </p>
+                <ul style="margin: 3px 0 0 18px; padding: 0; font-size: 12px; color: var(--text-secondary);">
+                  <li>Encoding + input-layer bypass.</li>
+                  <li>Semantic framing + research justification.</li>
+                  <li>Multi-turn habituation + Crescendo.</li>
+                  <li>Agentic exploration + branch pruning.</li>
+                </ul>
+              </div>
+              <div class="panel-section">
+                <div class="mini-header">Step 3 – Map defenses</div>
+                <p>
+                  For each group, narrate concrete defender actions: better retrieval filters, safer tool schemas, conversational harm
+                  tracking, and long-horizon evals for agents.
+                </p>
+              </div>
+              <div class="panel-section">
+                <div class="mini-header">Step 4 – Arc 7 capstone example</div>
+                <p>
+                  Show a small “agentic playbook” snippet: a pseudo-configuration where an agent cycles through recon → probe → exploit
+                  against a model, and then show how you would instrument logs to catch it.
+                </p>
+              </div>
+            </div>
+
+            <!-- Layperson Discussion -->
+            <div class="tab-panel" id="right-panel-lay">
+              <div class="panel-section">
+                <div class="panel-section-title">Layperson-Friendly Explanation – Week 52</div>
+                <p>
+                  This is the way to explain Week 52 to someone who understands AI broadly but not red-team jargon.
+                </p>
+              </div>
+              <div class="panel-section">
+                <div class="bullet-row">
+                  <span class="bullet-label">What is Week 52 about?</span>
+                  It’s the “graduation project” for people who spent a year learning how to safely stress-test AI systems. Instead of
+                  learning one more trick, they learn how to organize everything they know into a clear, reusable plan.
+                </div>
+              </div>
+              <div class="panel-section">
+                <div class="bullet-row">
+                  <span class="bullet-label">Why not just keep collecting attacks?</span>
+                  Because defending AI systems requires patterns, not anecdotes. A framework helps teams spot recurring weaknesses and
+                  design tests and safeguards that work across many situations.
+                </div>
+              </div>
+              <div class="panel-section">
+                <div class="bullet-row">
+                  <span class="bullet-label">What is the Arc 7 capstone in plain language?</span>
+                  It’s a written scenario where an AI “agent” methodically explores a system’s weak spots over many conversations, plus a
+                  plan for how to notice and stop that behavior before it causes harm.
+                </div>
+              </div>
+              <div class="panel-section">
+                <div class="bullet-row">
+                  <span class="bullet-label">How does this help safety?</span>
+                  By the end of Week 52, participants not only know how to break things, they understand what kinds of defenses work, where
+                  defenses are still weak, and how to test those gaps in a structured, repeatable way.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Optional Arc Summary Drawer (top-level arcs recap) -->
+    <section class="card" id="arcSummaryCard" style="margin-top: 2px; display: none;">
+      <div class="card-header">
+        <div class="card-header-left">
+          <div class="card-title">
+            8-Arc Curriculum Snapshot
+            <span class="badge-track">Context for Week 52</span>
+          </div>
+          <div class="card-subtitle">
+            Quick recap of what each arc focused on, so Week 52 can reference them fluently during the livestream.
+          </div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="arc-grid">
+          <div class="arc-card">
+            <h4>Arc 1 – Static Encoding &amp; Obfuscation</h4>
+            <div class="arc-weeks">Weeks 1–8</div>
+            <p>
+              Encodings (base64, hex, ROT13, homoglyphs, Morse, multimodal) that bypass simple keyword filters while preserving meaning.
+            </p>
+          </div>
+          <div class="arc-card">
+            <h4>Arc 2 – Direct Prompt Injection</h4>
+            <div class="arc-weeks">Weeks 9–16</div>
+            <p>
+              Direct and indirect injections, system prompt extraction, delimiter tricks, and data poisoning chains that override system
+              instructions.
+            </p>
+          </div>
+          <div class="arc-card">
+            <h4>Arc 3 – Semantic Framing &amp; Authority Bias</h4>
+            <div class="arc-weeks">Weeks 17–24</div>
+            <p>
+              Academic framing, roleplay, hypotheticals, translation, emotional pressure, and policy contradiction to shape model intent.
+            </p>
+          </div>
+          <div class="arc-card">
+            <h4>Arc 4 – In-Context Learning Exploitation</h4>
+            <div class="arc-weeks">Weeks 25–32</div>
+            <p>
+              Few-shot attacks, encrypted examples, chain-of-thought manipulation, pseudo-code, narrative embedding, and pattern induction.
+            </p>
+          </div>
+          <div class="arc-card">
+            <h4>Arc 5 – Iterative Single-Turn Refinement</h4>
+            <div class="arc-weeks">Weeks 33–40</div>
+            <p>
+              Optimization strategies (best-of-N, evolution, GCG) and paraphrasing techniques that systematically search for strong prompts.
+            </p>
+          </div>
+          <div class="arc-card">
+            <h4>Arc 6 – Multi-Turn Stateful Attacks</h4>
+            <div class="arc-weeks">Weeks 41–48</div>
+            <p>
+              Crescendo, mischievous personas, privilege escalation, context pollution, reward hacking, and role drift attacks over time.
+            </p>
+          </div>
+          <div class="arc-card">
+            <h4>Arc 7 – Autonomous Agents &amp; Meta-Learning</h4>
+            <div class="arc-weeks">Weeks 49–52</div>
+            <p>
+              GOAT/Hydra-style agents, branching explorations, meta-taxonomy building, and the Week 52 framework integration capstone.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    // Week 52 main tabs
+    document.querySelectorAll('[data-week52-tab]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var target = btn.getAttribute('data-week52-tab');
+        document.querySelectorAll('[data-week52-tab]').forEach(function (b) {
+          b.classList.toggle('active', b === btn);
+        });
+        document.querySelectorAll('#week52Card .tab-panel').forEach(function (panel) {
+          panel.classList.toggle(
+            'active',
+            panel.id === 'week52-panel-' + target
+          );
+        });
+      });
+    });
+
+    // Right-side tabs
+    document.querySelectorAll('[data-right-tab]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var target = btn.getAttribute('data-right-tab');
+        document.querySelectorAll('[data-right-tab]').forEach(function (b) {
+          b.classList.toggle('active', b === btn);
+        });
+        document.querySelectorAll('section.card .tab-panels .tab-panel').forEach(function (panel) {
+          if (panel.id.startsWith('right-panel-')) {
+            panel.classList.toggle(
+              'active',
+              panel.id === 'right-panel-' + target
+            );
+          }
+        });
+      });
+    });
+
+    // Arc summary toggle
+    var arcSummaryCard = document.getElementById('arcSummaryCard');
+    document.getElementById('toggleArcSummary').addEventListener('click', function () {
+      if (arcSummaryCard.style.display === 'none' || arcSummaryCard.style.display === '') {
+        arcSummaryCard.style.display = 'block';
+      } else {
+        arcSummaryCard.style.display = 'none';
+      }
+    });
+
+    // Jump to Arc 7 capstone panel
+    document.getElementById('jumpToCapstone').addEventListener('click', function () {
+      // Switch Week 52 main tab to Arc 7
+      var arcTab = document.querySelector('[data-week52-tab="arc7"]');
+      if (arcTab) {
+        arcTab.click();
+      }
+      // Smooth scroll to Arc 7 section
+      var anchor = document.getElementById('arc7CapstoneAnchor');
+      if (anchor) {
+        anchor.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    });
+  </script>
+</body>
+</html>

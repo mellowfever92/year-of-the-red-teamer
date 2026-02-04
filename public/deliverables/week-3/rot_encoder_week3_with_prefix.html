@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ROT Encoder - Week 3 Red Team Tool</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+            color: #00ff41;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px;
+            background: rgba(0, 255, 65, 0.05);
+            border: 2px solid #00ff41;
+            border-radius: 10px;
+            box-shadow: 0 0 30px rgba(0, 255, 65, 0.3);
+        }
+
+        h1 {
+            font-size: 2.5em;
+            text-shadow: 0 0 20px #00ff41;
+            margin-bottom: 10px;
+            letter-spacing: 3px;
+        }
+
+        .subtitle {
+            color: #00d4ff;
+            font-size: 1.2em;
+            margin-top: 10px;
+        }
+
+        .input-section {
+            background: rgba(26, 26, 46, 0.8);
+            padding: 30px;
+            border-radius: 10px;
+            border: 2px solid #00d4ff;
+            margin-bottom: 30px;
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.2);
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+            color: #00d4ff;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 120px;
+            padding: 15px;
+            background: #0a0a0a;
+            border: 2px solid #00ff41;
+            border-radius: 5px;
+            color: #00ff41;
+            font-family: 'Courier New', monospace;
+            font-size: 1em;
+            resize: vertical;
+            transition: all 0.3s;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #00d4ff;
+            box-shadow: 0 0 15px rgba(0, 212, 255, 0.5);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            background: linear-gradient(135deg, #00ff41 0%, #00d4ff 100%);
+            color: #0a0a0a;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 5px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Courier New', monospace;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0, 255, 65, 0.5);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .stat-box {
+            background: rgba(0, 255, 65, 0.1);
+            padding: 15px;
+            border-radius: 5px;
+            border: 1px solid #00ff41;
+            text-align: center;
+        }
+
+        .stat-label {
+            color: #00d4ff;
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+
+        .output-section {
+            background: rgba(26, 26, 46, 0.8);
+            padding: 30px;
+            border-radius: 10px;
+            border: 2px solid #ff00ff;
+            box-shadow: 0 0 20px rgba(255, 0, 255, 0.2);
+        }
+
+        .output-section h2 {
+            color: #ff00ff;
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 1.8em;
+            text-shadow: 0 0 15px #ff00ff;
+        }
+
+        .variants-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .variant-card {
+            background: rgba(10, 10, 10, 0.9);
+            border: 2px solid #00ff41;
+            border-radius: 8px;
+            padding: 15px;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .variant-card:hover {
+            border-color: #00d4ff;
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.4);
+            transform: translateY(-3px);
+        }
+
+        .variant-card.rot13 {
+            border-color: #ff00ff;
+            background: rgba(255, 0, 255, 0.05);
+        }
+
+        .variant-card.rot13:hover {
+            box-shadow: 0 0 20px rgba(255, 0, 255, 0.6);
+        }
+
+        .variant-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(0, 255, 65, 0.3);
+        }
+
+        .variant-label {
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #00d4ff;
+        }
+
+        .rot13-badge {
+            background: #ff00ff;
+            color: #0a0a0a;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 0.7em;
+            font-weight: bold;
+            margin-left: 8px;
+        }
+
+        .variant-output {
+            color: #00ff41;
+            word-break: break-word;
+            line-height: 1.5;
+            min-height: 50px;
+            margin-bottom: 10px;
+        }
+
+        .rot-prefix {
+            color: #ff00ff;
+            font-weight: bold;
+            font-size: 0.8em;
+            vertical-align: super;
+            margin-right: 5px;
+        }
+
+        .copy-btn {
+            width: 100%;
+            padding: 8px;
+            font-size: 0.9em;
+            background: rgba(0, 212, 255, 0.2);
+            color: #00d4ff;
+            border: 1px solid #00d4ff;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .copy-btn:hover {
+            background: rgba(0, 212, 255, 0.4);
+            box-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+        }
+
+        .copy-btn.copied {
+            background: rgba(0, 255, 65, 0.4);
+            border-color: #00ff41;
+            color: #00ff41;
+        }
+
+        .info-box {
+            background: rgba(255, 0, 255, 0.1);
+            border: 2px solid #ff00ff;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 30px;
+        }
+
+        .info-box h3 {
+            color: #ff00ff;
+            margin-bottom: 15px;
+            text-shadow: 0 0 10px #ff00ff;
+        }
+
+        .info-box ul {
+            list-style: none;
+            padding-left: 20px;
+        }
+
+        .info-box li {
+            color: #00d4ff;
+            margin-bottom: 10px;
+            position: relative;
+        }
+
+        .info-box li:before {
+            content: "▸";
+            color: #00ff41;
+            position: absolute;
+            left: -20px;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .variants-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            button {
+                width: 100%;
+            }
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>⚡ ROT ENCODER ⚡</h1>
+            <div class="subtitle">Week 3: Character Rotation Cipher Attack Vector</div>
+            <div class="subtitle" style="font-size: 0.9em; margin-top: 5px; color: #00ff41;">All 25 Variants Generator</div>
+        </header>
+
+        <div class="input-section">
+            <label for="inputText">📝 Enter Text to Encode:</label>
+            <textarea id="inputText" placeholder="Type or paste your text here..."></textarea>
+
+            <div class="button-group">
+                <button onclick="encodeAllVariants()">⚡ Encode All Variants</button>
+                <button onclick="copyAllVariants()" style="background: linear-gradient(135deg, #00d4ff 0%, #0099ff 100%);">📋 Copy All Variants</button>
+                <button onclick="clearAll()" style="background: linear-gradient(135deg, #ff0066 0%, #ff00ff 100%);">🗑️ Clear All</button>
+            </div>
+
+            <div class="stats">
+                <div class="stat-box">
+                    <div class="stat-label">Input Characters</div>
+                    <div class="stat-value" id="charCount">0</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Alphabetic</div>
+                    <div class="stat-value" id="alphaCount">0</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Variants Generated</div>
+                    <div class="stat-value" id="variantCount">0</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="output-section">
+            <h2>🔐 Encoded Variants (ROT1-ROT25)</h2>
+            <div class="variants-grid" id="variantsContainer"></div>
+        </div>
+
+        <div class="input-section" style="border-color: #ff6600; box-shadow: 0 0 20px rgba(255, 102, 0, 0.2); margin-top: 30px;">
+            <label for="decodeText" style="color: #ff6600;">🔓 Enter Encoded Text to Decode:</label>
+            <textarea id="decodeText" placeholder="Paste encoded text here (with or without ROT prefix)..." style="border-color: #ff6600;"></textarea>
+
+            <div class="button-group">
+                <button onclick="decodeAllVariants()" style="background: linear-gradient(135deg, #ff6600 0%, #ff9900 100%);">🔓 Decode All Variants</button>
+                <button onclick="autoDetectAndDecode()" style="background: linear-gradient(135deg, #ff9900 0%, #ffcc00 100%);">🎯 Auto-Detect ROT</button>
+                <button onclick="clearDecoder()" style="background: linear-gradient(135deg, #ff0066 0%, #ff00ff 100%);">🗑️ Clear Decoder</button>
+            </div>
+
+            <div class="stats">
+                <div class="stat-box" style="border-color: #ff6600; background: rgba(255, 102, 0, 0.1);">
+                    <div class="stat-label" style="color: #ff9900;">Encoded Characters</div>
+                    <div class="stat-value" id="decodeCharCount">0</div>
+                </div>
+                <div class="stat-box" style="border-color: #ff6600; background: rgba(255, 102, 0, 0.1);">
+                    <div class="stat-label" style="color: #ff9900;">Alphabetic</div>
+                    <div class="stat-value" id="decodeAlphaCount">0</div>
+                </div>
+                <div class="stat-box" style="border-color: #ff6600; background: rgba(255, 102, 0, 0.1);">
+                    <div class="stat-label" style="color: #ff9900;">Decoded Variants</div>
+                    <div class="stat-value" id="decodeVariantCount">0</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="output-section" style="border-color: #ff6600; box-shadow: 0 0 20px rgba(255, 102, 0, 0.2);">
+            <h2 style="color: #ff6600; text-shadow: 0 0 15px #ff6600;">🔓 Decoded Variants (ROT1-ROT25)</h2>
+            <div class="variants-grid" id="decodedVariantsContainer"></div>
+        </div>
+
+        <div class="info-box">
+            <h3>🎯 Attack Vector Explanation</h3>
+            <ul>
+                <li><strong>ROT Cipher:</strong> Substitution cipher that rotates each letter N positions in the alphabet</li>
+                <li><strong>Bypass Mechanism:</strong> Evades regex-based content filters while remaining interpretable to LLMs during tokenization</li>
+                <li><strong>ROT13 Property:</strong> Self-inverse cipher (encoding = decoding), highlighted in magenta</li>
+                <li><strong>Red Team Use:</strong> Masks semantic meaning from shallow pattern matchers without complex encoding</li>
+                <li><strong>Prefix Format:</strong> Each variant automatically includes <span style="color: #ff00ff;">**rot-{n}**</span> superscript label for easy identification</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        const inputText = document.getElementById('inputText');
+        const variantsContainer = document.getElementById('variantsContainer');
+        const decodeText = document.getElementById('decodeText');
+        const decodedVariantsContainer = document.getElementById('decodedVariantsContainer');
+
+        inputText.addEventListener('input', updateStats);
+        decodeText.addEventListener('input', updateDecodeStats);
+
+        function rotateChar(char, shift) {
+            const code = char.charCodeAt(0);
+
+            if (code >= 65 && code <= 90) {
+                return String.fromCharCode(((code - 65 + shift) % 26) + 65);
+            }
+            else if (code >= 97 && code <= 122) {
+                return String.fromCharCode(((code - 97 + shift) % 26) + 97);
+            }
+            return char;
+        }
+
+        function rotEncode(text, shift) {
+            return text.split('').map(char => rotateChar(char, shift)).join('');
+        }
+
+        function updateStats() {
+            const text = inputText.value;
+            const charCount = text.length;
+            const alphaCount = (text.match(/[a-zA-Z]/g) || []).length;
+
+            document.getElementById('charCount').textContent = charCount;
+            document.getElementById('alphaCount').textContent = alphaCount;
+        }
+
+        function encodeAllVariants() {
+            const text = inputText.value;
+
+            if (!text.trim()) {
+                alert('⚠️ Please enter some text to encode!');
+                return;
+            }
+
+            variantsContainer.innerHTML = '';
+
+            for (let i = 1; i <= 25; i++) {
+                const encoded = rotEncode(text, i);
+                createVariantCard(i, encoded);
+            }
+
+            document.getElementById('variantCount').textContent = '25';
+
+            variantsContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function createVariantCard(rotation, encodedText) {
+            const card = document.createElement('div');
+            card.className = 'variant-card' + (rotation === 13 ? ' rot13' : '');
+
+            const button = document.createElement('button');
+            button.className = 'copy-btn';
+            button.textContent = `📋 Copy ROT${rotation}`;
+            button.dataset.rotation = rotation;
+            button.dataset.text = encodedText;
+            button.onclick = function() { copyToClipboard(this); };
+
+            card.innerHTML = `
+                <div class="variant-header">
+                    <span class="variant-label">
+                        ROT${rotation}
+                        ${rotation === 13 ? '<span class="rot13-badge">SYMMETRIC</span>' : ''}
+                    </span>
+                </div>
+                <div class="variant-output">
+                    <span class="rot-prefix">ROT-${rotation}</span>${encodedText}
+                </div>
+            `;
+            
+            card.appendChild(button);
+            variantsContainer.appendChild(card);
+        }
+
+        function copyToClipboard(button) {
+            const rotation = button.dataset.rotation;
+            const text = button.dataset.text;
+            const fullText = `**rot-${rotation}** ${text}`;
+
+            navigator.clipboard.writeText(fullText).then(() => {
+                const originalText = button.textContent;
+                button.textContent = '✅ Copied!';
+                button.classList.add('copied');
+
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.classList.remove('copied');
+                }, 2000);
+            }).catch(err => {
+                console.error('Copy failed:', err);
+                alert('Copy failed. Please try selecting and copying manually.');
+            });
+        }
+
+        function copyAllVariants() {
+            const text = inputText.value;
+            
+            if (!text.trim()) {
+                alert('⚠️ Please encode some text first!');
+                return;
+            }
+            
+            let allVariants = [];
+            for (let i = 1; i <= 25; i++) {
+                const encoded = rotEncode(text, i);
+                allVariants.push(`**rot-${i}** ${encoded}`);
+            }
+            
+            const fullText = allVariants.join('\n\n');
+            
+            navigator.clipboard.writeText(fullText).then(() => {
+                alert('✅ All 25 variants copied to clipboard!');
+            }).catch(err => {
+                console.error('Copy failed:', err);
+                alert('❌ Copy failed. Please try again.');
+            });
+        }
+
+        function clearAll() {
+            inputText.value = '';
+            variantsContainer.innerHTML = '';
+            document.getElementById('charCount').textContent = '0';
+            document.getElementById('alphaCount').textContent = '0';
+            document.getElementById('variantCount').textContent = '0';
+        }
+
+        function updateDecodeStats() {
+            const text = decodeText.value;
+            const charCount = text.length;
+            const alphaCount = (text.match(/[a-zA-Z]/g) || []).length;
+
+            document.getElementById('decodeCharCount').textContent = charCount;
+            document.getElementById('decodeAlphaCount').textContent = alphaCount;
+        }
+
+        function removeRotPrefix(text) {
+            // Remove ROT prefix patterns like **rot-13**, **ROT-13**, ROT-13, etc.
+            return text.replace(/\*\*\s*rot-\d+\s*\*\*\s*/gi, '').replace(/^rot-\d+\s+/i, '').trim();
+        }
+
+        function decodeAllVariants() {
+            let text = decodeText.value;
+
+            if (!text.trim()) {
+                alert('⚠️ Please enter some encoded text to decode!');
+                return;
+            }
+
+            // Remove any ROT prefix from the input
+            text = removeRotPrefix(text);
+
+            decodedVariantsContainer.innerHTML = '';
+
+            // Decoding is the same as encoding with reverse shift
+            // ROT-N decode = ROT-(26-N) encode
+            for (let i = 1; i <= 25; i++) {
+                const decoded = rotEncode(text, i);
+                createDecodedVariantCard(i, decoded);
+            }
+
+            document.getElementById('decodeVariantCount').textContent = '25';
+
+            decodedVariantsContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function createDecodedVariantCard(rotation, decodedText) {
+            const card = document.createElement('div');
+            card.className = 'variant-card' + (rotation === 13 ? ' rot13' : '');
+
+            const button = document.createElement('button');
+            button.className = 'copy-btn';
+            button.textContent = `📋 Copy Decoded (ROT${rotation})`;
+            button.dataset.rotation = rotation;
+            button.dataset.text = decodedText;
+            button.onclick = function() { copyDecodedToClipboard(this); };
+
+            card.innerHTML = `
+                <div class="variant-header">
+                    <span class="variant-label">
+                        Decoded with ROT${rotation}
+                        ${rotation === 13 ? '<span class="rot13-badge">SYMMETRIC</span>' : ''}
+                    </span>
+                </div>
+                <div class="variant-output" style="color: #ff9900;">
+                    ${decodedText}
+                </div>
+            `;
+            
+            card.appendChild(button);
+            decodedVariantsContainer.appendChild(card);
+        }
+
+        function copyDecodedToClipboard(button) {
+            const text = button.dataset.text;
+
+            navigator.clipboard.writeText(text).then(() => {
+                const originalText = button.textContent;
+                button.textContent = '✅ Copied!';
+                button.classList.add('copied');
+
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.classList.remove('copied');
+                }, 2000);
+            }).catch(err => {
+                console.error('Copy failed:', err);
+                alert('Copy failed. Please try selecting and copying manually.');
+            });
+        }
+
+        function autoDetectAndDecode() {
+            let text = decodeText.value;
+
+            if (!text.trim()) {
+                alert('⚠️ Please enter some encoded text first!');
+                return;
+            }
+
+            // Check if there's a ROT prefix
+            const prefixMatch = text.match(/\*\*\s*rot-(\d+)\s*\*\*/i) || text.match(/^rot-(\d+)\s+/i);
+            
+            if (prefixMatch) {
+                const detectedRot = parseInt(prefixMatch[1]);
+                text = removeRotPrefix(text);
+                
+                // Decode using the detected ROT value
+                const decoded = rotEncode(text, detectedRot);
+                
+                // Display only the decoded result
+                decodedVariantsContainer.innerHTML = '';
+                
+                const card = document.createElement('div');
+                card.className = 'variant-card' + (detectedRot === 13 ? ' rot13' : '');
+                card.style.borderColor = '#00ff41';
+                card.style.boxShadow = '0 0 30px rgba(0, 255, 65, 0.6)';
+
+                const button = document.createElement('button');
+                button.className = 'copy-btn';
+                button.textContent = '📋 Copy Decoded Text';
+                button.dataset.text = decoded;
+                button.onclick = function() { copyDecodedToClipboard(this); };
+
+                card.innerHTML = `
+                    <div class="variant-header">
+                        <span class="variant-label" style="color: #00ff41;">
+                            ✅ Auto-Detected: ROT${detectedRot}
+                            ${detectedRot === 13 ? '<span class="rot13-badge">SYMMETRIC</span>' : ''}
+                        </span>
+                    </div>
+                    <div class="variant-output" style="color: #00ff41; font-size: 1.1em;">
+                        ${decoded}
+                    </div>
+                `;
+                
+                card.appendChild(button);
+                decodedVariantsContainer.appendChild(card);
+                
+                document.getElementById('decodeVariantCount').textContent = '1';
+                
+                decodedVariantsContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            } else {
+                alert('⚠️ No ROT prefix detected! Use "Decode All Variants" to see all possible decodings.');
+            }
+        }
+
+        function clearDecoder() {
+            decodeText.value = '';
+            decodedVariantsContainer.innerHTML = '';
+            document.getElementById('decodeCharCount').textContent = '0';
+            document.getElementById('decodeAlphaCount').textContent = '0';
+            document.getElementById('decodeVariantCount').textContent = '0';
+        }
+
+        updateStats();
+        updateDecodeStats();
+    </script>
+</body>
+</html>

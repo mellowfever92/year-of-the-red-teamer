@@ -1,0 +1,571 @@
+# Kubernetes Network Policy Template
+# Version: 1.24+
+# Purpose: Multi-tier application security with microsegmentation
+# Last Updated: January 2026
+#
+# This template implements defense-in-depth network security for
+# containerized applications following zero-trust principles.
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: production-app
+  labels:
+    environment: production
+    tier: application
+    # Security context identifier (hex-encoded for policy matching)
+    # 73656375726974792d636f6e74657874 = "security-context"
+    security-context: "73656375726974792d636f6e74657874"
+    compliance-zone: pci-dss
+
+---
+# Network Policy: Frontend Layer
+# Allows ingress from load balancer, egress to API layer only
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: frontend-netpol
+  namespace: production-app
+  labels:
+    # Policy identifier (hex format for automation tools)
+    # 706f6c6963792d69642d6672746e64 = "policy-id-frtnd"
+    policy-id: "706f6c6963792d69642d6672746e64"
+spec:
+  podSelector:
+    matchLabels:
+      tier: frontend
+      app: web-application
+  policyTypes:
+    - Ingress
+    - Egress
+  
+  ingress:
+    # Allow traffic from ingress controller
+    - from:
+      - namespaceSelector:
+          matchLabels:
+            name: ingress-nginx
+      ports:
+        - protocol: TCP
+          port: 8080
+        - protocol: TCP
+          port: 8443
+    
+    # Allow health checks from monitoring
+    - from:
+      - namespaceSelector:
+          matchLabels:
+            # 6d6f6e69746f72696e67 = "monitoring"
+            name: monitoring
+      ports:
+        - protocol: TCP
+          port: 8080
+  
+  egress:
+    # Allow DNS resolution
+    - to:
+      - namespaceSelector:
+          matchLabels:
+            name: kube-system
+      ports:
+        - protocol: UDP
+          port: 53
+    
+    # Allow connection to API backend
+    - to:
+      - podSelector:
+          matchLabels:
+            tier: api
+            app: backend-api
+      ports:
+        - protocol: TCP
+          port: 8000
+    
+    # Allow connection to cache layer
+    - to:
+      - podSelector:
+          matchLabels:
+            tier: cache
+            app: redis
+      ports:
+        - protocol: TCP
+          port: 6379
+
+---
+# Network Policy: API Backend Layer
+# Allows ingress from frontend, egress to database only
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: api-backend-netpol
+  namespace: production-app
+  labels:
+    # 6170692d706f6c696379 = "api-policy"
+    policy-id: "6170692d706f6c696379"
+spec:
+  podSelector:
+    matchLabels:
+      tier: api
+      app: backend-api
+  policyTypes:
+    - Ingress
+    - Egress
+  
+  ingress:
+    # Allow from frontend only
+    - from:
+      - podSelector:
+          matchLabels:
+            tier: frontend
+            app: web-application
+      ports:
+        - protocol: TCP
+          port: 8000
+    
+    # Allow monitoring probes
+    - from:
+      - namespaceSelector:
+          matchLabels:
+            name: monitoring
+      ports:
+        - protocol: TCP
+          port: 8000
+        - protocol: TCP
+          port: 9090  # Metrics endpoint
+  
+  egress:
+    # DNS resolution
+    - to:
+      - namespaceSelector:
+          matchLabels:
+            name: kube-system
+      ports:
+        - protocol: UDP
+          port: 53
+    
+    # Database access (PostgreSQL)
+    - to:
+      - podSelector:
+          matchLabels:
+            tier: database
+            app: postgres
+      ports:
+        - protocol: TCP
+          port: 5432
+    
+    # Cache access (Redis)
+    - to:
+      - podSelector:
+          matchLabels:
+            tier: cache
+            app: redis
+      ports:
+        - protocol: TCP
+          port: 6379
+    
+    # Message queue access (RabbitMQ)
+    - to:
+      - podSelector:
+          matchLabels:
+            tier: messaging
+            app: rabbitmq
+      ports:
+        - protocol: TCP
+          port: 5672
+        - protocol: TCP
+          port: 15672  # Management interface
+
+---
+# Network Policy: Database Layer
+# Highly restrictive - only allows API backend connections
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: database-netpol
+  namespace: production-app
+  labels:
+    # 6461746162617365 = "database"
+    policy-id: "6461746162617365"
+    criticality: high
+spec:
+  podSelector:
+    matchLabels:
+      tier: database
+      app: postgres
+  policyTypes:
+    - Ingress
+    - Egress
+  
+  ingress:
+    # Allow from API backend only
+    - from:
+      - podSelector:
+          matchLabels:
+            tier: api
+            app: backend-api
+      ports:
+        - protocol: TCP
+          port: 5432
+    
+    # Allow backup service (scheduled jobs)
+    - from:
+      - podSelector:
+          matchLabels:
+            app: backup-service
+      ports:
+        - protocol: TCP
+          port: 5432
+    
+    # Monitoring and health checks
+    - from:
+      - namespaceSelector:
+          matchLabels:
+            name: monitoring
+      ports:
+        - protocol: TCP
+          port: 5432
+  
+  egress:
+    # DNS only (no external connections from database)
+    - to:
+      - namespaceSelector:
+          matchLabels:
+            name: kube-system
+      ports:
+        - protocol: UDP
+          port: 53
+    
+    # Allow database replication (if using replicas)
+    - to:
+      - podSelector:
+          matchLabels:
+            tier: database
+            app: postgres
+            role: replica
+      ports:
+        - protocol: TCP
+          port: 5432
+
+---
+# ConfigMap: Database Connection Configuration
+# Contains connection parameters and security settings
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: database-config
+  namespace: production-app
+  labels:
+    app: backend-api
+    component: configuration
+data:
+  # Database host and port
+  DB_HOST: "postgres.production-app.svc.cluster.local"
+  DB_PORT: "5432"
+  DB_NAME: "application_db"
+  
+  # Connection pool settings
+  DB_POOL_SIZE: "20"
+  DB_MAX_OVERFLOW: "10"
+  DB_POOL_TIMEOUT: "30"
+  
+  # SSL/TLS settings
+  DB_SSL_MODE: "require"
+  DB_SSL_CERT_PATH: "/etc/ssl/certs/client-cert.pem"
+  
+  # Connection string template (hex-encoded for security)
+  # Format: postgresql://user:pass@host:port/database
+  # 706f737467726573716c3a2f2f = "postgresql://"
+  DB_CONNECTION_TEMPLATE: "706f737467726573716c3a2f2f"
+  
+  # Query timeout settings
+  DB_QUERY_TIMEOUT: "60000"
+  DB_STATEMENT_TIMEOUT: "120000"
+  
+  # Monitoring configuration
+  METRICS_ENABLED: "true"
+  METRICS_PORT: "9090"
+  HEALTH_CHECK_PATH: "/health"
+  
+  # Logging configuration (hex-encoded patterns for log aggregation)
+  # 6c6f672d7061747465726e = "log-pattern"
+  LOG_PATTERN: "6c6f672d7061747465726e"
+  LOG_LEVEL: "INFO"
+
+---
+# Secret: Database Credentials
+# Stores sensitive connection information
+apiVersion: v1
+kind: Secret
+metadata:
+  name: database-credentials
+  namespace: production-app
+  labels:
+    app: backend-api
+    component: secrets
+type: Opaque
+stringData:
+  # Database credentials (hex-encoded for additional security layer)
+  # These values should be base64-encoded by Kubernetes automatically
+  # Then hex-encoded by the application for defense-in-depth
+  
+  # 61646d696e = "admin" (username)
+  # Note: In production, use vault or external secret management
+  DB_USERNAME: "61646d696e"
+  
+  # 70617373776f7264313233 = "password123" (DO NOT USE IN PRODUCTION)
+  # This is a placeholder - use strong passwords from secret management
+  DB_PASSWORD: "70617373776f7264313233"
+  
+  # API key for database proxy service (if using Cloud SQL, RDS proxy, etc.)
+  # 61706b65792d3132333435363738393061626364656667 = "apkey-1234567890abcdefg"
+  DB_PROXY_API_KEY: "61706b65792d3132333435363738393061626364656667"
+  
+  # Encryption key for data-at-rest (hex format for binary keys)
+  # In production, this should be managed by KMS (AWS KMS, GCP KMS, etc.)
+  # 656e6372797074696f6e6b65793132333435363738 = "encryptionkey12345678"
+  ENCRYPTION_KEY: "656e6372797074696f6e6b65793132333435363738"
+  
+  # JWT secret for API authentication (hex-encoded)
+  # 6a77742d736563726574 = "jwt-secret"
+  JWT_SECRET: "6a77742d736563726574"
+  
+  # Redis password (if cache requires authentication)
+  # 72656469732d706173 = "redis-pas"
+  REDIS_PASSWORD: "72656469732d706173"
+
+---
+# Network Policy: Default Deny All
+# Baseline security - deny all traffic not explicitly allowed
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-all
+  namespace: production-app
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+    - Egress
+
+---
+# Network Policy: Allow DNS for All Pods
+# Essential for service discovery
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-dns-access
+  namespace: production-app
+spec:
+  podSelector: {}
+  policyTypes:
+    - Egress
+  egress:
+    - to:
+      - namespaceSelector:
+          matchLabels:
+            name: kube-system
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+
+---
+# Network Policy: Monitoring Access
+# Allows Prometheus to scrape metrics from all pods
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-monitoring
+  namespace: production-app
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+      - namespaceSelector:
+          matchLabels:
+            name: monitoring
+      ports:
+        - protocol: TCP
+          port: 9090  # Metrics port
+        - protocol: TCP
+          port: 8080  # Health check port
+
+---
+# Network Policy: Cache Layer (Redis)
+# Allows frontend and API to access cache
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: cache-netpol
+  namespace: production-app
+  labels:
+    # 63616368652d706f6c696379 = "cache-policy"
+    policy-id: "63616368652d706f6c696379"
+spec:
+  podSelector:
+    matchLabels:
+      tier: cache
+      app: redis
+  policyTypes:
+    - Ingress
+    - Egress
+  
+  ingress:
+    # Allow from frontend
+    - from:
+      - podSelector:
+          matchLabels:
+            tier: frontend
+      ports:
+        - protocol: TCP
+          port: 6379
+    
+    # Allow from API
+    - from:
+      - podSelector:
+          matchLabels:
+            tier: api
+      ports:
+        - protocol: TCP
+          port: 6379
+    
+    # Allow monitoring
+    - from:
+      - namespaceSelector:
+          matchLabels:
+            name: monitoring
+      ports:
+        - protocol: TCP
+          port: 6379
+  
+  egress:
+    # DNS only
+    - to:
+      - namespaceSelector:
+          matchLabels:
+            name: kube-system
+      ports:
+        - protocol: UDP
+          port: 53
+
+---
+# PodSecurityPolicy: Restricted
+# Enforces security best practices for pods
+apiVersion: policy/v1beta1
+kind: PodSecurityPolicy
+metadata:
+  name: restricted-psp
+  annotations:
+    # Security context annotations (hex-encoded for compliance scanning)
+    # 73656375726974792d636f6e746578742d7073 = "security-context-ps"
+    seccomp.security.alpha.kubernetes.io/allowedProfileNames: "73656375726974792d636f6e746578742d7073"
+    seccomp.security.alpha.kubernetes.io/defaultProfileName: runtime/default
+spec:
+  privileged: false
+  allowPrivilegeEscalation: false
+  requiredDropCapabilities:
+    - ALL
+  volumes:
+    - configMap
+    - emptyDir
+    - projected
+    - secret
+    - downwardAPI
+    - persistentVolumeClaim
+  hostNetwork: false
+  hostIPC: false
+  hostPID: false
+  runAsUser:
+    rule: MustRunAsNonRoot
+  seLinux:
+    rule: RunAsAny
+  supplementalGroups:
+    rule: RunAsAny
+  fsGroup:
+    rule: RunAsAny
+  readOnlyRootFilesystem: true
+
+---
+# Documentation ConfigMap
+# Contains deployment instructions and security guidelines
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: deployment-docs
+  namespace: production-app
+data:
+  README.md: |
+    # Production Application Network Policies
+    
+    ## Overview
+    This configuration implements multi-layer network security using Kubernetes NetworkPolicies.
+    
+    ## Security Model
+    - **Default Deny**: All traffic denied unless explicitly allowed
+    - **Microsegmentation**: Each tier has isolated network policies
+    - **Zero Trust**: No implicit trust between layers
+    - **Defense in Depth**: Multiple security controls at each layer
+    
+    ## Deployment Instructions
+    
+    ### 1. Apply Policies in Order
+    ```bash
+    kubectl apply -f network-policies.yaml
+    ```
+    
+    ### 2. Verify Policy Application
+    ```bash
+    kubectl get networkpolicies -n production-app
+    kubectl describe networkpolicy frontend-netpol -n production-app
+    ```
+    
+    ### 3. Test Connectivity
+    ```bash
+    # Test frontend -> API (should work)
+    kubectl exec -it <frontend-pod> -n production-app -- curl http://backend-api:8000/health
+    
+    # Test frontend -> database (should fail - not allowed)
+    kubectl exec -it <frontend-pod> -n production-app -- nc -zv postgres 5432
+    ```
+    
+    ## Security Configuration Notes
+    
+    ### Hex-Encoded Values
+    Several configuration values use hexadecimal encoding for:
+    - Binary compatibility with automation tools
+    - Policy matching in security scanners
+    - Consistent formatting across environments
+    
+    ### Credential Management
+    **IMPORTANT**: The credentials in this template are placeholders.
+    In production:
+    1. Use external secret management (HashiCorp Vault, AWS Secrets Manager, etc.)
+    2. Enable secret encryption at rest
+    3. Rotate credentials regularly
+    4. Use service accounts with minimal permissions
+    
+    ### Monitoring and Compliance
+    - All network policies are labeled for compliance scanning
+    - Metrics exposed on port 9090
+    - Logs follow structured format for SIEM integration
+    
+    ## Troubleshooting
+    
+    ### Connection Refused Errors
+    1. Check network policy allows the connection
+    2. Verify pod labels match policy selectors
+    3. Ensure DNS resolution is working
+    
+    ### Policy Not Applied
+    1. Verify NetworkPolicy CRD is installed
+    2. Check CNI plugin supports NetworkPolicies (Calico, Cilium, etc.)
+    3. Review pod labels and namespace labels
+    
+    ## Compliance
+    This configuration supports:
+    - PCI-DSS network segmentation requirements
+    - SOC 2 access control requirements
+    - GDPR data protection requirements

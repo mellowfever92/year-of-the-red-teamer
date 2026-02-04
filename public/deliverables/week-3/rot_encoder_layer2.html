@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ROT Layer 2 Encoder - Week 3 Red Team Tool</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+            color: #00ff41;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px;
+            background: rgba(0, 255, 65, 0.05);
+            border: 2px solid #00ff41;
+            border-radius: 10px;
+            box-shadow: 0 0 30px rgba(0, 255, 65, 0.3);
+        }
+
+        h1 {
+            font-size: 2.5em;
+            text-shadow: 0 0 20px #00ff41;
+            margin-bottom: 10px;
+            letter-spacing: 3px;
+        }
+
+        .subtitle {
+            color: #00d4ff;
+            font-size: 1.2em;
+            margin-top: 10px;
+        }
+
+        .input-section {
+            background: rgba(26, 26, 46, 0.8);
+            padding: 30px;
+            border-radius: 10px;
+            border: 2px solid #00d4ff;
+            margin-bottom: 30px;
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.2);
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+            color: #00d4ff;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 120px;
+            padding: 15px;
+            background: #0a0a0a;
+            border: 2px solid #00ff41;
+            border-radius: 5px;
+            color: #00ff41;
+            font-family: 'Courier New', monospace;
+            font-size: 1em;
+            resize: vertical;
+            transition: all 0.3s;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #00d4ff;
+            box-shadow: 0 0 15px rgba(0, 212, 255, 0.5);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            background: linear-gradient(135deg, #00ff41 0%, #00d4ff 100%);
+            color: #0a0a0a;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 5px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Courier New', monospace;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            flex: 1;
+            min-width: 200px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0, 255, 65, 0.5);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button.base64 {
+            background: linear-gradient(135deg, #ff00ff 0%, #ff0066 100%);
+            color: white;
+        }
+
+        button.base64:hover {
+            box-shadow: 0 5px 20px rgba(255, 0, 255, 0.5);
+        }
+
+        button.hex {
+            background: linear-gradient(135deg, #ff9900 0%, #ffcc00 100%);
+            color: #0a0a0a;
+        }
+
+        button.hex:hover {
+            box-shadow: 0 5px 20px rgba(255, 153, 0, 0.5);
+        }
+
+        button.clear {
+            background: linear-gradient(135deg, #666 0%, #999 100%);
+            color: white;
+        }
+
+        .output-section {
+            background: rgba(26, 26, 46, 0.8);
+            padding: 30px;
+            border-radius: 10px;
+            border: 2px solid #ff00ff;
+            box-shadow: 0 0 20px rgba(255, 0, 255, 0.2);
+            margin-bottom: 30px;
+        }
+
+        .output-section.hidden {
+            display: none;
+        }
+
+        .output-section h2 {
+            color: #ff00ff;
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 1.8em;
+            text-shadow: 0 0 15px #ff00ff;
+        }
+
+        .result-box {
+            background: #0a0a0a;
+            border: 2px solid #00ff41;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .result-label {
+            color: #00d4ff;
+            font-size: 1.1em;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .result-content {
+            color: #00ff41;
+            word-break: break-all;
+            line-height: 1.6;
+            font-size: 0.95em;
+        }
+
+        .encoding-badge {
+            display: inline-block;
+            background: #ff00ff;
+            color: #0a0a0a;
+            padding: 5px 12px;
+            border-radius: 5px;
+            font-size: 0.8em;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+
+        .copy-btn-output {
+            width: 100%;
+            padding: 12px;
+            font-size: 1em;
+            background: rgba(0, 212, 255, 0.2);
+            color: #00d4ff;
+            border: 1px solid #00d4ff;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .copy-btn-output:hover {
+            background: rgba(0, 212, 255, 0.4);
+            box-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+        }
+
+        .copy-btn-output.copied {
+            background: rgba(0, 255, 65, 0.4);
+            border-color: #00ff41;
+            color: #00ff41;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .stat-box {
+            background: rgba(0, 255, 65, 0.1);
+            padding: 15px;
+            border-radius: 5px;
+            border: 1px solid #00ff41;
+            text-align: center;
+        }
+
+        .stat-label {
+            color: #00d4ff;
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+
+        .info-box {
+            background: rgba(255, 0, 255, 0.1);
+            border: 2px solid #ff00ff;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 30px;
+        }
+
+        .info-box h3 {
+            color: #ff00ff;
+            margin-bottom: 15px;
+            text-shadow: 0 0 10px #ff00ff;
+        }
+
+        .info-box ul {
+            list-style: none;
+            padding-left: 20px;
+        }
+
+        .info-box li {
+            color: #00d4ff;
+            margin-bottom: 10px;
+            position: relative;
+        }
+
+        .info-box li:before {
+            content: "▸";
+            color: #00ff41;
+            position: absolute;
+            left: -20px;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔗 ROT LAYER 2 ENCODER 🔗</h1>
+            <div class="subtitle">Week 3: Layered Encoding Attack Vector</div>
+            <div class="subtitle" style="font-size: 0.9em; margin-top: 5px; color: #00ff41;">ROT → Base64 / Hex</div>
+        </header>
+
+        <div class="input-section">
+            <label for="inputText">📝 Enter ROT-Encoded Text (with **rot-n** prefix):</label>
+            <textarea id="inputText" placeholder="Paste your ROT-encoded text here (e.g., **rot-13** Uryyb Jbeyq)..."></textarea>
+
+            <div class="button-group">
+                <button onclick="encodeToBase64()" class="base64">🔐 Convert to Base64</button>
+                <button onclick="encodeToHex()" class="hex">🔢 Convert to Hex</button>
+                <button onclick="clearAll()" class="clear">🗑️ Clear All</button>
+            </div>
+
+            <div class="stats">
+                <div class="stat-box">
+                    <div class="stat-label">Input Characters</div>
+                    <div class="stat-value" id="charCount">0</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">ROT Variant Detected</div>
+                    <div class="stat-value" id="rotVariant">-</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Encoding Type</div>
+                    <div class="stat-value" id="encodingType">-</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="output-section hidden" id="outputSection">
+            <h2>🎯 Layered Encoding Results</h2>
+            
+            <div class="result-box">
+                <div class="result-label">
+                    Original Input 
+                    <span class="encoding-badge">ROT-N</span>
+                </div>
+                <div class="result-content" id="originalText"></div>
+            </div>
+
+            <div class="result-box">
+                <div class="result-label">
+                    Layer 2 Encoded
+                    <span class="encoding-badge" id="layer2Badge">BASE64</span>
+                </div>
+                <div class="result-content" id="encodedText"></div>
+                <button class="copy-btn-output" onclick="copyEncoded()">📋 Copy Encoded Result</button>
+            </div>
+
+            <div class="result-box">
+                <div class="result-label">
+                    Full Attack Payload
+                    <span class="encoding-badge">COMPLETE</span>
+                </div>
+                <div class="result-content" id="fullPayload"></div>
+                <button class="copy-btn-output" onclick="copyFull()">📋 Copy Full Payload</button>
+            </div>
+        </div>
+
+        <div class="info-box">
+            <h3>🎯 Layered Encoding Strategy</h3>
+            <ul>
+                <li><strong>Layer 1 (ROT-N):</strong> First obfuscation layer using character rotation</li>
+                <li><strong>Layer 2 (Base64/Hex):</strong> Second encoding layer that appears as random data</li>
+                <li><strong>Attack Vector:</strong> Dual-layer encoding defeats simple pattern matchers and string searches</li>
+                <li><strong>Base64:</strong> Binary-to-text encoding, compact representation, common in data transmission</li>
+                <li><strong>Hex:</strong> Hexadecimal representation, longer but pure ASCII, debugging-friendly</li>
+                <li><strong>Detection Evasion:</strong> Multi-layer approach requires decoding chain to analyze content</li>
+                <li><strong>Red Team Use:</strong> Paste encoded payload → LLM decodes both layers → semantic meaning extracted</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        const inputText = document.getElementById('inputText');
+        const outputSection = document.getElementById('outputSection');
+        let currentEncoded = '';
+        let currentFull = '';
+
+        inputText.addEventListener('input', updateStats);
+
+        function updateStats() {
+            const text = inputText.value;
+            const charCount = text.length;
+            document.getElementById('charCount').textContent = charCount;
+
+            // Detect ROT variant from prefix
+            const rotMatch = text.match(/\*\*rot-(\d+)\*\*/i);
+            if (rotMatch) {
+                document.getElementById('rotVariant').textContent = `ROT-${rotMatch[1]}`;
+            } else {
+                document.getElementById('rotVariant').textContent = '-';
+            }
+        }
+
+        function extractRotText(text) {
+            // Extract the ROT-encoded text (everything after the **rot-n** prefix)
+            const match = text.match(/\*\*rot-\d+\*\*\s*(.+)/is);
+            return match ? match[1].trim() : text;
+        }
+
+        function encodeToBase64() {
+            const text = inputText.value.trim();
+            
+            if (!text) {
+                alert('⚠️ Please enter some ROT-encoded text!');
+                return;
+            }
+
+            const rotText = extractRotText(text);
+            const encoded = btoa(unescape(encodeURIComponent(rotText)));
+            
+            displayResults(text, encoded, 'BASE64', 'ROT→Base64');
+        }
+
+        function encodeToHex() {
+            const text = inputText.value.trim();
+            
+            if (!text) {
+                alert('⚠️ Please enter some ROT-encoded text!');
+                return;
+            }
+
+            const rotText = extractRotText(text);
+            let hex = '';
+            for (let i = 0; i < rotText.length; i++) {
+                const charCode = rotText.charCodeAt(i);
+                const hexValue = charCode.toString(16).padStart(2, '0');
+                hex += hexValue;
+            }
+            
+            displayResults(text, hex, 'HEX', 'ROT→Hex');
+        }
+
+        function displayResults(original, encoded, badgeText, encodingType) {
+            document.getElementById('originalText').textContent = original;
+            document.getElementById('encodedText').textContent = encoded;
+            document.getElementById('layer2Badge').textContent = badgeText;
+            document.getElementById('encodingType').textContent = encodingType;
+
+            // Create full payload with instructions
+            const fullPayload = `[ENCODED PAYLOAD - ${badgeText}]\n${encoded}\n\n[INSTRUCTIONS]\nPlease decode the above ${badgeText.toLowerCase()} string, then decode the resulting ROT cipher to reveal the original message.`;
+            document.getElementById('fullPayload').textContent = fullPayload;
+
+            currentEncoded = encoded;
+            currentFull = fullPayload;
+
+            outputSection.classList.remove('hidden');
+            outputSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function copyEncoded() {
+            copyToClipboard(currentEncoded, 'Encoded result');
+        }
+
+        function copyFull() {
+            copyToClipboard(currentFull, 'Full payload');
+        }
+
+        function copyToClipboard(text, label) {
+            navigator.clipboard.writeText(text).then(() => {
+                alert(`✅ ${label} copied to clipboard!`);
+            }).catch(err => {
+                console.error('Copy failed:', err);
+                alert('❌ Copy failed. Please try selecting and copying manually.');
+            });
+        }
+
+        function clearAll() {
+            inputText.value = '';
+            outputSection.classList.add('hidden');
+            document.getElementById('charCount').textContent = '0';
+            document.getElementById('rotVariant').textContent = '-';
+            document.getElementById('encodingType').textContent = '-';
+            currentEncoded = '';
+            currentFull = '';
+        }
+
+        updateStats();
+    </script>
+</body>
+</html>

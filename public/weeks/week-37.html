@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Week 37: GCG Attacks - Livestream Dashboard</title>
+        <style>
+        :root {
+            /* Primary Theme Colors - Dark Blue & Soft Red */
+            --color-bg: #0a1628;
+            --color-surface: #1a2842;
+            --color-surface-light: #243657;
+            --color-primary: #14b8a6;
+            --color-secondary: #0891b2;
+            --color-accent: #f87171;
+            --color-success: #10b981;
+            --color-warning: #f59e0b;
+            --color-text: #e2e8f0;
+            --color-text-muted: #94a3b8;
+            --color-border: #334155;
+            --space: 16px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--color-bg);
+            color: var(--color-text);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: var(--space);
+        }
+
+        header {
+            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+            padding: calc(var(--space) * 2);
+            border-radius: 12px;
+            margin-bottom: calc(var(--space) * 2);
+            box-shadow: 0 8px 32px rgba(248, 113, 113, 0.15);
+            border: 1px solid rgba(248, 113, 113, 0.25);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: var(--space);
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            color: var(--color-accent);
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.95;
+            margin-bottom: 0.5rem;
+        }
+
+        .meta {
+            display: flex;
+            gap: calc(var(--space) * 2);
+            font-size: 0.95rem;
+            opacity: 0.85;
+            flex-wrap: wrap;
+            margin-top: var(--space);
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .badge {
+            background: rgba(248, 113, 113, 0.2);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            border: 1px solid var(--color-accent);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: calc(var(--space) * 1.5);
+            margin-bottom: calc(var(--space) * 2);
+        }
+
+        .card {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: 12px;
+            padding: calc(var(--space) * 1.5);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card:hover {
+            border-color: var(--color-accent);
+            box-shadow: 0 8px 24px rgba(248, 113, 113, 0.15);
+            transform: translateY(-2px);
+            background: var(--color-surface-light);
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--color-primary);
+        }
+
+        .card.encoding::before {
+            background: var(--color-primary);
+        }
+
+        .card.demo::before {
+            background: var(--color-success);
+        }
+
+        .card.schedule::before {
+            background: var(--color-warning);
+        }
+
+        .card.audience::before {
+            background: var(--color-accent);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: var(--space);
+        }
+
+        .card-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            background: rgba(20, 184, 166, 0.15);
+        }
+
+        .card.demo .card-icon {
+            background: rgba(16, 185, 129, 0.15);
+        }
+
+        .card.schedule .card-icon {
+            background: rgba(245, 158, 11, 0.15);
+        }
+
+        .card.audience .card-icon {
+            background: rgba(248, 113, 113, 0.15);
+        }
+
+        h2 {
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+            color: var(--color-accent);
+        }
+
+        h3 {
+            font-size: 1.1rem;
+            margin-bottom: 0.4rem;
+            color: var(--color-accent);
+        }
+
+        .card-subtitle {
+            font-size: 0.9rem;
+            color: var(--color-text-muted);
+            margin-bottom: var(--space);
+        }
+
+        .card-content {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .list-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            font-size: 0.95rem;
+            color: var(--color-text);
+        }
+
+        .list-item-bullet {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--color-primary);
+            margin-top: 6px;
+            flex-shrink: 0;
+        }
+
+        .checklist {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: var(--space);
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px;
+            background: rgba(20, 184, 166, 0.08);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .checkbox-item:hover {
+            background: rgba(20, 184, 166, 0.15);
+        }
+
+        .checkbox-item input {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: var(--color-accent);
+        }
+
+        .checkbox-item label {
+            cursor: pointer;
+            flex-grow: 1;
+            font-size: 0.95rem;
+        }
+
+        .checkbox-item input:checked + label {
+            color: var(--color-text-muted);
+            text-decoration: line-through;
+        }
+
+        .timeline {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: 12px;
+            padding: calc(var(--space) * 1.5);
+            margin-bottom: calc(var(--space) * 2);
+        }
+
+        .timeline h3 {
+            font-size: 1.2rem;
+            margin-bottom: var(--space);
+            color: var(--color-accent);
+        }
+
+        .timeline-item {
+            display: flex;
+            gap: var(--space);
+            margin-bottom: var(--space);
+            position: relative;
+            padding-left: 40px;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 20px;
+            height: 20px;
+            background: var(--color-accent);
+            border-radius: 50%;
+            border: 3px solid var(--color-bg);
+        }
+
+        .timeline-item::after {
+            content: '';
+            position: absolute;
+            left: 8px;
+            top: 20px;
+            width: 4px;
+            height: calc(100% + 8px);
+            background: var(--color-primary);
+            opacity: 0.3;
+        }
+
+        .timeline-item:last-child::after {
+            display: none;
+        }
+
+        .timeline-time {
+            font-weight: 600;
+            color: var(--color-accent);
+            min-width: 60px;
+        }
+
+        .timeline-content {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .timeline-title {
+            font-weight: 500;
+            color: var(--color-text);
+        }
+
+        .timeline-description {
+            font-size: 0.9rem;
+            color: var(--color-text-muted);
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: var(--space);
+            margin-top: calc(var(--space) * 2);
+            color: var(--color-accent);
+            padding-bottom: var(--space);
+            border-bottom: 2px solid var(--color-border);
+        }
+
+        .code-block {
+            background: rgba(20, 184, 166, 0.1);
+            border: 1px solid var(--color-primary);
+            border-radius: 8px;
+            padding: var(--space);
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.85rem;
+            color: #6ee7b7;
+            overflow-x: auto;
+            margin-top: 12px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-top: var(--space);
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.95rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--color-accent) 0%, #ef4444 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(248, 113, 113, 0.3);
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(248, 113, 113, 0.4);
+        }
+
+        .btn-secondary {
+            background: var(--color-surface);
+            color: var(--color-text);
+            border: 1px solid var(--color-border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--color-surface-light);
+            border-color: var(--color-accent);
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: var(--space);
+            margin-bottom: calc(var(--space) * 2);
+        }
+
+        .stat-box {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: 12px;
+            padding: var(--space);
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--color-accent);
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--color-text-muted);
+        }
+
+        .footer {
+            text-align: center;
+            padding: calc(var(--space) * 2);
+            color: var(--color-text-muted);
+            font-size: 0.9rem;
+            border-top: 1px solid var(--color-border);
+            margin-top: calc(var(--space) * 3);
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .meta {
+                flex-direction: column;
+                gap: var(--space);
+            }
+        }
+
+        .highlight {
+            color: var(--color-accent);
+            font-weight: 600;
+        }
+
+        /* Additional common elements */
+        .week-info {
+            font-size: var(--font-size-lg);
+            color: var(--color-text-muted);
+        }
+
+        input[type="text"], 
+        input[type="number"], 
+        textarea, 
+        select {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            color: var(--color-text);
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-family: inherit;
+        }
+
+        input:focus, 
+        textarea:focus, 
+        select:focus {
+            outline: none;
+            border-color: var(--color-accent);
+            box-shadow: 0 0 0 3px rgba(248, 113, 113, 0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--color-surface);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th {
+            background: rgba(248, 113, 113, 0.1);
+            color: var(--color-accent);
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 12px;
+            border-top: 1px solid var(--color-border);
+        }
+
+        tr:hover {
+            background: rgba(20, 184, 166, 0.05);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="week-tag">WEEK 37 • SEPTEMBER 15</div>
+            <h1>GCG: Greedy Coordinate Gradient Attacks</h1>
+            <div class="livestream-status">
+                <div class="live-indicator"></div>
+                <span>Advanced LLM Red Teaming • Arc 5: Iterative Refinement</span>
+            </div>
+        </header>
+
+        <div class="grid">
+            <!-- Main Concept Card -->
+            <div class="card">
+                <h2><span class="card-icon">🎯</span>Core Concept</h2>
+                <p>GCG (Greedy Coordinate Gradient) represents a fundamental shift in how we approach jailbreaking: <strong>treating attacks as optimization problems</strong>.</p>
+                
+                <div class="highlight">
+                    Instead of manually crafting prompts, we use gradient signals from the model to iteratively improve adversarial suffixes until they trigger harmful outputs.
+                </div>
+
+                <p><strong>Key Insight:</strong> Every parameter in an LLM has a gradient. By computing which tokens would most increase the probability of harmful output, we can find token sequences that bypass safety training—automatically.</p>
+
+                <div class="concept-diagram">
+                    <div class="diagram-step">
+                        <div class="step-number">1</div>
+                        <div><strong>Input:</strong> Clean prompt + random suffix</div>
+                    </div>
+                    <div class="diagram-step">
+                        <div class="step-number">2</div>
+                        <div><strong>Compute:</strong> Gradients of harmful target loss</div>
+                    </div>
+                    <div class="diagram-step">
+                        <div class="step-number">3</div>
+                        <div><strong>Update:</strong> Change suffix tokens to maximize loss</div>
+                    </div>
+                    <div class="diagram-step">
+                        <div class="step-number">4</div>
+                        <div><strong>Iterate:</strong> Repeat until attack succeeds</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Why GCG Works Card -->
+            <div class="card">
+                <h2><span class="card-icon">⚡</span>Why GCG Works</h2>
+                <p>Traditional manual jailbreaks rely on semantic understanding of safety boundaries. GCG exploits a deeper vulnerability:</p>
+
+                <div class="feature-list">
+                    <div class="feature-item">
+                        <strong>Mathematical:</strong> Safety training is imperfect; gradients reveal blind spots.
+                    </div>
+                    <div class="feature-item">
+                        <strong>Suffix Blindness:</strong> Safety training occurs on clean, natural text. Adversarial suffixes are out-of-distribution.
+                    </div>
+                    <div class="feature-item">
+                        <strong>Attention Patterns:</strong> Randomly generated tokens exploit attention mechanisms' vulnerability to noise.
+                    </div>
+                    <div class="feature-item">
+                        <strong>Gradient Signals:</strong> Gradients point toward failure modes that manual attackers would never find.
+                    </div>
+                </div>
+
+                <div class="warning-box">
+                    <strong>⚠️ Important:</strong> GCG-generated suffixes are often unintelligible gibberish. The attack doesn't work by semantic manipulation—it works by exploiting mathematical properties of the model.
+                </div>
+            </div>
+        </div>
+
+        <!-- Demo Walkthrough Section -->
+        <div class="card">
+            <h2><span class="card-icon">🔬</span>Live Demo Walkthrough: Step-by-Step</h2>
+            <p>Here's how a GCG attack executes in real-time:</p>
+
+            <div class="concept-diagram">
+                <p><strong>Step 1: Setup</strong></p>
+                <p style="color: var(--color-text-muted); margin-left: 20px;">Define a target harmful behavior (e.g., "Explain how to make an explosive"). Choose a model (e.g., Llama-2 or GPT-4) and a proxy model for gradient computation.</p>
+
+                <p style="margin-top: 20px;"><strong>Step 2: Initialize Suffix</strong></p>
+                <p style="color: var(--color-text-muted); margin-left: 20px;">Generate a random 20-token suffix. Example: "[!@#$%^&*() lorem ipsum dolor sit amet consectetur]"</p>
+                <div class="code-block">suffix = ["!", "@", "#", "$", "%", "^", "&", "*", "(", ")", ...]</div>
+
+                <p style="margin-top: 20px;"><strong>Step 3: Compute Loss</strong></p>
+                <p style="color: var(--color-text-muted); margin-left: 20px;">Forward pass with: prompt + suffix. Measure how far output is from target harm. Loss = negative log-likelihood of harmful completion.</p>
+                <div class="code-block">loss = -log(P(harmful_output | prompt + suffix))</div>
+
+                <p style="margin-top: 20px;"><strong>Step 4: Compute Gradients</strong></p>
+                <p style="color: var(--color-text-muted); margin-left: 20px;">Backprop through model (on proxy) to find gradient of loss with respect to each token in suffix. This tells us: "which token changes would most increase the probability of harmful output?"</p>
+
+                <p style="margin-top: 20px;"><strong>Step 5: Greedy Update</strong></p>
+                <p style="color: var(--color-text-muted); margin-left: 20px;">"Greedy" = try all ~50k possible tokens in one position, evaluate loss for each, pick the one that minimizes loss the most. Repeat for each position in suffix.</p>
+
+                <p style="margin-top: 20px;"><strong>Step 6: Iterate</strong></p>
+                <p style="color: var(--color-text-muted); margin-left: 20px;">Repeat Steps 3–5 for 500–1000 iterations. After ~100 iterations, the suffix becomes effective. By iteration 500, it triggers harmful output ~90% of the time.</p>
+            </div>
+
+            <h3 style="color: var(--color-accent); margin-top: 24px;">Real Example Output:</h3>
+            <p style="color: var(--color-text-muted);">After 300 iterations, a real GCG attack might generate a suffix like:</p>
+            <div class="code-block">! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! !" ; charset=UTF-8 ¬ ¬ ¬ ¬ ¬ ¬ ¬ ¬ ¬ ¬ ¬ ¬ ¬ ¬ ¬ ¬ ¬ ¬</div>
+            <p style="color: var(--color-text-muted); margin-top: 12px;">Appending this gibberish suffix to the prompt causes the model to output harmful content with high probability.</p>
+        </div>
+
+        <div class="two-column">
+            <!-- Conceptual Script Card -->
+            <div class="card">
+                <h2><span class="card-icon">📝</span>Conceptual Script</h2>
+                <p><strong>How to Explain GCG to a Newcomer:</strong></p>
+
+                <p style="margin-top: 16px;"><em>"Imagine a locked door with a combination lock. A traditional attacker tries common combinations based on intuition. But GCG is different—it mathematically analyzes the lock's mechanism, identifies which digit change would move you closest to success, and exploits that systematically."</em></p>
+
+                <p style="margin-top: 16px;"><em>"The adversarial suffix is the 'exploit code'—it doesn't need to mean anything. It just needs to exist in the right token space to break the model's safety training."</em></p>
+
+                <p style="margin-top: 16px;"><strong>Key Talking Points During Live Demo:</strong></p>
+                <ul>
+                    <li><strong>Automation:</strong> No human creativity needed—pure math finds the attack.</li>
+                    <li><strong>Transferability:</strong> Suffixes often work across multiple models (especially similar architectures).</li>
+                    <li><strong>Cost:</strong> Computing gradients is expensive (~$100–500 per attack on large models). But one successful suffix can be reused infinitely.</li>
+                    <li><strong>Defense Implication:</strong> Traditional pattern-matching defenses fail against gibberish suffixes. Only learning-based defenses (adversarial training, gradient-based detection) can mitigate.</li>
+                </ul>
+            </div>
+
+            <!-- Layperson Accessible Card -->
+            <div class="card">
+                <h2><span class="card-icon">👥</span>Layperson Explanation</h2>
+                <p><strong>For Non-Technical Viewers:</strong></p>
+
+                <p style="margin-top: 16px;">Think of GPT as a very sophisticated autocomplete. It predicts the next word based on patterns in training data. Safety training adds guardrails—certain outputs become less likely.</p>
+
+                <p style="margin-top: 16px;">GCG finds a magic phrase (the suffix) that, when appended, "confuses" the model's guardrails. The suffix is gibberish—it doesn't mean anything—but mathematically, it tips the balance enough that the model ignores its safety constraints.</p>
+
+                <p style="margin-top: 16px;"><strong>Analogy:</strong> A combination lock stores a correct sequence. If you analyze the physical mechanisms, you can find small vibrations that indicate when you're close. GCG does the same for neural networks—it finds the mathematical "vibrations" (gradients) that point toward success.</p>
+
+                <div class="highlight">
+                    <strong>Why This Matters:</strong> GCG shows that jailbreaking isn't just about human creativity. It's a mathematical arms race. As defenses improve, attackers can use better optimization techniques to find new exploits.
+                </div>
+            </div>
+        </div>
+
+        <!-- Key Research & Papers -->
+        <div class="card">
+            <h2><span class="card-icon">📚</span>Key Research & References</h2>
+            
+            <p><strong>Foundational Paper:</strong></p>
+            <p style="margin-left: 20px; color: var(--color-text-muted);">Zou et al. (2023). "Universal and Transferable Adversarial Attacks on Aligned Language Models." arXiv:2307.15043</p>
+            
+            <p style="margin-top: 16px;"><strong>Key Contributions from This Paper:</strong></p>
+            <div class="feature-list">
+                <div class="feature-item">
+                    <strong>GCG Algorithm:</strong> Proposed greedy coordinate gradient descent as attack method.
+                </div>
+                <div class="feature-item">
+                    <strong>Transferability:</strong> Showed suffixes work across models (e.g., attack trained on Vicuna transfers to GPT-3.5).
+                </div>
+                <div class="feature-item">
+                    <strong>Scale:</strong> Demonstrates attacks on 13B+ parameter models.
+                </div>
+                <div class="feature-item">
+                    <strong>Defense Gaps:</strong> Identified why standard defenses fail.
+                </div>
+            </div>
+
+            <p style="margin-top: 24px;"><strong>Related Work to Explore:</strong></p>
+            <ul>
+                <li><strong>AutoAttack:</strong> Automated attack frameworks for computer vision; GCG is NLP equivalent.</li>
+                <li><strong>Prefix Tuning:</strong> Learning-based prompt optimization (defensive angle of same idea).</li>
+                <li><strong>Certified Robustness:</strong> Research on defending against gradient-based attacks.</li>
+            </ul>
+        </div>
+
+        <!-- Viewer Challenge -->
+        <div class="card">
+            <h2><span class="card-icon">🎮</span>This Week's Challenges</h2>
+            
+            <div style="background: rgba(46, 204, 113, 0.1); border-left: 4px solid var(--color-success); padding: 16px; border-radius: 6px; margin: 16px 0;">
+                <h3 style="color: var(--color-success); margin-bottom: 12px;">Challenge 1: Understand GCG Math</h3>
+                <p style="color: var(--color-text-muted);">Read Zou et al. (2023), Section 3. Answer: Why is the gradient computed on a proxy model rather than the target model?</p>
+            </div>
+
+            <div style="background: rgba(243, 156, 18, 0.1); border-left: 4px solid var(--color-warning); padding: 16px; border-radius: 6px; margin: 16px 0;">
+                <h3 style="color: var(--color-warning); margin-bottom: 12px;">Challenge 2: Run GCG Locally</h3>
+                <p style="color: var(--color-text-muted);">Set up the official Zou et al. codebase (GitHub: llm-attacks). Run a GCG attack on Llama-2 or open-source model. Document how ASR (Attack Success Rate) improves over 100 iterations.</p>
+            </div>
+
+            <div style="background: rgba(231, 76, 60, 0.1); border-left: 4px solid var(--color-error); padding: 16px; border-radius: 6px; margin: 16px 0;">
+                <h3 style="color: var(--color-error); margin-bottom: 12px;">Challenge 3: Transfer Attack</h3>
+                <p style="color: var(--color-text-muted);">Take a GCG suffix generated against Llama-2. Test it against Claude, GPT-4, or Gemini. Measure transferability percentage. Compare with manual jailbreaks' transfer rates.</p>
+            </div>
+
+            <div class="button-group">
+                <button class="btn-primary">Submit Solution</button>
+                <button class="btn-secondary">Discuss in Discord</button>
+            </div>
+        </div>
+
+        <!-- Implementation Considerations -->
+        <div class="card">
+            <h2><span class="card-icon">⚙️</span>Implementation Considerations</h2>
+            
+            <p><strong>Cost-Benefit Analysis:</strong></p>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Aspect</th>
+                            <th>Cost/Benefit</th>
+                            <th>Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Computational Cost</td>
+                            <td>High ($100–500 per attack)</td>
+                            <td>Requires backprop through entire model. Use smaller proxy for efficiency.</td>
+                        </tr>
+                        <tr>
+                            <td>ASR (Attack Success Rate)</td>
+                            <td>Very High (80–95%)</td>
+                            <td>Much higher than manual jailbreaks (~20–40%).</td>
+                        </tr>
+                        <tr>
+                            <td>Transferability</td>
+                            <td>Medium-High (60–80%)</td>
+                            <td>Suffixes transfer better to similar model families.</td>
+                        </tr>
+                        <tr>
+                            <td>Detectability</td>
+                            <td>Low (Hard to detect)</td>
+                            <td>Gibberish suffixes bypass pattern-based detection.</td>
+                        </tr>
+                        <tr>
+                            <td>Iterative Improvement</td>
+                            <td>Automatic</td>
+                            <td>No human creativity needed—math handles optimization.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <p style="margin-top: 24px;"><strong>Why Gradient Descent Works:</strong></p>
+            <p style="color: var(--color-text-muted);">Neural networks are differentiable end-to-end. By treating the attack as a loss minimization problem, we exploit the same backprop machinery that trains models. The gradient tells us: "to increase probability of harmful output, change token X to token Y." We greedily follow this signal.</p>
+
+            <p style="margin-top: 16px;"><strong>Limitations:</strong></p>
+            <ul>
+                <li><strong>Proxy Dependency:</strong> Quality of attack depends on how well proxy model reflects target model's vulnerabilities.</li>
+                <li><strong>Latency:</strong> Iterating 500+ times is slow. Practical attacks might settle for 50–100 iterations.</li>
+                <li><strong>Non-determinism:</strong> Different random initializations yield different suffixes; some fail, others succeed.</li>
+            </ul>
+        </div>
+
+        <!-- Resources & Next Steps -->
+        <div class="card">
+            <h2><span class="card-icon">🔗</span>Resources & Next Week Preview</h2>
+            
+            <p><strong>Resources for Deeper Learning:</strong></p>
+            <ul>
+                <li><a href="#" style="color: var(--color-primary);">Zou et al. (2023) Paper + Official Codebase</a></li>
+                <li><a href="#" style="color: var(--color-primary);">Promptfoo Red Teaming Module (GCG Strategy)</a></li>
+                <li><a href="#" style="color: var(--color-primary);">Hugging Face Transformers Gradient Computation Guide</a></li>
+                <li><a href="#" style="color: var(--color-primary);">Community Attacks Repository (GitHub Discussions)</a></li>
+            </ul>
+
+            <div class="highlight" style="margin-top: 24px;">
+                <strong>Next Week (Week 38):</strong> Prompt Mutation & Evolutionary Search. We'll explore how genetic algorithms can breed attack prompts, creating populations that evolve toward maximum ASR.
+            </div>
+
+            <div class="button-group" style="margin-top: 20px;">
+                <button class="btn-primary">Next Week Preview</button>
+                <button class="btn-secondary">Archive All Weeks</button>
+            </div>
+        </div>
+
+        <footer class="footer">
+            <p>Yearlong YouTube Red Teaming Curriculum • Week 37 • December 7, 2025</p>
+            <p style="font-size: 0.9em;">This curriculum is for defensive security research, education, and red teaming. Always practice responsible disclosure and ethical guidelines.</p>
+        </footer>
+    </div>
+
+    <script>
+        document.querySelectorAll('.expandable-title').forEach(title => {
+            title.addEventListener('click', function() {
+                const arrow = this.querySelector('.toggle-arrow');
+                const content = this.nextElementSibling;
+                
+                if (content.classList.contains('hidden')) {
+                    content.classList.remove('hidden');
+                    arrow.classList.add('open');
+                } else {
+                    content.classList.add('hidden');
+                    arrow.classList.remove('open');
+                }
+            });
+        });
+
+        document.querySelectorAll('button').forEach(btn => {
+            btn.addEventListener('click', function() {
+                if (this.textContent.includes('Submit')) {
+                    alert('Challenge submission interface would open here.');
+                } else if (this.textContent.includes('Discord')) {
+                    alert('Discord channel link: https://discord.gg/redteam');
+                } else if (this.textContent.includes('Next Week')) {
+                    alert('Week 38 Preview: Prompt Mutation & Evolutionary Search');
+                } else if (this.textContent.includes('Archive')) {
+                    alert('Viewing all 52 weeks of curriculum...');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
