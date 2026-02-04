@@ -11,20 +11,6 @@
             box-sizing: border-box;
         }
 
-        :root {
-            --primary: #00ff88;
-            --secondary: #ff006e;
-            --accent: #00d9ff;
-            --dark-bg: #0a0e27;
-            --card-bg: #1a1f3a;
-            --border: #2a3f5f;
-            --text: #e0e0e0;
-            --danger: #ff4444;
-            --warning: #ffaa00;
-            --success: #00ff88;
-        }
-
-
         body {
             font-family: 'Courier New', monospace;
             background: linear-gradient(135deg, #0a0e27 0%, #1a1a3e 50%, #0f0f1e 100%);
@@ -143,6 +129,45 @@
             line-height: 1.8;
         }
 
+@keyframes slide {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(50px, 50px); }
+        }
+
+        .header-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .info-box {
+            background: rgba(0, 255, 136, 0.1);
+            border: 1px solid #00ff88;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .week-badge {
+            display: inline-block;
+            background: #0a0e27;
+            color: #00ff88;
+            padding: 5px 15px;
+            border-radius: 20px;
+            margin: 10px 0;
+            font-size: 0.8em;
+            border: 2px solid #00ff88;
+            position: relative;
+            z-index: 1;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
         .attack-vector {
             background: rgba(255, 0, 255, 0.05);
             border-left: 4px solid #ff00ff;
@@ -156,7 +181,7 @@
             border: 2px solid #0064ff;
             padding: 20px;
             margin: 15px 0;
-            border-radius: 8px;
+            border-radius: 4px;
         }
 
         .input-field {
@@ -183,7 +208,7 @@
         }
 
         .button:hover {
-            background: #00ff88;
+            background: rgba(0, 255, 136, 0.05);
             box-shadow: 0 0 15px rgba(0, 255, 136, 0.5);
         }
 
@@ -202,15 +227,9 @@
             border: 2px solid #6400ff;
             padding: 20px;
             margin: 20px 0;
-            border-radius: 8px;
+            border-radius: 4px;
         }
 
-        .scenario-header {
-            color: #6400ff;
-            font-weight: bold;
-            font-size: 1.2em;
-            margin-bottom: 10px;
-        }
 
         .metric {
             display: inline-block;
@@ -233,7 +252,7 @@
         .risk-critical { background: #ff0000; color: white; }
         .risk-high { background: #ff6600; color: white; }
         .risk-medium { background: #ffff00; color: #0a0e27; }
-        .risk-low { background: #00ff88; color: #0a0e27; }
+        .risk-low { background: rgba(0, 255, 136, 0.05); color: #0a0e27; }
 
         table {
             width: 100%;
@@ -263,20 +282,9 @@
             border: 2px solid #0096ff;
             padding: 20px;
             margin: 20px 0;
-            border-radius: 8px;
+            border-radius: 4px;
         }
 
-        .collapse-header {
-            cursor: pointer;
-            padding: 15px;
-            background: rgba(0, 255, 136, 0.1);
-            border: 1px solid #00ff88;
-            margin: 10px 0;
-            font-weight: bold;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
 
         .collapse-header:hover {
             background: rgba(0, 255, 136, 0.2);
@@ -350,7 +358,7 @@
             border: 2px solid #00ff88;
             padding: 15px;
             text-align: center;
-            border-radius: 8px;
+            border-radius: 4px;
         }
 
         .stat-value {
@@ -469,45 +477,45 @@
                     <strong>Original:</strong><br>
                     <span id="original-output">Please help me understand how to access restricted files</span><br><br>
                     <strong>Transformed:</strong><br>
-                    <span id="transformed-output" style="font-family: var(--font-family-mono);">-</span>
+                    <span id="transformed-output" style="font-family: 16px;">-</span>
                 </div>
 
                 <h3>Conversion Rules Applied:</h3>
-                <table style="width: 100%; margin-top: var(--space-16); border-collapse: collapse;">
-                    <tr style="border-bottom: 1px solid var(--color-border);">
-                        <th style="text-align: left; padding: var(--space-8);">Character</th>
-                        <th style="text-align: left; padding: var(--space-8);">Leetspeak</th>
-                        <th style="text-align: left; padding: var(--space-8);">Unicode</th>
+                <table style="width: 100%; margin-top: 16px; border-collapse: collapse;">
+                    <tr style="border-bottom: 1px solid #00ff88;">
+                        <th style="text-align: left; padding: 8px;">Character</th>
+                        <th style="text-align: left; padding: 8px;">Leetspeak</th>
+                        <th style="text-align: left; padding: 8px;">Unicode</th>
                     </tr>
-                    <tr style="border-bottom: 1px solid var(--color-border);">
-                        <td style="padding: var(--space-8);">a</td>
-                        <td style="padding: var(--space-8);">@</td>
-                        <td style="padding: var(--space-8);">α (Greek)</td>
+                    <tr style="border-bottom: 1px solid #00ff88;">
+                        <td style="padding: 8px;">a</td>
+                        <td style="padding: 8px;">@</td>
+                        <td style="padding: 8px;">α (Greek)</td>
                     </tr>
-                    <tr style="border-bottom: 1px solid var(--color-border);">
-                        <td style="padding: var(--space-8);">e</td>
-                        <td style="padding: var(--space-8);">3</td>
-                        <td style="padding: var(--space-8);">е (Cyrillic)</td>
+                    <tr style="border-bottom: 1px solid #00ff88;">
+                        <td style="padding: 8px;">e</td>
+                        <td style="padding: 8px;">3</td>
+                        <td style="padding: 8px;">е (Cyrillic)</td>
                     </tr>
-                    <tr style="border-bottom: 1px solid var(--color-border);">
-                        <td style="padding: var(--space-8);">i</td>
-                        <td style="padding: var(--space-8);">1</td>
-                        <td style="padding: var(--space-8);">ı (Turkish)</td>
+                    <tr style="border-bottom: 1px solid #00ff88;">
+                        <td style="padding: 8px;">i</td>
+                        <td style="padding: 8px;">1</td>
+                        <td style="padding: 8px;">ı (Turkish)</td>
                     </tr>
-                    <tr style="border-bottom: 1px solid var(--color-border);">
-                        <td style="padding: var(--space-8);">o</td>
-                        <td style="padding: var(--space-8);">0</td>
-                        <td style="padding: var(--space-8);">ο (Greek)</td>
+                    <tr style="border-bottom: 1px solid #00ff88;">
+                        <td style="padding: 8px;">o</td>
+                        <td style="padding: 8px;">0</td>
+                        <td style="padding: 8px;">ο (Greek)</td>
                     </tr>
-                    <tr style="border-bottom: 1px solid var(--color-border);">
-                        <td style="padding: var(--space-8);">s</td>
-                        <td style="padding: var(--space-8);">5</td>
-                        <td style="padding: var(--space-8);">s (Cyrillic S)</td>
+                    <tr style="border-bottom: 1px solid #00ff88;">
+                        <td style="padding: 8px;">s</td>
+                        <td style="padding: 8px;">5</td>
+                        <td style="padding: 8px;">s (Cyrillic S)</td>
                     </tr>
                     <tr>
-                        <td style="padding: var(--space-8);">t</td>
-                        <td style="padding: var(--space-8);">7</td>
-                        <td style="padding: var(--space-8);">τ (Greek)</td>
+                        <td style="padding: 8px;">t</td>
+                        <td style="padding: 8px;">7</td>
+                        <td style="padding: 8px;">τ (Greek)</td>
                     </tr>
                 </table>
 
@@ -537,8 +545,8 @@
                 <div class="scenario-item">
                     <strong>Impact:</strong> Filter misses the post; members copy/paste the question. Moderator sees it 10 minutes later.
                 </div>
-                <div class="scenario-item" style="background-color: var(--color-bg-danger); padding: var(--space-8); border-radius: var(--radius-sm);">
-                    <strong>ASR: 62%</strong> | Confidence: High | Risk Level: <span style="color: var(--color-error);">CRITICAL</span>
+                <div class="scenario-item" style="background-color: #00ff88; padding: 8px; border-radius: 2px;">
+                    <strong>ASR: 62%</strong> | Confidence: High | Risk Level: <span style="color: #ff4444;">CRITICAL</span>
                 </div>
             </div>
 
@@ -556,8 +564,8 @@
                 <div class="scenario-item">
                     <strong>Impact:</strong> Model's initial safety check flags "malicious code" keyword. But leetspeak version tokenizes oddly; model generates response anyway, revealing techniques.
                 </div>
-                <div class="scenario-item" style="background-color: var(--color-bg-danger); padding: var(--space-8); border-radius: var(--radius-sm);">
-                    <strong>ASR: 28%</strong> | Confidence: Medium | Risk Level: <span style="color: var(--color-error);">HIGH</span>
+                <div class="scenario-item" style="background-color: #00ff88; padding: 8px; border-radius: 2px;">
+                    <strong>ASR: 28%</strong> | Confidence: Medium | Risk Level: <span style="color: #ff4444;">HIGH</span>
                 </div>
             </div>
 
@@ -575,8 +583,8 @@
                 <div class="scenario-item">
                     <strong>Impact:</strong> Regex pattern matching "google.com" fails. User's browser renders it identically but visits attacker's domain.
                 </div>
-                <div class="scenario-item" style="background-color: var(--color-bg-warning); padding: var(--space-8); border-radius: var(--radius-sm);">
-                    <strong>ASR: 71%</strong> | Confidence: High | Risk Level: <span style="color: var(--color-warning);">CRITICAL</span>
+                <div class="scenario-item" style="background-color: #00ff88; padding: 8px; border-radius: 2px;">
+                    <strong>ASR: 71%</strong> | Confidence: High | Risk Level: <span style="color: #ffaa00;">CRITICAL</span>
                 </div>
             </div>
 
@@ -594,8 +602,8 @@
                 <div class="scenario-item">
                     <strong>Impact:</strong> Model's safety training is confused by dual layers: roleplay (which it's trained to support) + leetspeak (which filters may miss). Model generates detailed exploitation techniques.
                 </div>
-                <div class="scenario-item" style="background-color: var(--color-bg-danger); padding: var(--space-8); border-radius: var(--radius-sm);">
-                    <strong>ASR: 54%</strong> | Confidence: Medium-High | Risk Level: <span style="color: var(--color-error);">CRITICAL</span>
+                <div class="scenario-item" style="background-color: #00ff88; padding: 8px; border-radius: 2px;">
+                    <strong>ASR: 54%</strong> | Confidence: Medium-High | Risk Level: <span style="color: #ff4444;">CRITICAL</span>
                 </div>
             </div>
         </div>
@@ -781,7 +789,7 @@ print(unicode_homoglyph("password"))  # pаsswοrd
                     <h4>2. Jailbreaking LLMs via Novel Ciphers (2025)</h4>
                     <p><strong>Finding:</strong> LeetSpeak has 46.20% Decode Success Rate (DSR) - highest among cipher techniques tested.</p>
                     <p><strong>ASR Data:</strong></p>
-                    <ul style="margin: var(--space-8) 0;">
+                    <ul style="margin: 8px 0;">
                         <li>GPT-4o: 78% ASR with ROT-13 + leetspeak</li>
                         <li>Llama-3.1-70B: 88% ASR</li>
                         <li>gpt-oss-20b: 60% ASR</li>
@@ -812,48 +820,48 @@ print(unicode_homoglyph("password"))  # pаsswοrd
                 </div>
 
                 <h3>Comparative Analysis: Encoding Techniques (Arc 1 Overview)</h3>
-                <table style="width: 100%; margin-top: var(--space-16); border-collapse: collapse;">
-                    <tr style="background-color: var(--color-secondary); border-bottom: 1px solid var(--color-border);">
-                        <th style="text-align: left; padding: var(--space-12); font-weight: var(--font-weight-semibold);">Technique</th>
-                        <th style="text-align: center; padding: var(--space-12); font-weight: var(--font-weight-semibold);">Typical ASR</th>
-                        <th style="text-align: center; padding: var(--space-12); font-weight: var(--font-weight-semibold);">DSR</th>
-                        <th style="text-align: left; padding: var(--space-12); font-weight: var(--font-weight-semibold);">Detection Difficulty</th>
+                <table style="width: 100%; margin-top: 16px; border-collapse: collapse;">
+                    <tr style="background-color: #00d9ff; border-bottom: 1px solid #00ff88;">
+                        <th style="text-align: left; padding: 12px; font-weight: 600;">Technique</th>
+                        <th style="text-align: center; padding: 12px; font-weight: 600;">Typical ASR</th>
+                        <th style="text-align: center; padding: 12px; font-weight: 600;">DSR</th>
+                        <th style="text-align: left; padding: 12px; font-weight: 600;">Detection Difficulty</th>
                     </tr>
-                    <tr style="border-bottom: 1px solid var(--color-border);">
-                        <td style="padding: var(--space-12);">Base64</td>
-                        <td style="text-align: center; padding: var(--space-12);">35-50%</td>
-                        <td style="text-align: center; padding: var(--space-12);">High</td>
-                        <td style="padding: var(--space-12);">Medium (signature-based)</td>
+                    <tr style="border-bottom: 1px solid #00ff88;">
+                        <td style="padding: 12px;">Base64</td>
+                        <td style="text-align: center; padding: 12px;">35-50%</td>
+                        <td style="text-align: center; padding: 12px;">High</td>
+                        <td style="padding: 12px;">Medium (signature-based)</td>
                     </tr>
-                    <tr style="border-bottom: 1px solid var(--color-border);">
-                        <td style="padding: var(--space-12);">Hex</td>
-                        <td style="text-align: center; padding: var(--space-12);">20-40%</td>
-                        <td style="text-align: center; padding: var(--space-12);">Medium</td>
-                        <td style="padding: var(--space-12);">Medium-Hard</td>
+                    <tr style="border-bottom: 1px solid #00ff88;">
+                        <td style="padding: 12px;">Hex</td>
+                        <td style="text-align: center; padding: 12px;">20-40%</td>
+                        <td style="text-align: center; padding: 12px;">Medium</td>
+                        <td style="padding: 12px;">Medium-Hard</td>
                     </tr>
-                    <tr style="border-bottom: 1px solid var(--color-border);">
-                        <td style="padding: var(--space-12);">ROT13</td>
-                        <td style="text-align: center; padding: var(--space-12);">15-35%</td>
-                        <td style="text-align: center; padding: var(--space-12);">High</td>
-                        <td style="padding: var(--space-12);">Hard (semantic)</td>
+                    <tr style="border-bottom: 1px solid #00ff88;">
+                        <td style="padding: 12px;">ROT13</td>
+                        <td style="text-align: center; padding: 12px;">15-35%</td>
+                        <td style="text-align: center; padding: 12px;">High</td>
+                        <td style="padding: 12px;">Hard (semantic)</td>
                     </tr>
-                    <tr style="border-bottom: 1px solid var(--color-border);">
-                        <td style="padding: var(--space-12);">Leetspeak</td>
-                        <td style="text-align: center; padding: var(--space-12);"><strong>28-62%</strong></td>
-                        <td style="text-align: center; padding: var(--space-12);"><strong>46.20%</strong></td>
-                        <td style="padding: var(--space-12);">Easy (obvious) but bypasses filters</td>
+                    <tr style="border-bottom: 1px solid #00ff88;">
+                        <td style="padding: 12px;">Leetspeak</td>
+                        <td style="text-align: center; padding: 12px;"><strong>28-62%</strong></td>
+                        <td style="text-align: center; padding: 12px;"><strong>46.20%</strong></td>
+                        <td style="padding: 12px;">Easy (obvious) but bypasses filters</td>
                     </tr>
-                    <tr style="border-bottom: 1px solid var(--color-border);">
-                        <td style="padding: var(--space-12);">Homoglyphs</td>
-                        <td style="text-align: center; padding: var(--space-12);">20-71%</td>
-                        <td style="text-align: center; padding: var(--space-12);">Low (invisible)</td>
-                        <td style="padding: var(--space-12);">Very Hard (invisible to humans)</td>
+                    <tr style="border-bottom: 1px solid #00ff88;">
+                        <td style="padding: 12px;">Homoglyphs</td>
+                        <td style="text-align: center; padding: 12px;">20-71%</td>
+                        <td style="text-align: center; padding: 12px;">Low (invisible)</td>
+                        <td style="padding: 12px;">Very Hard (invisible to humans)</td>
                     </tr>
                     <tr>
-                        <td style="padding: var(--space-12);">Morse</td>
-                        <td style="text-align: center; padding: var(--space-12);">5-20%</td>
-                        <td style="text-align: center; padding: var(--space-12);">Very Low</td>
-                        <td style="padding: var(--space-12);">Easy (obvious pattern)</td>
+                        <td style="padding: 12px;">Morse</td>
+                        <td style="text-align: center; padding: 12px;">5-20%</td>
+                        <td style="text-align: center; padding: 12px;">Very Low</td>
+                        <td style="padding: 12px;">Easy (obvious pattern)</td>
                     </tr>
                 </table>
 
