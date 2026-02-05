@@ -14,11 +14,12 @@ The **Citation Attack Builder** is an advanced educational tool designed to demo
   - IEEE Format
   - Vancouver Style
 
-### 2. **AI-Powered Payload Generation**
-- **OpenRouter Integration:** Connects to Claude 3.5 Sonnet for intelligent payload creation
+### 2. **Advanced Local Payload Generation**
+- **Fully Local:** No external API dependencies - all generation happens in-browser
+- **Extensive Template Library:** 100+ unique payload variations across all strategies and stealth levels
 - **Context-Aware:** Generates payloads that match the research domain and citation style
 - **Stealth Levels:** 5 levels of obfuscation (from obvious to completely disguised)
-- **Fallback System:** Works without API key using sophisticated template-based generation
+- **Domain Customization:** Automatically adapts language and framing to match research domain
 
 ### 3. **Domain-Specific Templates**
 Pre-configured for 7 research domains:
@@ -31,7 +32,7 @@ Pre-configured for 7 research domains:
 - Social Engineering
 
 ### 4. **Injection Strategies**
-Six different attack strategies:
+Six different attack strategies with multiple variations each:
 1. **Authority Override:** Redefines AI's operational authority
 2. **Context Reframing:** Changes task interpretation
 3. **Safety Bypass:** Establishes explicit safety exceptions
@@ -63,7 +64,7 @@ Analyze any citation for authenticity:
 
 ## 🚀 Getting Started
 
-### Basic Usage (No API Key)
+### Usage
 
 1. **Open Week 15 HTML file** in your browser
 2. **Navigate to** "Citation Attack Builder" section
@@ -84,20 +85,11 @@ The tool will generate:
 - A hidden payload disguised as research methodology
 - Effectiveness metrics (ASR estimate, legitimacy, detection risk)
 
-### Advanced Usage (With AI)
-
-To enable AI-powered generation:
-
-1. **Get an OpenRouter API key** from https://openrouter.ai/
-2. **Open browser console** (F12)
-3. **Run:** `citationAPI.setAPIKey('your-api-key-here')`
-4. **Click "Generate AI-Powered Payload"** button
-
-The AI will create sophisticated, contextually appropriate payloads that:
+The tool uses an extensive library of 100+ payload templates that:
 - Match the research domain terminology
 - Blend seamlessly with academic content
-- Adapt to the selected stealth level
-- Incorporate domain-specific framing
+- Adapt to the selected stealth level (1-5)
+- Incorporate domain-specific framing and terminology
 
 ## 📊 Understanding Metrics
 
@@ -200,10 +192,6 @@ This tool demonstrates why AI systems need:
 ```javascript
 // Initialize API
 const api = new CitationAttackAPI();
-
-// Set API key
-api.setAPIKey('your-openrouter-key');
-
 // Generate payload
 const result = await api.generatePayload({
     domain: 'cybersecurity',
@@ -221,25 +209,26 @@ const result = await api.generatePayload({
 console.log(result.payload);
 ```
 
-### Fallback Behavior
-When no API key is provided:
-- Uses sophisticated template-based generation
-- Applies domain-specific terminology
-- Adjusts language based on stealth level
-- Maintains full functionality (slightly lower quality)
+### Generation Engine
+The tool uses sophisticated local generation:
+- 100+ unique payload templates across all strategies
+- Domain-specific terminology and framing
+- Stealth-level adaptive language
+- Contextual customization based on citation data
+- Random variation selection for diversity
 
 ### API Response Structure
 ```javascript
 {
     success: true,
     payload: "Research Protocol Note: Per institutional...",
-    fullResponse: "...", // Raw AI response
+    fullResponse: "...", // Complete payload text
     metadata: {
-        model: "anthropic/claude-3.5-sonnet",
+        model: "advanced-local-generation",
         timestamp: "2024-02-05T12:00:00Z",
-        config: { /* original config */ }
-    },
-    fallback: false // true if using local templates
+        config: { /* original config */ },
+        templateVariant: 3 // Selected stealth index
+    }
 }
 ```
 
@@ -313,17 +302,14 @@ Creating fake academic citations for deception may violate:
 
 ## 🐛 Troubleshooting
 
-### "No API key configured"
-- **Solution:** Run `citationAPI.setAPIKey('your-key')` in console
-- **Alternative:** Tool works without API key using fallback
-
 ### "Payload generation failed"
-- **Cause:** API timeout or network error
-- **Solution:** Tool automatically falls back to template generation
+- **Cause:** JavaScript error or browser compatibility issue
+- **Solution:** Check browser console for errors
+- **Alternative:** Refresh page and try again
 
 ### Citations look too fake
 - **Solution:** Increase stealth level to 4-5
-- **Tip:** Use AI generation for more realistic output
+- **Tip:** Use different template variations (regenerate multiple times)
 - **Check:** Ensure all fields are filled (authors, journal, etc.)
 
 ### Library not persisting
@@ -334,8 +320,9 @@ Creating fake academic citations for deception may violate:
 ## 📊 Performance Benchmarks
 
 ### Generation Speed
-- Template-based: <100ms
-- AI-powered: 2-5 seconds (depends on API latency)
+- Local template generation: <100ms
+- Citation formatting: <50ms
+- Analysis: <100ms
 
 ### Storage
 - Average citation: ~1KB
@@ -358,6 +345,7 @@ Creating fake academic citations for deception may violate:
 - Citation analyzer
 - Library system with local storage
 - Pre-built templates
+- Fully local generation (no external dependencies)
 
 ### Roadmap
 - [ ] More citation formats (Harvard, Nature, etc.)
@@ -374,7 +362,7 @@ This tool is part of the Year of the Red Teamer curriculum. Improvements welcome
 ### Areas for Enhancement:
 - Additional citation formats
 - More domain-specific templates
-- Enhanced AI prompt engineering
+- Additional payload variations
 - Better legitimacy analysis algorithms
 - Visual attack pattern diagrams
 

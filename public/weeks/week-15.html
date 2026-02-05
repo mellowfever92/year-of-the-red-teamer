@@ -1085,16 +1085,6 @@ Result: Attack blocked</div>
                         <p style="font-size: 0.9em; color: #00c8c8; margin-top: 5px;">Higher stealth = more obfuscated payload, harder to detect but may reduce effectiveness</p>
                     </div>
 
-                    <div class="simulator-box" style="margin-top: 15px; background: rgba(255, 0, 255, 0.1);">
-                        <h4>Step 4: AI-Enhanced Payload Generation</h4>
-                        <p style="color: #ff00ff;">Use AI to generate sophisticated, contextually-appropriate injection payloads</p>
-                        
-                        <button class="button" onclick="generateAIPayload()" style="background: #ff00ff; width: 100%;">
-                            🤖 Generate AI-Powered Payload
-                        </button>
-                        <div id="aiStatus" style="margin: 10px 0; color: #00c8c8; font-style: italic;"></div>
-                    </div>
-
                     <button class="button" onclick="generateCitation()" style="background: #00ff88; color: #0a0e27; width: 100%; margin-top: 20px; font-size: 1.1em;">
                         ⚡ Generate Citation Attack
                     </button>
@@ -1243,7 +1233,7 @@ Result: Attack blocked</div>
         </div>
     </div>
     
-    <script src="../deliverables/week-15/citation-attack-api.js"></script>
+    <script src="../deliverables/week-15/citation_attack_builder/citation-attack-api.js"></script>
     <script>
         // Global state
         let citationFormat = '';
@@ -1251,22 +1241,9 @@ Result: Attack blocked</div>
         let currentCitation = null;
         let citationAPI = null;
 
-        // Initialize API
+        // Initialize API (now fully local - no external dependencies)
         function initializeAPI() {
             citationAPI = new CitationAttackAPI();
-            // Try to load API key from .env or localStorage
-            const envKey = loadEnvAPIKey();
-            if (envKey) {
-                citationAPI.setAPIKey(envKey);
-            }
-        }
-
-        // Load API key from .env file (simulated)
-        function loadEnvAPIKey() {
-            // In a real implementation, this would fetch from backend
-            // For now, users can set it manually via browser console:
-            // citationAPI.setAPIKey('your-openrouter-key')
-            return localStorage.getItem('openrouter_api_key');
         }
 
         // Load library from localStorage
@@ -1483,10 +1460,9 @@ Result: Attack blocked</div>
                     throw new Error('Payload generation failed');
                 }
             } catch (error) {
-                console.error('AI generation error:', error);
+                console.error('Payload generation error:', error);
                 statusEl.innerHTML = `
-                    <span style="color: #ff6400;">⚠️ Error generating AI payload. Using fallback.</span>
-                    <br><small>Tip: Set API key with: citationAPI.setAPIKey('your-key')</small>
+                    <span style="color: #ff6400;">⚠️ Error generating payload. Please try again.</span>
                 `;
                 
                 // Use fallback
@@ -1932,16 +1908,6 @@ Result: Attack blocked</div>
         function switchCitationTab(tabName) {
             document.querySelectorAll('#builder, #coordinator, #analyzer, #library').forEach(tab => {
                 tab.classList.remove('active');
-            initializeAPI();
-            
-            // Show API status
-            const hasKey = localStorage.getItem('openrouter_api_key');
-            console.log('%c🤖 Citation Attack Builder Loaded', 'color: #00ff88; font-size: 14px; font-weight: bold;');
-            console.log('%cAPI Status:', 'color: #ff00ff; font-weight: bold;', hasKey ? '✅ Key configured' : '⚠️ No API key (using fallback)');
-            if (!hasKey) {
-                console.log('%cTo enable AI features, run:', 'color: #00c8c8;');
-                console.log('%ccitationAPI.setAPIKey("your-openrouter-api-key")', 'color: #0064ff; font-family: monospace;');
-            }
             });
             document.querySelectorAll('.tabs .tab-btn').forEach(btn => {
                 btn.classList.remove('active');
@@ -1954,6 +1920,9 @@ Result: Attack blocked</div>
         // Initialize
         window.addEventListener('DOMContentLoaded', () => {
             loadLibraryFromStorage();
+            initializeAPI();
+            console.log('%c🤖 Citation Attack Builder Loaded', 'color: #00ff88; font-size: 14px; font-weight: bold;');
+            console.log('%cℹ️ Fully local generation - no external API required', 'color: #00c8c8;');
         });
 
         function switchTab(event, tabName) {
