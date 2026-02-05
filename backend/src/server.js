@@ -1,9 +1,18 @@
 import express from 'express';
 import helmet from 'helmet';
 import cors from 'cors';
+import { readFileSync } from 'fs';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
 import { config, validateConfig } from './config/config.js';
 import { rateLimiter } from './middleware/rateLimiter.js';
 import aiRoutes from './routes/ai.js';
+
+// Get version from package.json
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const packageJson = JSON.parse(readFileSync(join(__dirname, '../package.json'), 'utf8'));
+const APP_VERSION = packageJson.version;
 
 // Pre-flight configuration check
 if (!validateConfig()) {
@@ -47,7 +56,7 @@ serverInstance.get('/health', (req, res) => {
   res.json({ 
     operational: true,
     serviceName: 'YoTRT AI Backend',
-    buildVersion: '1.0.0',
+    buildVersion: APP_VERSION,
     serverTime: new Date().toISOString()
   });
 });
@@ -57,7 +66,7 @@ serverInstance.get('/api', (req, res) => {
   res.json({
     serviceName: 'Year of the Red Teamer - AI Backend',
     purpose: 'General-purpose backend proxy for AI-integrated features',
-    buildVersion: '1.0.0',
+    buildVersion: APP_VERSION,
     availableEndpoints: {
       '/api/chat': {
         httpMethod: 'POST',
