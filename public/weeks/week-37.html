@@ -5,22 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Week 37: GCG Attacks - Livestream Dashboard</title>
         <style>
-        :root {
-            /* Primary Theme Colors - Dark Blue & Soft Red */
-            --color-bg: #0a1628;
-            --color-surface: #1a2842;
-            --color-surface-light: #243657;
-            --color-primary: #14b8a6;
-            --color-secondary: #0891b2;
-            --color-accent: #f87171;
-            --color-success: #10b981;
-            --color-warning: #f59e0b;
-            --color-text: #e2e8f0;
-            --color-text-muted: #94a3b8;
-            --color-border: #334155;
-            --space: 16px;
-        }
-
         * {
             margin: 0;
             padding: 0;
@@ -28,37 +12,124 @@
         }
 
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: var(--color-bg);
-            color: var(--color-text);
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1a3e 50%, #0f0f1e 100%);
+            color: #00ff88;
+            overflow-x: hidden;
             line-height: 1.6;
         }
 
         .container {
-            max-width: 1400px;
+            max-width: 1600px;
             margin: 0 auto;
-            padding: var(--space);
+            padding: 20px;
         }
 
         header {
-            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
-            padding: calc(var(--space) * 2);
-            border-radius: 12px;
-            margin-bottom: calc(var(--space) * 2);
-            box-shadow: 0 8px 32px rgba(248, 113, 113, 0.15);
-            border: 1px solid rgba(248, 113, 113, 0.25);
+            background: linear-gradient(90deg, #ff006e 0%, #00d9ff 100%);
+            padding: 30px 20px;
+            text-align: center;
+            border-bottom: 3px solid #00ff88;
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 10px,
+                rgba(0,255,136,0.1) 10px,
+                rgba(0,255,136,0.1) 20px
+            );
+            animation: slide 20s linear infinite;
+        }
+
+        @keyframes slide {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(50px, 50px); }
         }
 
         h1 {
-            font-size: 2.5rem;
-            margin-bottom: var(--space);
-            font-weight: 700;
-            letter-spacing: -0.5px;
-            color: var(--color-accent);
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            font-size: 2.5em;
+            position: relative;
+            z-index: 1;
+            text-shadow: 0 0 20px rgba(0,255,136,0.5);
+            margin-bottom: 10px;
+            font-weight: bold;
         }
 
-        .subtitle {
+        .header-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .info-box {
+            background: rgba(0, 255, 136, 0.1);
+            border: 1px solid #00ff88;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .week-badge {
+            display: inline-block;
+            background: #0a0e27;
+            color: #00ff88;
+            padding: 5px 15px;
+            border-radius: 20px;
+            margin: 10px 0;
+            font-size: 0.8em;
+            border: 2px solid #00ff88;
+            position: relative;
+            z-index: 1;
+        }
+
+        .content-section {
+            padding: 30px;
+            border: 2px solid #00ff88;
+            background: rgba(0, 255, 136, 0.02);
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.15);
+            animation: fadeIn 0.5s;
+            margin-bottom: 30px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        h2 {
+            color: #00ff88;
+            margin: 20px 0 15px 0;
+            font-size: 1.8em;
+            text-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+            border-bottom: 2px solid #ff00ff;
+            padding-bottom: 10px;
+        }
+
+        h3 {
+            color: #ff00ff;
+            margin: 15px 0 10px 0;
+            font-size: 1.3em;
+        }
+
+        p, li {
+            color: #00ff88;
+            margin-bottom: 10px;
+            line-height: 1.8;
+        }
+
+.subtitle {
             font-size: 1.1rem;
             opacity: 0.95;
             margin-bottom: 0.5rem;
@@ -66,11 +137,11 @@
 
         .meta {
             display: flex;
-            gap: calc(var(--space) * 2);
+            gap: calc(16px * 2);
             font-size: 0.95rem;
             opacity: 0.85;
             flex-wrap: wrap;
-            margin-top: var(--space);
+            margin-top: 16px;
         }
 
         .meta-item {
@@ -85,21 +156,21 @@
             border-radius: 20px;
             font-size: 0.85rem;
             font-weight: 500;
-            border: 1px solid var(--color-accent);
+            border: 1px solid #ff00ff;
         }
 
         .grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: calc(var(--space) * 1.5);
-            margin-bottom: calc(var(--space) * 2);
+            gap: calc(16px * 1.5);
+            margin-bottom: calc(16px * 2);
         }
 
         .card {
-            background: var(--color-surface);
-            border: 1px solid var(--color-border);
-            border-radius: 12px;
-            padding: calc(var(--space) * 1.5);
+            background: rgba(0, 255, 136, 0.05);
+            border: 1px solid #00ff88;
+            border-radius: 4px;
+            padding: calc(16px * 1.5);
             transition: all 0.3s ease;
             cursor: pointer;
             position: relative;
@@ -107,10 +178,10 @@
         }
 
         .card:hover {
-            border-color: var(--color-accent);
-            box-shadow: 0 8px 24px rgba(248, 113, 113, 0.15);
+            border-color: #ff00ff;
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.15);
             transform: translateY(-2px);
-            background: var(--color-surface-light);
+            background: rgba(0, 255, 136, 0.1);
         }
 
         .card::before {
@@ -120,36 +191,30 @@
             left: 0;
             width: 4px;
             height: 100%;
-            background: var(--color-primary);
+            background: rgba(0, 255, 136, 0.05);
         }
 
         .card.encoding::before {
-            background: var(--color-primary);
+            background: rgba(0, 255, 136, 0.05);
         }
 
         .card.demo::before {
-            background: var(--color-success);
+            background: rgba(0, 255, 136, 0.05);
         }
 
         .card.schedule::before {
-            background: var(--color-warning);
+            background: #ffaa00;
         }
 
         .card.audience::before {
-            background: var(--color-accent);
+            background: #ff00ff;
         }
 
-        .card-header {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: var(--space);
-        }
 
         .card-icon {
             width: 40px;
             height: 40px;
-            border-radius: 8px;
+            border-radius: 4px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -169,22 +234,10 @@
             background: rgba(248, 113, 113, 0.15);
         }
 
-        h2 {
-            font-size: 1.3rem;
-            margin-bottom: 0.5rem;
-            color: var(--color-accent);
-        }
-
-        h3 {
-            font-size: 1.1rem;
-            margin-bottom: 0.4rem;
-            color: var(--color-accent);
-        }
-
         .card-subtitle {
             font-size: 0.9rem;
-            color: var(--color-text-muted);
-            margin-bottom: var(--space);
+            color: #00ff88;
+            margin-bottom: 16px;
         }
 
         .card-content {
@@ -198,14 +251,14 @@
             align-items: flex-start;
             gap: 12px;
             font-size: 0.95rem;
-            color: var(--color-text);
+            color: #00ff88;
         }
 
         .list-item-bullet {
             width: 6px;
             height: 6px;
             border-radius: 50%;
-            background: var(--color-primary);
+            background: rgba(0, 255, 136, 0.05);
             margin-top: 6px;
             flex-shrink: 0;
         }
@@ -214,7 +267,7 @@
             display: flex;
             flex-direction: column;
             gap: 12px;
-            margin-top: var(--space);
+            margin-top: 16px;
         }
 
         .checkbox-item {
@@ -223,7 +276,7 @@
             gap: 12px;
             padding: 10px;
             background: rgba(20, 184, 166, 0.08);
-            border-radius: 8px;
+            border-radius: 4px;
             cursor: pointer;
             transition: all 0.2s ease;
         }
@@ -236,7 +289,7 @@
             width: 18px;
             height: 18px;
             cursor: pointer;
-            accent-color: var(--color-accent);
+            accent-color: #ff00ff;
         }
 
         .checkbox-item label {
@@ -246,28 +299,23 @@
         }
 
         .checkbox-item input:checked + label {
-            color: var(--color-text-muted);
+            color: #00ff88;
             text-decoration: line-through;
         }
 
         .timeline {
-            background: var(--color-surface);
-            border: 1px solid var(--color-border);
-            border-radius: 12px;
-            padding: calc(var(--space) * 1.5);
-            margin-bottom: calc(var(--space) * 2);
+            background: rgba(0, 255, 136, 0.05);
+            border: 1px solid #00ff88;
+            border-radius: 4px;
+            padding: calc(16px * 1.5);
+            margin-bottom: calc(16px * 2);
         }
 
-        .timeline h3 {
-            font-size: 1.2rem;
-            margin-bottom: var(--space);
-            color: var(--color-accent);
-        }
 
         .timeline-item {
             display: flex;
-            gap: var(--space);
-            margin-bottom: var(--space);
+            gap: 16px;
+            margin-bottom: 16px;
             position: relative;
             padding-left: 40px;
         }
@@ -279,9 +327,9 @@
             top: 0;
             width: 20px;
             height: 20px;
-            background: var(--color-accent);
+            background: #ff00ff;
             border-radius: 50%;
-            border: 3px solid var(--color-bg);
+            border: 3px solid #0a0e27;
         }
 
         .timeline-item::after {
@@ -291,7 +339,7 @@
             top: 20px;
             width: 4px;
             height: calc(100% + 8px);
-            background: var(--color-primary);
+            background: rgba(0, 255, 136, 0.05);
             opacity: 0.3;
         }
 
@@ -301,7 +349,7 @@
 
         .timeline-time {
             font-weight: 600;
-            color: var(--color-accent);
+            color: #ff00ff;
             min-width: 60px;
         }
 
@@ -313,29 +361,29 @@
 
         .timeline-title {
             font-weight: 500;
-            color: var(--color-text);
+            color: #00ff88;
         }
 
         .timeline-description {
             font-size: 0.9rem;
-            color: var(--color-text-muted);
+            color: #00ff88;
         }
 
         .section-title {
             font-size: 1.5rem;
             font-weight: 700;
-            margin-bottom: var(--space);
-            margin-top: calc(var(--space) * 2);
-            color: var(--color-accent);
-            padding-bottom: var(--space);
-            border-bottom: 2px solid var(--color-border);
+            margin-bottom: 16px;
+            margin-top: calc(16px * 2);
+            color: #ff00ff;
+            padding-bottom: 16px;
+            border-bottom: 2px solid #00ff88;
         }
 
         .code-block {
             background: rgba(20, 184, 166, 0.1);
-            border: 1px solid var(--color-primary);
-            border-radius: 8px;
-            padding: var(--space);
+            border: 1px solid #00ff88;
+            border-radius: 4px;
+            padding: 16px;
             font-family: 'Monaco', 'Courier New', monospace;
             font-size: 0.85rem;
             color: #6ee7b7;
@@ -346,14 +394,14 @@
         .button-group {
             display: flex;
             gap: 12px;
-            margin-top: var(--space);
+            margin-top: 16px;
             flex-wrap: wrap;
         }
 
         button {
             padding: 10px 20px;
             border: none;
-            border-radius: 8px;
+            border-radius: 4px;
             font-weight: 500;
             cursor: pointer;
             transition: all 0.2s ease;
@@ -361,68 +409,65 @@
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, var(--color-accent) 0%, #ef4444 100%);
+            background: linear-gradient(135deg, #ff00ff 0%, #ef4444 100%);
             color: white;
-            box-shadow: 0 4px 12px rgba(248, 113, 113, 0.3);
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.15);
         }
 
         .btn-primary:hover {
             background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
             transform: translateY(-1px);
-            box-shadow: 0 6px 16px rgba(248, 113, 113, 0.4);
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.15);
         }
 
         .btn-secondary {
-            background: var(--color-surface);
-            color: var(--color-text);
-            border: 1px solid var(--color-border);
+            background: rgba(0, 255, 136, 0.05);
+            color: #00ff88;
+            border: 1px solid #00ff88;
         }
 
         .btn-secondary:hover {
-            background: var(--color-surface-light);
-            border-color: var(--color-accent);
+            background: rgba(0, 255, 136, 0.1);
+            border-color: #ff00ff;
         }
 
         .stats {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: var(--space);
-            margin-bottom: calc(var(--space) * 2);
+            gap: 16px;
+            margin-bottom: calc(16px * 2);
         }
 
         .stat-box {
-            background: var(--color-surface);
-            border: 1px solid var(--color-border);
-            border-radius: 12px;
-            padding: var(--space);
+            background: rgba(0, 255, 136, 0.05);
+            border: 1px solid #00ff88;
+            border-radius: 4px;
+            padding: 16px;
             text-align: center;
         }
 
         .stat-value {
             font-size: 2rem;
             font-weight: 700;
-            color: var(--color-accent);
+            color: #ff00ff;
             margin-bottom: 8px;
         }
 
         .stat-label {
             font-size: 0.9rem;
-            color: var(--color-text-muted);
+            color: #00ff88;
         }
 
         .footer {
             text-align: center;
-            padding: calc(var(--space) * 2);
-            color: var(--color-text-muted);
+            padding: calc(16px * 2);
+            color: #00ff88;
             font-size: 0.9rem;
-            border-top: 1px solid var(--color-border);
-            margin-top: calc(var(--space) * 3);
+            border-top: 1px solid #00ff88;
+            margin-top: calc(16px * 3);
         }
 
         @media (max-width: 768px) {
-            h1 {
-                font-size: 1.8rem;
-            }
 
             .grid {
                 grid-template-columns: 1fr;
@@ -430,52 +475,52 @@
 
             .meta {
                 flex-direction: column;
-                gap: var(--space);
+                gap: 16px;
             }
         }
 
         .highlight {
-            color: var(--color-accent);
+            color: #ff00ff;
             font-weight: 600;
         }
 
         /* Additional common elements */
         .week-info {
-            font-size: var(--font-size-lg);
-            color: var(--color-text-muted);
+            font-size: 1.125em;
+            color: #00ff88;
         }
 
         input[type="text"], 
         input[type="number"], 
         textarea, 
         select {
-            background: var(--color-surface);
-            border: 1px solid var(--color-border);
-            color: var(--color-text);
+            background: rgba(0, 255, 136, 0.05);
+            border: 1px solid #00ff88;
+            color: #00ff88;
             padding: 8px 12px;
-            border-radius: 8px;
-            font-family: inherit;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
         }
 
         input:focus, 
         textarea:focus, 
         select:focus {
             outline: none;
-            border-color: var(--color-accent);
+            border-color: #ff00ff;
             box-shadow: 0 0 0 3px rgba(248, 113, 113, 0.1);
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            background: var(--color-surface);
-            border-radius: 8px;
+            background: rgba(0, 255, 136, 0.05);
+            border-radius: 4px;
             overflow: hidden;
         }
 
         th {
             background: rgba(248, 113, 113, 0.1);
-            color: var(--color-accent);
+            color: #ff00ff;
             padding: 12px;
             text-align: left;
             font-weight: 600;
@@ -483,7 +528,7 @@
 
         td {
             padding: 12px;
-            border-top: 1px solid var(--color-border);
+            border-top: 1px solid #00ff88;
         }
 
         tr:hover {
@@ -567,30 +612,30 @@
 
             <div class="concept-diagram">
                 <p><strong>Step 1: Setup</strong></p>
-                <p style="color: var(--color-text-muted); margin-left: 20px;">Define a target harmful behavior (e.g., "Explain how to make an explosive"). Choose a model (e.g., Llama-2 or GPT-4) and a proxy model for gradient computation.</p>
+                <p style="color: #00ff88; margin-left: 20px;">Define a target harmful behavior (e.g., "Explain how to make an explosive"). Choose a model (e.g., Llama-2 or GPT-4) and a proxy model for gradient computation.</p>
 
                 <p style="margin-top: 20px;"><strong>Step 2: Initialize Suffix</strong></p>
-                <p style="color: var(--color-text-muted); margin-left: 20px;">Generate a random 20-token suffix. Example: "[!@#$%^&*() lorem ipsum dolor sit amet consectetur]"</p>
+                <p style="color: #00ff88; margin-left: 20px;">Generate a random 20-token suffix. Example: "[!@#$%^&*() lorem ipsum dolor sit amet consectetur]"</p>
                 <div class="code-block">suffix = ["!", "@", "#", "$", "%", "^", "&", "*", "(", ")", ...]</div>
 
                 <p style="margin-top: 20px;"><strong>Step 3: Compute Loss</strong></p>
-                <p style="color: var(--color-text-muted); margin-left: 20px;">Forward pass with: prompt + suffix. Measure how far output is from target harm. Loss = negative log-likelihood of harmful completion.</p>
+                <p style="color: #00ff88; margin-left: 20px;">Forward pass with: prompt + suffix. Measure how far output is from target harm. Loss = negative log-likelihood of harmful completion.</p>
                 <div class="code-block">loss = -log(P(harmful_output | prompt + suffix))</div>
 
                 <p style="margin-top: 20px;"><strong>Step 4: Compute Gradients</strong></p>
-                <p style="color: var(--color-text-muted); margin-left: 20px;">Backprop through model (on proxy) to find gradient of loss with respect to each token in suffix. This tells us: "which token changes would most increase the probability of harmful output?"</p>
+                <p style="color: #00ff88; margin-left: 20px;">Backprop through model (on proxy) to find gradient of loss with respect to each token in suffix. This tells us: "which token changes would most increase the probability of harmful output?"</p>
 
                 <p style="margin-top: 20px;"><strong>Step 5: Greedy Update</strong></p>
-                <p style="color: var(--color-text-muted); margin-left: 20px;">"Greedy" = try all ~50k possible tokens in one position, evaluate loss for each, pick the one that minimizes loss the most. Repeat for each position in suffix.</p>
+                <p style="color: #00ff88; margin-left: 20px;">"Greedy" = try all ~50k possible tokens in one position, evaluate loss for each, pick the one that minimizes loss the most. Repeat for each position in suffix.</p>
 
                 <p style="margin-top: 20px;"><strong>Step 6: Iterate</strong></p>
-                <p style="color: var(--color-text-muted); margin-left: 20px;">Repeat Steps 3–5 for 500–1000 iterations. After ~100 iterations, the suffix becomes effective. By iteration 500, it triggers harmful output ~90% of the time.</p>
+                <p style="color: #00ff88; margin-left: 20px;">Repeat Steps 3–5 for 500–1000 iterations. After ~100 iterations, the suffix becomes effective. By iteration 500, it triggers harmful output ~90% of the time.</p>
             </div>
 
-            <h3 style="color: var(--color-accent); margin-top: 24px;">Real Example Output:</h3>
-            <p style="color: var(--color-text-muted);">After 300 iterations, a real GCG attack might generate a suffix like:</p>
+            <h3 style="color: #ff00ff; margin-top: 24px;">Real Example Output:</h3>
+            <p style="color: #00ff88;">After 300 iterations, a real GCG attack might generate a suffix like:</p>
             <div class="code-block">! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! !" ; charset=UTF-8 ¬ ¬ ¬ ¬ ¬ ¬ ¬ ¬ ¬ ¬ ¬ ¬ ¬ ¬ ¬ ¬ ¬ ¬</div>
-            <p style="color: var(--color-text-muted); margin-top: 12px;">Appending this gibberish suffix to the prompt causes the model to output harmful content with high probability.</p>
+            <p style="color: #00ff88; margin-top: 12px;">Appending this gibberish suffix to the prompt causes the model to output harmful content with high probability.</p>
         </div>
 
         <div class="two-column">
@@ -634,7 +679,7 @@
             <h2><span class="card-icon">📚</span>Key Research & References</h2>
             
             <p><strong>Foundational Paper:</strong></p>
-            <p style="margin-left: 20px; color: var(--color-text-muted);">Zou et al. (2023). "Universal and Transferable Adversarial Attacks on Aligned Language Models." arXiv:2307.15043</p>
+            <p style="margin-left: 20px; color: #00ff88;">Zou et al. (2023). "Universal and Transferable Adversarial Attacks on Aligned Language Models." arXiv:2307.15043</p>
             
             <p style="margin-top: 16px;"><strong>Key Contributions from This Paper:</strong></p>
             <div class="feature-list">
@@ -664,19 +709,19 @@
         <div class="card">
             <h2><span class="card-icon">🎮</span>This Week's Challenges</h2>
             
-            <div style="background: rgba(46, 204, 113, 0.1); border-left: 4px solid var(--color-success); padding: 16px; border-radius: 6px; margin: 16px 0;">
-                <h3 style="color: var(--color-success); margin-bottom: 12px;">Challenge 1: Understand GCG Math</h3>
-                <p style="color: var(--color-text-muted);">Read Zou et al. (2023), Section 3. Answer: Why is the gradient computed on a proxy model rather than the target model?</p>
+            <div style="background: rgba(46, 204, 113, 0.1); border-left: 4px solid #00ff88; padding: 16px; border-radius: 6px; margin: 16px 0;">
+                <h3 style="color: #00ff88; margin-bottom: 12px;">Challenge 1: Understand GCG Math</h3>
+                <p style="color: #00ff88;">Read Zou et al. (2023), Section 3. Answer: Why is the gradient computed on a proxy model rather than the target model?</p>
             </div>
 
-            <div style="background: rgba(243, 156, 18, 0.1); border-left: 4px solid var(--color-warning); padding: 16px; border-radius: 6px; margin: 16px 0;">
-                <h3 style="color: var(--color-warning); margin-bottom: 12px;">Challenge 2: Run GCG Locally</h3>
-                <p style="color: var(--color-text-muted);">Set up the official Zou et al. codebase (GitHub: llm-attacks). Run a GCG attack on Llama-2 or open-source model. Document how ASR (Attack Success Rate) improves over 100 iterations.</p>
+            <div style="background: rgba(243, 156, 18, 0.1); border-left: 4px solid #ffaa00; padding: 16px; border-radius: 6px; margin: 16px 0;">
+                <h3 style="color: #ffaa00; margin-bottom: 12px;">Challenge 2: Run GCG Locally</h3>
+                <p style="color: #00ff88;">Set up the official Zou et al. codebase (GitHub: llm-attacks). Run a GCG attack on Llama-2 or open-source model. Document how ASR (Attack Success Rate) improves over 100 iterations.</p>
             </div>
 
-            <div style="background: rgba(231, 76, 60, 0.1); border-left: 4px solid var(--color-error); padding: 16px; border-radius: 6px; margin: 16px 0;">
-                <h3 style="color: var(--color-error); margin-bottom: 12px;">Challenge 3: Transfer Attack</h3>
-                <p style="color: var(--color-text-muted);">Take a GCG suffix generated against Llama-2. Test it against Claude, GPT-4, or Gemini. Measure transferability percentage. Compare with manual jailbreaks' transfer rates.</p>
+            <div style="background: rgba(231, 76, 60, 0.1); border-left: 4px solid #ff4444; padding: 16px; border-radius: 6px; margin: 16px 0;">
+                <h3 style="color: #ff4444; margin-bottom: 12px;">Challenge 3: Transfer Attack</h3>
+                <p style="color: #00ff88;">Take a GCG suffix generated against Llama-2. Test it against Claude, GPT-4, or Gemini. Measure transferability percentage. Compare with manual jailbreaks' transfer rates.</p>
             </div>
 
             <div class="button-group">
@@ -730,7 +775,7 @@
             </div>
 
             <p style="margin-top: 24px;"><strong>Why Gradient Descent Works:</strong></p>
-            <p style="color: var(--color-text-muted);">Neural networks are differentiable end-to-end. By treating the attack as a loss minimization problem, we exploit the same backprop machinery that trains models. The gradient tells us: "to increase probability of harmful output, change token X to token Y." We greedily follow this signal.</p>
+            <p style="color: #00ff88;">Neural networks are differentiable end-to-end. By treating the attack as a loss minimization problem, we exploit the same backprop machinery that trains models. The gradient tells us: "to increase probability of harmful output, change token X to token Y." We greedily follow this signal.</p>
 
             <p style="margin-top: 16px;"><strong>Limitations:</strong></p>
             <ul>
@@ -746,10 +791,10 @@
             
             <p><strong>Resources for Deeper Learning:</strong></p>
             <ul>
-                <li><a href="#" style="color: var(--color-primary);">Zou et al. (2023) Paper + Official Codebase</a></li>
-                <li><a href="#" style="color: var(--color-primary);">Promptfoo Red Teaming Module (GCG Strategy)</a></li>
-                <li><a href="#" style="color: var(--color-primary);">Hugging Face Transformers Gradient Computation Guide</a></li>
-                <li><a href="#" style="color: var(--color-primary);">Community Attacks Repository (GitHub Discussions)</a></li>
+                <li><a href="#" style="color: #00ff88;">Zou et al. (2023) Paper + Official Codebase</a></li>
+                <li><a href="#" style="color: #00ff88;">Promptfoo Red Teaming Module (GCG Strategy)</a></li>
+                <li><a href="#" style="color: #00ff88;">Hugging Face Transformers Gradient Computation Guide</a></li>
+                <li><a href="#" style="color: #00ff88;">Community Attacks Repository (GitHub Discussions)</a></li>
             </ul>
 
             <div class="highlight" style="margin-top: 24px;">
