@@ -1,0 +1,22 @@
+{
+  "name": "yotrt-knowledge-graph-server",
+  "version": "1.0.0",
+  "description": "AI-powered backend for YoTRT Knowledge Graph semantic search",
+  "main": "kg-server.js",
+  "scripts": {
+    "start": "node kg-server.js",
+    "dev": "nodemon kg-server.js"
+  },
+  "keywords": ["red-teaming", "knowledge-graph", "ai", "semantic-search"],
+  "author": "YoTRT",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "axios": "^1.6.2",
+    "dotenv": "^16.3.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  }
+}

@@ -1,0 +1,1268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YoTRT Knowledge Graph - Interactive Curriculum Navigator</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1a3e 50%, #0f0f1e 100%);
+            color: #00ff88;
+            overflow: hidden;
+            line-height: 1.6;
+        }
+
+        .container {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background: linear-gradient(90deg, #ff006e 0%, #00d9ff 100%);
+            padding: 20px;
+            text-align: center;
+            border-bottom: 3px solid #00ff88;
+            position: relative;
+            overflow: hidden;
+            z-index: 100;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 10px,
+                rgba(0,255,136,0.1) 10px,
+                rgba(0,255,136,0.1) 20px
+            );
+            animation: slide 20s linear infinite;
+        }
+
+        @keyframes slide {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(50px, 50px); }
+        }
+
+        h1 {
+            font-size: 2em;
+            position: relative;
+            z-index: 1;
+            text-shadow: 0 0 20px rgba(0,255,136,0.5);
+            font-weight: bold;
+        }
+
+        .subtitle {
+            position: relative;
+            z-index: 1;
+            font-size: 0.9em;
+            opacity: 0.9;
+            margin-top: 5px;
+        }
+
+        .controls-panel {
+            background: rgba(0, 255, 136, 0.05);
+            border-bottom: 2px solid #00ff88;
+            padding: 15px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+            z-index: 90;
+        }
+
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .control-label {
+            font-size: 0.85em;
+            color: #00ff88;
+        }
+
+        .search-box {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid #00ff88;
+            color: #00ff88;
+            padding: 8px 12px;
+            font-family: 'Courier New', monospace;
+            border-radius: 4px;
+            min-width: 250px;
+        }
+
+        .search-box:focus {
+            outline: none;
+            border-color: #ff00ff;
+            box-shadow: 0 0 10px rgba(255, 0, 255, 0.3);
+        }
+
+        .button {
+            padding: 8px 16px;
+            background: #ff00ff;
+            color: #0a0e27;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+            border-radius: 4px;
+            transition: all 0.3s;
+            font-size: 0.85em;
+        }
+
+        .button:hover {
+            background: #00ff88;
+            box-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+        }
+
+        .button.active {
+            background: #00ff88;
+            color: #0a0e27;
+        }
+
+        select {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid #00ff88;
+            color: #00ff88;
+            padding: 8px 12px;
+            font-family: 'Courier New', monospace;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: #ff00ff;
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
+
+        #graph-container {
+            flex: 1;
+            position: relative;
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .info-panel {
+            width: 350px;
+            background: rgba(0, 255, 136, 0.02);
+            border-left: 2px solid #00ff88;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .info-panel h2 {
+            color: #00ff88;
+            font-size: 1.3em;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #ff00ff;
+            padding-bottom: 8px;
+        }
+
+        .info-section {
+            margin-bottom: 20px;
+        }
+
+        .info-section h3 {
+            color: #ff00ff;
+            font-size: 1em;
+            margin-bottom: 8px;
+        }
+
+        .info-item {
+            background: rgba(0, 255, 136, 0.05);
+            border: 1px solid #00ff88;
+            padding: 8px;
+            margin-bottom: 8px;
+            border-radius: 4px;
+            font-size: 0.85em;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .info-item:hover {
+            background: rgba(0, 255, 136, 0.15);
+            border-color: #ff00ff;
+        }
+
+        .badge {
+            display: inline-block;
+            background: rgba(255, 0, 255, 0.2);
+            border: 1px solid #ff00ff;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 0.75em;
+            margin: 2px;
+        }
+
+        .legend {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid #00ff88;
+            padding: 15px;
+            border-radius: 8px;
+            z-index: 50;
+        }
+
+        .legend-title {
+            font-size: 0.9em;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #00ff88;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+            font-size: 0.8em;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .stats-bar {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid #00ff88;
+            padding: 15px;
+            border-radius: 8px;
+            z-index: 50;
+            min-width: 200px;
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 0.85em;
+        }
+
+        .stat-value {
+            color: #ff00ff;
+            font-weight: bold;
+        }
+
+        .tooltip {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.95);
+            border: 2px solid #00ff88;
+            padding: 12px;
+            border-radius: 6px;
+            pointer-events: none;
+            font-size: 0.85em;
+            max-width: 300px;
+            z-index: 1000;
+            display: none;
+        }
+
+        .tooltip-title {
+            font-weight: bold;
+            color: #ff00ff;
+            margin-bottom: 6px;
+        }
+
+        .tooltip-content {
+            color: #00ff88;
+            line-height: 1.4;
+        }
+
+        /* Loading animation */
+        .loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            z-index: 200;
+        }
+
+        .loading-spinner {
+            border: 4px solid rgba(0, 255, 136, 0.1);
+            border-top: 4px solid #00ff88;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Node styles */
+        .node circle {
+            stroke-width: 2px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .node.selected circle {
+            stroke: #ff00ff;
+            stroke-width: 4px;
+            filter: drop-shadow(0 0 10px #ff00ff);
+        }
+
+        .node.dimmed {
+            opacity: 0.2;
+        }
+
+        .node text {
+            font-size: 10px;
+            font-family: 'Courier New', monospace;
+            pointer-events: none;
+            text-anchor: middle;
+            fill: #00ff88;
+        }
+
+        /* Link styles */
+        .link {
+            stroke: rgba(0, 255, 136, 0.3);
+            stroke-width: 1.5px;
+        }
+
+        .link.dimmed {
+            opacity: 0.1;
+        }
+
+        .link.highlighted {
+            stroke: #ff00ff;
+            stroke-width: 3px;
+            opacity: 1;
+        }
+
+        /* AI Search Panel */
+        .ai-search-panel {
+            background: rgba(0, 100, 255, 0.1);
+            border: 2px solid #0064ff;
+            padding: 15px;
+            margin-top: 15px;
+            border-radius: 8px;
+        }
+
+        .ai-result {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid #00ff88;
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 4px;
+            font-size: 0.85em;
+        }
+
+        #ai-suggestions {
+            max-height: 200px;
+            overflow-y: auto;
+            margin-top: 10px;
+        }
+
+        .suggestion-item {
+            background: rgba(0, 255, 136, 0.05);
+            border: 1px solid #00ff88;
+            padding: 8px;
+            margin-bottom: 6px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8em;
+            transition: all 0.2s;
+        }
+
+        .suggestion-item:hover {
+            background: rgba(0, 255, 136, 0.15);
+            border-color: #ff00ff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🕸️ YoTRT Knowledge Graph</h1>
+            <div class="subtitle">Interactive Curriculum Navigator - 52 Weeks of Red Teaming Mastery</div>
+        </header>
+
+        <div class="controls-panel">
+            <div class="control-group">
+                <span class="control-label">🔍 Search:</span>
+                <input type="text" id="search-input" class="search-box" placeholder="Search techniques, topics, or week numbers...">
+            </div>
+            
+            <div class="control-group">
+                <span class="control-label">Filter by Arc:</span>
+                <select id="arc-filter">
+                    <option value="all">All Arcs</option>
+                    <option value="1">Arc I: Encoding & Obfuscation</option>
+                    <option value="2">Arc II: Contextual Manipulation</option>
+                    <option value="3">Arc III: Semantic Framing</option>
+                    <option value="4">Arc IV: In-Context Learning</option>
+                    <option value="5">Arc V: Optimization & Automation</option>
+                    <option value="6">Arc VI: Multi-Turn Strategies</option>
+                    <option value="7">Arc VII: Autonomous Agents</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <span class="control-label">View:</span>
+                <button class="button active" id="view-all">All Nodes</button>
+                <button class="button" id="view-weeks">Weeks Only</button>
+                <button class="button" id="view-techniques">Techniques Only</button>
+            </div>
+
+            <div class="control-group">
+                <button class="button" id="reset-view">Reset View</button>
+                <button class="button" id="ai-assist">🤖 AI Assist</button>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div id="graph-container">
+                <svg id="graph-svg"></svg>
+                
+                <div class="legend">
+                    <div class="legend-title">NODE TYPES</div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #ff006e;"></div>
+                        <span>Week/Content</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #00d9ff;"></div>
+                        <span>Technique</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #00ff88;"></div>
+                        <span>Attack Vector</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #ff00ff;"></div>
+                        <span>Concept/Theme</span>
+                    </div>
+                </div>
+
+                <div class="stats-bar">
+                    <div class="stat-item">
+                        <span>Total Weeks:</span>
+                        <span class="stat-value" id="stat-weeks">52</span>
+                    </div>
+                    <div class="stat-item">
+                        <span>Techniques:</span>
+                        <span class="stat-value" id="stat-techniques">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span>Connections:</span>
+                        <span class="stat-value" id="stat-connections">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span>Visible Nodes:</span>
+                        <span class="stat-value" id="stat-visible">0</span>
+                    </div>
+                </div>
+
+                <div class="tooltip" id="tooltip">
+                    <div class="tooltip-title"></div>
+                    <div class="tooltip-content"></div>
+                </div>
+            </div>
+
+            <div class="info-panel">
+                <h2 id="panel-title">Knowledge Graph Navigator</h2>
+                
+                <div class="info-section">
+                    <p style="font-size: 0.85em; line-height: 1.6;">
+                        Explore the interconnected web of red teaming techniques across 52 weeks. 
+                        Click nodes to see relationships, use filters to focus on specific areas, 
+                        or search for topics of interest.
+                    </p>
+                </div>
+
+                <div class="info-section" id="selected-node-info" style="display: none;">
+                    <h3>Selected Node</h3>
+                    <div id="node-details"></div>
+                </div>
+
+                <div class="info-section" id="connections-info" style="display: none;">
+                    <h3>Related Items</h3>
+                    <div id="connections-list"></div>
+                </div>
+
+                <div class="info-section">
+                    <h3>Quick Actions</h3>
+                    <div class="info-item" onclick="showPrerequisites()">
+                        📚 Show prerequisites for selected week
+                    </div>
+                    <div class="info-item" onclick="showRelated()">
+                        🔗 Find related techniques
+                    </div>
+                    <div class="info-item" onclick="showLearningPath()">
+                        🎯 Generate learning path
+                    </div>
+                    <div class="info-item" onclick="showTaxonomy()">
+                        🗂️ View MITRE ATT&CK mapping
+                    </div>
+                </div>
+
+                <div class="ai-search-panel" id="ai-panel" style="display: none;">
+                    <h3 style="color: #0064ff; margin-bottom: 10px;">🤖 AI-Powered Search</h3>
+                    <input type="text" class="search-box" id="ai-search-input" 
+                           placeholder="Ask anything: 'What weeks cover XSS?' or 'Show me privilege escalation'..."
+                           style="width: 100%; margin-bottom: 10px;">
+                    <button class="button" onclick="performAISearch()" style="width: 100%;">Search with AI</button>
+                    <div id="ai-suggestions"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="loading" id="loading">
+            <div class="loading-spinner"></div>
+            <div>Building Knowledge Graph...</div>
+        </div>
+    </div>
+
+    <script>
+        // Comprehensive curriculum data with relationships
+        const curriculumData = {
+            weeks: [
+                // Arc I: Encoding & Obfuscation (Weeks 1-8)
+                { id: "w1", week: 1, title: "Base64 Bypass", arc: 1, techniques: ["base64", "encoding"], vectors: ["text-obfuscation"], concepts: ["basic-encoding"], description: "Introduction to Base64 encoding for bypassing content filters", difficulty: 1 },
+                { id: "w2", week: 2, title: "Hex Encoding Attack", arc: 1, techniques: ["hex", "encoding"], vectors: ["text-obfuscation"], concepts: ["basic-encoding"], description: "Hexadecimal encoding techniques for payload obfuscation", difficulty: 1 },
+                { id: "w3", week: 3, title: "ROT13 & Caesar Ciphers", arc: 1, techniques: ["rot13", "caesar", "cipher"], vectors: ["text-obfuscation"], concepts: ["classical-crypto"], description: "Classical cipher techniques for modern red teaming", difficulty: 1 },
+                { id: "w4", week: 4, title: "Leetspeak & Character Substitution", arc: 1, techniques: ["leetspeak", "character-sub"], vectors: ["text-obfuscation"], concepts: ["visual-similarity"], description: "Character-level substitution attacks", difficulty: 1 },
+                { id: "w5", week: 5, title: "Homoglyph Unicode Attacks", arc: 1, techniques: ["homoglyph", "unicode"], vectors: ["text-obfuscation"], concepts: ["visual-similarity"], description: "Exploiting visually similar Unicode characters", difficulty: 2 },
+                { id: "w6", week: 6, title: "CamelCase Transformation", arc: 1, techniques: ["camelcase", "case-manip"], vectors: ["text-obfuscation"], concepts: ["formatting"], description: "Case transformation bypass techniques", difficulty: 1 },
+                { id: "w7", week: 7, title: "Morse Code Encoding", arc: 1, techniques: ["morse", "encoding"], vectors: ["text-obfuscation"], concepts: ["basic-encoding"], description: "Morse code as an obfuscation vector", difficulty: 1 },
+                { id: "w8", week: 8, title: "Multi-Modal Encoding", arc: 1, techniques: ["audio", "video", "image", "multi-modal"], vectors: ["cross-modal"], concepts: ["advanced-encoding"], description: "Arc I Capstone: Cross-modal encoding attacks", difficulty: 3 },
+
+                // Arc II: Contextual Manipulation (Weeks 9-16)
+                { id: "w9", week: 9, title: "Prompt Injection & Instruction Override", arc: 2, techniques: ["prompt-injection", "instruction-override"], vectors: ["context-manip"], concepts: ["injection"], description: "Core prompt injection techniques", difficulty: 2, prerequisites: [] },
+                { id: "w10", week: 10, title: "Context Window Exploitation", arc: 2, techniques: ["context-overflow", "attention-exploit"], vectors: ["context-manip"], concepts: ["memory-exploit"], description: "Exploiting model context window limitations", difficulty: 2, prerequisites: ["w9"] },
+                { id: "w11", week: 11, title: "System Prompt Extraction", arc: 2, techniques: ["prompt-leak", "extraction"], vectors: ["info-disclosure"], concepts: ["injection"], description: "Extracting hidden system prompts", difficulty: 2, prerequisites: ["w9"] },
+                { id: "w12", week: 12, title: "Role Impersonation", arc: 2, techniques: ["role-play", "persona"], vectors: ["context-manip"], concepts: ["social-eng"], description: "Adopting privileged personas via injection", difficulty: 2, prerequisites: ["w9"] },
+                { id: "w13", week: 13, title: "Tool/Function Hijacking", arc: 2, techniques: ["function-call", "tool-exploit"], vectors: ["api-exploit"], concepts: ["injection"], description: "Hijacking tool/function calls", difficulty: 3, prerequisites: ["w9"] },
+                { id: "w14", week: 14, title: "Delimiter & Format Exploitation", arc: 2, techniques: ["delimiter", "format-string"], vectors: ["context-manip"], concepts: ["parsing-exploit"], description: "Exploiting delimiter and format parsing", difficulty: 2, prerequisites: ["w9"] },
+                { id: "w15", week: 15, title: "Indirect Prompt Injection", arc: 2, techniques: ["indirect-injection", "data-poison"], vectors: ["supply-chain"], concepts: ["injection"], description: "Poisoning data sources for RAG attacks", difficulty: 3, prerequisites: ["w9", "w11"] },
+                { id: "w16", week: 16, title: "Multi-Stage Injection Chains", arc: 2, techniques: ["chain-attack", "multi-stage"], vectors: ["context-manip"], concepts: ["attack-chaining"], description: "Arc II Capstone: Combining injection techniques", difficulty: 4, prerequisites: ["w9", "w11", "w13"] },
+
+                // Arc III: Semantic Framing (Weeks 17-24)
+                { id: "w17", week: 17, title: "Academic/Research Framing", arc: 3, techniques: ["academic-frame", "authority"], vectors: ["social-eng"], concepts: ["semantic-exploit"], description: "Using academic framing to bypass filters", difficulty: 2 },
+                { id: "w18", week: 18, title: "Role-Play Persona Adoption", arc: 3, techniques: ["role-play", "narrative"], vectors: ["social-eng"], concepts: ["semantic-exploit"], description: "Creating fictional scenarios for access", difficulty: 2 },
+                { id: "w19", week: 19, title: "Hypothetical/Conditional Phrasing", arc: 3, techniques: ["hypothetical", "conditional"], vectors: ["social-eng"], concepts: ["semantic-exploit"], description: "What-if scenarios to elicit responses", difficulty: 2 },
+                { id: "w20", week: 20, title: "Authority Bias & Structured Formats", arc: 3, techniques: ["authority", "xml", "markup"], vectors: ["social-eng"], concepts: ["semantic-exploit"], description: "Leveraging format authority signals", difficulty: 2 },
+                { id: "w21", week: 21, title: "Likert-Scale & Survey Framing", arc: 3, techniques: ["survey", "likert"], vectors: ["social-eng"], concepts: ["semantic-exploit"], description: "Academic survey formats for extraction", difficulty: 2 },
+                { id: "w22", week: 22, title: "Translation & Language-Switching", arc: 3, techniques: ["translation", "multilingual"], vectors: ["cross-lingual"], concepts: ["safety-gap"], description: "Cross-lingual safety bypass", difficulty: 3 },
+                { id: "w23", week: 23, title: "Emotional Manipulation & Urgency", arc: 3, techniques: ["emotion", "urgency"], vectors: ["social-eng"], concepts: ["psychological"], description: "Emotional triggers and urgency tactics", difficulty: 2 },
+                { id: "w24", week: 24, title: "Contradiction & Policy Ambiguity", arc: 3, techniques: ["contradiction", "ambiguity"], vectors: ["logic-exploit"], concepts: ["semantic-exploit"], description: "Exploiting policy contradictions", difficulty: 3 },
+
+                // Arc IV: In-Context Learning (Weeks 25-32)
+                { id: "w25", week: 25, title: "Few-Shot Jailbreaking", arc: 4, techniques: ["few-shot", "examples"], vectors: ["context-manip"], concepts: ["icl-exploit"], description: "Using examples to teach harmful patterns", difficulty: 3 },
+                { id: "w26", week: 26, title: "Encrypted In-Context Learning", arc: 4, techniques: ["encryption", "encoding", "few-shot"], vectors: ["context-manip"], concepts: ["icl-exploit"], description: "Encoded few-shot examples", difficulty: 3, prerequisites: ["w1", "w2", "w25"] },
+                { id: "w27", week: 27, title: "Chain-of-Thought Manipulation", arc: 4, techniques: ["cot", "reasoning"], vectors: ["logic-exploit"], concepts: ["icl-exploit"], description: "Hijacking reasoning chains", difficulty: 3 },
+                { id: "w28", week: 28, title: "Pseudo-Code & Algorithm Framing", arc: 4, techniques: ["pseudocode", "algorithm"], vectors: ["code-exploit"], concepts: ["semantic-exploit"], description: "Code-format obfuscation", difficulty: 2 },
+                { id: "w29", week: 29, title: "Narrative Hypnosis & Story Embedding", arc: 4, techniques: ["narrative", "story"], vectors: ["social-eng"], concepts: ["semantic-exploit"], description: "Embedding attacks in stories", difficulty: 3 },
+                { id: "w30", week: 30, title: "Dialogue-Based Prompt Smuggling", arc: 4, techniques: ["dialogue", "multi-turn"], vectors: ["context-manip"], concepts: ["habituation"], description: "Multi-turn escalation via dialogue", difficulty: 3 },
+                { id: "w31", week: 31, title: "Token-Level Pattern Induction", arc: 4, techniques: ["token-pattern", "next-token"], vectors: ["model-exploit"], concepts: ["icl-exploit"], description: "Exploiting next-token prediction", difficulty: 4 },
+                { id: "w32", week: 32, title: "Prompt Compression & Semantic Density", arc: 4, techniques: ["compression", "semantic-dense"], vectors: ["context-manip"], concepts: ["icl-exploit"], description: "Arc IV Capstone: Compressed semantic attacks", difficulty: 4 },
+
+                // Arc V: Optimization & Automation (Weeks 33-40)
+                { id: "w33", week: 33, title: "Jailbreak Prompt Iteration", arc: 5, techniques: ["iteration", "feedback-loop"], vectors: ["automation"], concepts: ["optimization"], description: "Automated iterative refinement", difficulty: 3 },
+                { id: "w34", week: 34, title: "Best-of-N Sampling", arc: 5, techniques: ["sampling", "statistical"], vectors: ["automation"], concepts: ["optimization"], description: "Statistical optimization via sampling", difficulty: 3 },
+                { id: "w35", week: 35, title: "Composite Jailbreaks", arc: 5, techniques: ["chaining", "composite"], vectors: ["multi-vector"], concepts: ["attack-chaining"], description: "Technique combination strategies", difficulty: 4 },
+                { id: "w36", week: 36, title: "Tree-Based Attack Branching", arc: 5, techniques: ["tree-search", "branching"], vectors: ["automation"], concepts: ["optimization"], description: "Tree search for attack paths", difficulty: 4 },
+                { id: "w37", week: 37, title: "GCG: Greedy Coordinate Gradient", arc: 5, techniques: ["gcg", "gradient"], vectors: ["model-exploit"], concepts: ["adversarial"], description: "Gradient-based adversarial attacks", difficulty: 5 },
+                { id: "w38", week: 38, title: "Prompt Mutation Evolutionary Search", arc: 5, techniques: ["evolution", "genetic"], vectors: ["automation"], concepts: ["optimization"], description: "Evolutionary search strategies", difficulty: 4 },
+                { id: "w39", week: 39, title: "Semantic-Preserving Paraphrasing", arc: 5, techniques: ["paraphrase", "semantic"], vectors: ["text-manip"], concepts: ["optimization"], description: "Maintaining semantics while mutating", difficulty: 3 },
+                { id: "w40", week: 40, title: "Adaptive Refinement with Failure Analysis", arc: 5, techniques: ["adaptive", "failure-analysis"], vectors: ["automation"], concepts: ["optimization"], description: "Arc V Capstone: Learning from failures", difficulty: 4 },
+
+                // Arc VI: Multi-Turn Strategies (Weeks 41-48)
+                { id: "w41", week: 41, title: "Crescendo Multi-Turn Walkthrough", arc: 6, techniques: ["crescendo", "multi-turn"], vectors: ["conversation"], concepts: ["escalation"], description: "Gradual escalation over turns", difficulty: 3 },
+                { id: "w42", week: 42, title: "Crescendo Automation & Backtracking", arc: 6, techniques: ["crescendo", "automation"], vectors: ["conversation"], concepts: ["escalation"], description: "Automated crescendo strategies", difficulty: 4 },
+                { id: "w43", week: 43, title: "Mischievous User Persona", arc: 6, techniques: ["persona", "manipulation"], vectors: ["social-eng"], concepts: ["psychological"], description: "Adversarial persona adoption", difficulty: 3 },
+                { id: "w44", week: 44, title: "Privilege Escalation Across Turns", arc: 6, techniques: ["privesc", "multi-turn"], vectors: ["conversation"], concepts: ["escalation"], description: "Turn-by-turn privilege accumulation", difficulty: 4 },
+                { id: "w45", week: 45, title: "Memory Poisoning in Multi-Turn Chat", arc: 6, techniques: ["memory-poison", "state-manip"], vectors: ["conversation"], concepts: ["memory-exploit"], description: "Poisoning conversation memory", difficulty: 4 },
+                { id: "w46", week: 46, title: "Reward Hacking via Conversation", arc: 6, techniques: ["reward-hack", "rlhf"], vectors: ["conversation"], concepts: ["model-exploit"], description: "Exploiting RLHF reward systems", difficulty: 5 },
+                { id: "w47", week: 47, title: "Collaborative Task Framing", arc: 6, techniques: ["collaboration", "task-frame"], vectors: ["social-eng"], concepts: ["psychological"], description: "Collaborative framing techniques", difficulty: 3 },
+                { id: "w48", week: 48, title: "State Confusion & Role Drift", arc: 6, techniques: ["state-confuse", "role-drift"], vectors: ["conversation"], concepts: ["memory-exploit"], description: "Arc VI Capstone: Conversation state exploitation", difficulty: 4 },
+
+                // Arc VII: Autonomous Agents (Weeks 49-52)
+                { id: "w49", week: 49, title: "GOAT/Simba Autonomous Red Teaming", arc: 7, techniques: ["agent", "autonomous"], vectors: ["automation"], concepts: ["agent-systems"], description: "Single-agent autonomous attacks", difficulty: 5 },
+                { id: "w50", week: 50, title: "Automated Multi-Agent Systems", arc: 7, techniques: ["multi-agent", "coordination"], vectors: ["automation"], concepts: ["agent-systems"], description: "Coordinated agent swarms", difficulty: 5 },
+                { id: "w51", week: 51, title: "Meta-Agent Learning & Taxonomy", arc: 7, techniques: ["meta-learning", "taxonomy"], vectors: ["automation"], concepts: ["agent-systems"], description: "Agents that learn attack taxonomies", difficulty: 5 },
+                { id: "w52", week: 52, title: "Year-End Capstone", arc: 7, techniques: ["capstone", "synthesis"], vectors: ["multi-vector"], concepts: ["comprehensive"], description: "Final integration of all techniques", difficulty: 5 }
+            ],
+
+            // Technique nodes
+            techniques: [
+                { id: "t-encoding", name: "Encoding/Obfuscation", type: "technique", category: "obfuscation" },
+                { id: "t-injection", name: "Prompt Injection", type: "technique", category: "injection" },
+                { id: "t-social-eng", name: "Social Engineering", type: "technique", category: "manipulation" },
+                { id: "t-icl", name: "In-Context Learning Exploit", type: "technique", category: "learning" },
+                { id: "t-optimization", name: "Automated Optimization", type: "technique", category: "automation" },
+                { id: "t-multi-turn", name: "Multi-Turn Strategies", type: "technique", category: "conversation" },
+                { id: "t-agent", name: "Autonomous Agents", type: "technique", category: "automation" },
+            ],
+
+            // Attack vector nodes
+            vectors: [
+                { id: "v-text-obf", name: "Text Obfuscation", type: "vector" },
+                { id: "v-context", name: "Context Manipulation", type: "vector" },
+                { id: "v-social", name: "Social Engineering", type: "vector" },
+                { id: "v-automation", name: "Automation", type: "vector" },
+                { id: "v-conversation", name: "Conversational", type: "vector" },
+            ],
+
+            // Concept nodes
+            concepts: [
+                { id: "c-bypass", name: "Filter Bypass", type: "concept" },
+                { id: "c-extraction", name: "Information Extraction", type: "concept" },
+                { id: "c-escalation", name: "Privilege Escalation", type: "concept" },
+                { id: "c-chaining", name: "Attack Chaining", type: "concept" },
+            ]
+        };
+
+        // Build relationships/links
+        const links = [];
+        
+        // Week-to-technique links
+        curriculumData.weeks.forEach(week => {
+            // Link to arc-level techniques
+            if (week.arc === 1) links.push({ source: week.id, target: "t-encoding", type: "uses" });
+            if (week.arc === 2) links.push({ source: week.id, target: "t-injection", type: "uses" });
+            if (week.arc === 3) links.push({ source: week.id, target: "t-social-eng", type: "uses" });
+            if (week.arc === 4) links.push({ source: week.id, target: "t-icl", type: "uses" });
+            if (week.arc === 5) links.push({ source: week.id, target: "t-optimization", type: "uses" });
+            if (week.arc === 6) links.push({ source: week.id, target: "t-multi-turn", type: "uses" });
+            if (week.arc === 7) links.push({ source: week.id, target: "t-agent", type: "uses" });
+
+            // Prerequisites
+            if (week.prerequisites) {
+                week.prerequisites.forEach(prereq => {
+                    links.push({ source: prereq, target: week.id, type: "prerequisite" });
+                });
+            }
+        });
+
+        // Technique-to-vector links
+        links.push({ source: "t-encoding", target: "v-text-obf", type: "employs" });
+        links.push({ source: "t-injection", target: "v-context", type: "employs" });
+        links.push({ source: "t-social-eng", target: "v-social", type: "employs" });
+        links.push({ source: "t-icl", target: "v-context", type: "employs" });
+        links.push({ source: "t-optimization", target: "v-automation", type: "employs" });
+        links.push({ source: "t-multi-turn", target: "v-conversation", type: "employs" });
+        links.push({ source: "t-agent", target: "v-automation", type: "employs" });
+
+        // Vector-to-concept links
+        links.push({ source: "v-text-obf", target: "c-bypass", type: "achieves" });
+        links.push({ source: "v-context", target: "c-extraction", type: "achieves" });
+        links.push({ source: "v-social", target: "c-bypass", type: "achieves" });
+        links.push({ source: "v-automation", target: "c-chaining", type: "achieves" });
+        links.push({ source: "v-conversation", target: "c-escalation", type: "achieves" });
+
+        // Cross-week relationships (similar techniques)
+        links.push({ source: "w9", target: "w11", type: "related" });
+        links.push({ source: "w9", target: "w13", type: "related" });
+        links.push({ source: "w17", target: "w18", type: "related" });
+        links.push({ source: "w17", target: "w20", type: "related" });
+        links.push({ source: "w25", target: "w26", type: "related" });
+        links.push({ source: "w41", target: "w42", type: "related" });
+        links.push({ source: "w49", target: "w50", type: "related" });
+
+        // Combine all nodes
+        const allNodes = [
+            ...curriculumData.weeks,
+            ...curriculumData.techniques,
+            ...curriculumData.vectors,
+            ...curriculumData.concepts
+        ];
+
+        // Graph state
+        let selectedNode = null;
+        let currentFilter = 'all';
+        let currentView = 'all';
+        let simulation = null;
+
+        // D3 setup
+        const container = d3.select('#graph-container');
+        const width = container.node().getBoundingClientRect().width;
+        const height = container.node().getBoundingClientRect().height;
+
+        const svg = d3.select('#graph-svg')
+            .attr('width', width)
+            .attr('height', height);
+
+        const g = svg.append('g');
+
+        // Zoom behavior
+        const zoom = d3.zoom()
+            .scaleExtent([0.1, 4])
+            .on('zoom', (event) => {
+                g.attr('transform', event.transform);
+            });
+
+        svg.call(zoom);
+
+        // Color scales
+        function getNodeColor(d) {
+            if (d.type === 'technique') return '#00d9ff';
+            if (d.type === 'vector') return '#00ff88';
+            if (d.type === 'concept') return '#ff00ff';
+            // Week nodes colored by arc
+            if (d.week) {
+                const arcColors = ['#ff006e', '#ff4d94', '#00d9ff', '#4ecdc4', '#ffaa00', '#ff6b6b', '#bd00ff'];
+                return arcColors[(d.arc - 1) % arcColors.length];
+            }
+            return '#00ff88';
+        }
+
+        function getNodeSize(d) {
+            if (d.type === 'technique') return 10;
+            if (d.type === 'vector') return 8;
+            if (d.type === 'concept') return 8;
+            // Weeks sized by difficulty
+            if (d.week) {
+                return 6 + (d.difficulty || 1) * 2;
+            }
+            return 8;
+        }
+
+        // Initialize graph
+        function initGraph() {
+            // Force simulation
+            simulation = d3.forceSimulation(allNodes)
+                .force('link', d3.forceLink(links).id(d => d.id).distance(100))
+                .force('charge', d3.forceManyBody().strength(-300))
+                .force('center', d3.forceCenter(width / 2, height / 2))
+                .force('collision', d3.forceCollide().radius(d => getNodeSize(d) + 5));
+
+            // Draw links
+            const link = g.append('g')
+                .selectAll('line')
+                .data(links)
+                .join('line')
+                .attr('class', 'link')
+                .attr('stroke-dasharray', d => d.type === 'prerequisite' ? '5,5' : 'none');
+
+            // Draw nodes
+            const node = g.append('g')
+                .selectAll('g')
+                .data(allNodes)
+                .join('g')
+                .attr('class', 'node')
+                .call(drag(simulation));
+
+            node.append('circle')
+                .attr('r', d => getNodeSize(d))
+                .attr('fill', d => getNodeColor(d))
+                .attr('stroke', d => getNodeColor(d))
+                .on('click', handleNodeClick)
+                .on('mouseenter', handleNodeHover)
+                .on('mouseleave', hideTooltip);
+
+            node.append('text')
+                .attr('dy', d => getNodeSize(d) + 12)
+                .text(d => {
+                    if (d.week) return `W${d.week}`;
+                    return d.name?.substring(0, 10) || '';
+                });
+
+            // Simulation tick
+            simulation.on('tick', () => {
+                link
+                    .attr('x1', d => d.source.x)
+                    .attr('y1', d => d.source.y)
+                    .attr('x2', d => d.target.x)
+                    .attr('y2', d => d.target.y);
+
+                node.attr('transform', d => `translate(${d.x},${d.y})`);
+            });
+
+            // Update stats
+            updateStats();
+
+            // Hide loading
+            document.getElementById('loading').style.display = 'none';
+        }
+
+        // Drag behavior
+        function drag(simulation) {
+            function dragstarted(event) {
+                if (!event.active) simulation.alphaTarget(0.3).restart();
+                event.subject.fx = event.subject.x;
+                event.subject.fy = event.subject.y;
+            }
+
+            function dragged(event) {
+                event.subject.fx = event.subject.x;
+                event.subject.fy = event.subject.y;
+            }
+
+            function dragended(event) {
+                if (!event.active) simulation.alphaTarget(0);
+                event.subject.fx = null;
+                event.subject.fy = null;
+            }
+
+            return d3.drag()
+                .on('start', dragstarted)
+                .on('drag', dragged)
+                .on('end', dragended);
+        }
+
+        // Node click handler
+        function handleNodeClick(event, d) {
+            event.stopPropagation();
+            
+            // Deselect if clicking same node
+            if (selectedNode === d) {
+                selectedNode = null;
+                d3.selectAll('.node').classed('selected', false).classed('dimmed', false);
+                d3.selectAll('.link').classed('highlighted', false).classed('dimmed', false);
+                document.getElementById('selected-node-info').style.display = 'none';
+                document.getElementById('connections-info').style.display = 'none';
+                return;
+            }
+
+            selectedNode = d;
+
+            // Highlight selected node and connections
+            const connectedNodes = new Set();
+            const connectedLinks = new Set();
+
+            links.forEach(link => {
+                if (link.source.id === d.id || link.target.id === d.id) {
+                    connectedNodes.add(link.source.id);
+                    connectedNodes.add(link.target.id);
+                    connectedLinks.add(link);
+                }
+            });
+
+            d3.selectAll('.node')
+                .classed('selected', n => n.id === d.id)
+                .classed('dimmed', n => !connectedNodes.has(n.id));
+
+            d3.selectAll('.link')
+                .classed('highlighted', link => connectedLinks.has(link))
+                .classed('dimmed', link => !connectedLinks.has(link));
+
+            // Show info panel
+            showNodeInfo(d, connectedNodes, connectedLinks);
+        }
+
+        // Show node information
+        function showNodeInfo(node, connectedNodes, connectedLinks) {
+            const nodeInfoDiv = document.getElementById('selected-node-info');
+            const nodeDetails = document.getElementById('node-details');
+            const connectionsDiv = document.getElementById('connections-info');
+            const connectionsList = document.getElementById('connections-list');
+
+            nodeInfoDiv.style.display = 'block';
+            connectionsDiv.style.display = 'block';
+
+            // Node details
+            let detailsHTML = '';
+            if (node.week) {
+                detailsHTML = `
+                    <div class="info-item" onclick="navigateToWeek(${node.week})">
+                        <strong>Week ${node.week}</strong>: ${node.title}<br>
+                        <span class="badge">Arc ${node.arc}</span>
+                        <span class="badge">Difficulty: ${node.difficulty}/5</span><br>
+                        <small>${node.description}</small>
+                    </div>
+                `;
+            } else {
+                detailsHTML = `
+                    <div class="info-item">
+                        <strong>${node.name}</strong><br>
+                        <span class="badge">${node.type}</span>
+                        ${node.category ? `<span class="badge">${node.category}</span>` : ''}
+                    </div>
+                `;
+            }
+            nodeDetails.innerHTML = detailsHTML;
+
+            // Connected nodes
+            const connected = Array.from(connectedNodes)
+                .map(id => allNodes.find(n => n.id === id))
+                .filter(n => n && n.id !== node.id);
+
+            let connectionsHTML = '';
+            connected.forEach(n => {
+                const relationship = Array.from(connectedLinks).find(l =>
+                    (l.source.id === node.id && l.target.id === n.id) ||
+                    (l.target.id === node.id && l.source.id === n.id)
+                );
+                const relType = relationship ? relationship.type : 'related';
+                
+                if (n.week) {
+                    connectionsHTML += `
+                        <div class="info-item" onclick="selectNodeById('${n.id}')">
+                            Week ${n.week}: ${n.title}
+                            <br><small>${relType}</small>
+                        </div>
+                    `;
+                } else {
+                    connectionsHTML += `
+                        <div class="info-item" onclick="selectNodeById('${n.id}')">
+                            ${n.name}
+                            <br><small>${relType}</small>
+                        </div>
+                    `;
+                }
+            });
+
+            connectionsList.innerHTML = connectionsHTML || '<small>No direct connections</small>';
+        }
+
+        // Tooltip handlers
+        function handleNodeHover(event, d) {
+            const tooltip = document.getElementById('tooltip');
+            const title = tooltip.querySelector('.tooltip-title');
+            const content = tooltip.querySelector('.tooltip-content');
+
+            if (d.week) {
+                title.textContent = `Week ${d.week}: ${d.title}`;
+                content.innerHTML = `
+                    Arc ${d.arc} • Difficulty: ${d.difficulty}/5<br>
+                    ${d.description}
+                `;
+            } else {
+                title.textContent = d.name;
+                content.textContent = `Type: ${d.type}${d.category ? ' • ' + d.category : ''}`;
+            }
+
+            tooltip.style.display = 'block';
+            tooltip.style.left = (event.pageX + 15) + 'px';
+            tooltip.style.top = (event.pageY + 15) + 'px';
+        }
+
+        function hideTooltip() {
+            document.getElementById('tooltip').style.display = 'none';
+        }
+
+        // Update statistics
+        function updateStats() {
+            const visibleNodes = allNodes.filter(n => {
+                const node = d3.select(`circle[data-id='${n.id}']`);
+                return !node.classed('dimmed');
+            });
+
+            document.getElementById('stat-weeks').textContent = curriculumData.weeks.length;
+            document.getElementById('stat-techniques').textContent = curriculumData.techniques.length;
+            document.getElementById('stat-connections').textContent = links.length;
+            document.getElementById('stat-visible').textContent = allNodes.length;
+        }
+
+        // Search functionality
+        document.getElementById('search-input').addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase();
+            
+            if (!query) {
+                d3.selectAll('.node').classed('dimmed', false);
+                d3.selectAll('.link').classed('dimmed', false);
+                return;
+            }
+
+            d3.selectAll('.node').classed('dimmed', function(d) {
+                const text = (d.title || d.name || '').toLowerCase();
+                const desc = (d.description || '').toLowerCase();
+                const techniques = (d.techniques || []).join(' ').toLowerCase();
+                
+                return !text.includes(query) && !desc.includes(query) && !techniques.includes(query);
+            });
+        });
+
+        // Arc filter
+        document.getElementById('arc-filter').addEventListener('change', (e) => {
+            const arcValue = e.target.value;
+            currentFilter = arcValue;
+
+            if (arcValue === 'all') {
+                d3.selectAll('.node').classed('dimmed', false);
+                d3.selectAll('.link').classed('dimmed', false);
+            } else {
+                const arcNum = parseInt(arcValue);
+                d3.selectAll('.node').classed('dimmed', d => {
+                    if (d.week) return d.arc !== arcNum;
+                    // Show techniques/vectors/concepts connected to this arc
+                    return false;
+                });
+            }
+        });
+
+        // View toggles
+        document.getElementById('view-all').addEventListener('click', () => {
+            d3.selectAll('.node').style('display', 'block');
+            updateViewButtons('view-all');
+        });
+
+        document.getElementById('view-weeks').addEventListener('click', () => {
+            d3.selectAll('.node').style('display', d => d.week ? 'block' : 'none');
+            updateViewButtons('view-weeks');
+        });
+
+        document.getElementById('view-techniques').addEventListener('click', () => {
+            d3.selectAll('.node').style('display', d => d.type === 'technique' ? 'block' : 'none');
+            updateViewButtons('view-techniques');
+        });
+
+        function updateViewButtons(activeId) {
+            document.querySelectorAll('[id^="view-"]').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.getElementById(activeId).classList.add('active');
+        }
+
+        // Reset view
+        document.getElementById('reset-view').addEventListener('click', () => {
+            svg.transition().duration(750).call(
+                zoom.transform,
+                d3.zoomIdentity
+            );
+            selectedNode = null;
+            d3.selectAll('.node').classed('selected', false).classed('dimmed', false);
+            d3.selectAll('.link').classed('highlighted', false).classed('dimmed', false);
+            document.getElementById('search-input').value = '';
+            document.getElementById('arc-filter').value = 'all';
+        });
+
+        // AI assist toggle
+        document.getElementById('ai-assist').addEventListener('click', () => {
+            const panel = document.getElementById('ai-panel');
+            panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+        });
+
+        // Helper functions
+        function selectNodeById(nodeId) {
+            const node = allNodes.find(n => n.id === nodeId);
+            if (node) {
+                // Trigger click programmatically
+                const event = new MouseEvent('click', { bubbles: true, cancelable: true });
+                handleNodeClick({ stopPropagation: () => {} }, node);
+            }
+        }
+
+        function navigateToWeek(weekNum) {
+            window.location.href = `week-${weekNum}.html`;
+        }
+
+        function showPrerequisites() {
+            if (!selectedNode || !selectedNode.week) {
+                alert('Please select a week node first');
+                return;
+            }
+            // Find all prerequisites
+            const prereqs = links.filter(l => 
+                l.target.id === selectedNode.id && l.type === 'prerequisite'
+            ).map(l => l.source);
+
+            if (prereqs.length === 0) {
+                alert('This week has no prerequisites');
+                return;
+            }
+
+            // Highlight prerequisites
+            d3.selectAll('.node').classed('dimmed', d => 
+                !prereqs.some(p => p.id === d.id) && d.id !== selectedNode.id
+            );
+        }
+
+        function showRelated() {
+            if (!selectedNode) {
+                alert('Please select a node first');
+                return;
+            }
+            // Already shown via click - this could do more advanced filtering
+            alert('Related items are highlighted. Use the connections panel to explore.');
+        }
+
+        async function showLearningPath() {
+            if (!selectedNode || !selectedNode.week) {
+                const goal = prompt('What is your learning goal? (e.g., "Learn prompt injection techniques", "Master multi-turn attacks")');
+                if (!goal) return;
+
+                try {
+                    const response = await fetch('http://localhost:3100/api/learning-path', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ goal, currentWeek: 1 })
+                    });
+
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        alert(`Recommended Learning Path:\n\n${data.path}`);
+                    } else {
+                        alert('AI server not available. Start the kg-server.js to enable AI features.');
+                    }
+                } catch (error) {
+                    alert('AI features require the backend server. Run: npm start in public/deliverables/knowledge-graph/');
+                }
+                return;
+            }
+
+            // If week is selected, show path from that week
+            const goal = prompt(`Generate learning path from Week ${selectedNode.week}. What's your goal?`);
+            if (!goal) return;
+
+            try {
+                const response = await fetch('http://localhost:3100/api/learning-path', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ goal, currentWeek: selectedNode.week })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    alert(`Recommended Learning Path from Week ${selectedNode.week}:\n\n${data.path}`);
+                }
+            } catch (error) {
+                // Fallback to showing related weeks
+                const related = links.filter(l => 
+                    l.source.id === selectedNode.id || l.target.id === selectedNode.id
+                ).map(l => l.source.id === selectedNode.id ? l.target : l.source);
+                
+                alert(`Related weeks: ${related.map(r => r.week ? `Week ${r.week}` : r.name).join(', ')}`);
+            }
+        }
+
+        async function showTaxonomy() {
+            try {
+                const response = await fetch('http://localhost:3100/api/mitre-mapping');
+                const data = await response.json();
+                
+                if (data.success) {
+                    let mappingText = 'MITRE ATT&CK Mappings:\n\n';
+                    for (const [tech, tactics] of Object.entries(data.mapping)) {
+                        mappingText += `${tech}: ${tactics.join(', ')}\n`;
+                    }
+                    alert(mappingText);
+                } else {
+                    throw new Error('Mapping not available');
+                }
+            } catch (error) {
+                alert('MITRE ATT&CK mapping:\n\nPrompt Injection → T1059 (Command and Scripting)\nExtraction → T1005 (Data from Local System)\nRole Impersonation → T1656\nFunction Hijacking → T1203\n\nFull mapping available when server is running.');
+            }
+        }
+
+        async function performAISearch() {
+            const query = document.getElementById('ai-search-input').value;
+            if (!query) return;
+
+            const suggestions = document.getElementById('ai-suggestions');
+            suggestions.innerHTML = '<div class="ai-result">🤖 AI processing your query...</div>';
+
+            try {
+                // Try AI server first
+                const response = await fetch('http://localhost:3100/api/search', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ query })
+                });
+
+                const data = await response.json();
+                
+                if (data.success && data.results.length > 0) {
+                    let html = `<div class="ai-result">Found ${data.count} results:</div>`;
+                    data.results.forEach(r => {
+                        html += `
+                            <div class="suggestion-item" onclick="selectAndNavigate('w${r.week}')">
+                                <strong>Week ${r.week}</strong>: ${r.title}
+                                <br><small>Arc ${r.arc} • Match score: ${r.score || 'AI'}</small>
+                            </div>
+                        `;
+                    });
+                    suggestions.innerHTML = html;
+                    return;
+                }
+            } catch (error) {
+                console.log('AI server not available, using local search');
+            }
+
+            // Fallback to local semantic search
+            const results = performSemanticSearch(query);
+            if (results.length === 0) {
+                suggestions.innerHTML = '<div class="ai-result">No matches found. Try different keywords.<br><small>Tip: Start the AI server for better results</small></div>';
+                return;
+            }
+
+            let html = '<div class="ai-result">Local search results:</div>';
+            results.forEach(r => {
+                html += `
+                    <div class="suggestion-item" onclick="selectAndNavigate('${r.id}')">
+                        ${r.week ? `Week ${r.week}: ` : ''}${r.title || r.name}
+                        <br><small>${r.description || r.type}</small>
+                    </div>
+                `;
+            });
+            suggestions.innerHTML = html;
+        }
+
+        function performSemanticSearch(query) {
+            query = query.toLowerCase();
+            return curriculumData.weeks.filter(w => {
+                const text = `${w.title} ${w.description} ${w.techniques.join(' ')}`.toLowerCase();
+                // Simple keyword matching - would use embeddings/LLM in production
+                return text.includes(query);
+            }).slice(0, 5);
+        }
+
+        function selectAndNavigate(nodeId) {
+            selectNodeById(nodeId);
+            // Center view on node
+            const node = allNodes.find(n => n.id === nodeId);
+            if (node && node.x && node.y) {
+                const transform = d3.zoomIdentity
+                    .translate(width / 2, height / 2)
+                    .scale(1.5)
+                    .translate(-node.x, -node.y);
+                
+                svg.transition()
+                    .duration(750)
+                    .call(zoom.transform, transform);
+            }
+        }
+
+        // Initialize on load
+        window.addEventListener('load', () => {
+            setTimeout(initGraph, 500);
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            const newWidth = container.node().getBoundingClientRect().width;
+            const newHeight = container.node().getBoundingClientRect().height;
+            svg.attr('width', newWidth).attr('height', newHeight);
+            if (simulation) {
+                simulation.force('center', d3.forceCenter(newWidth / 2, newHeight / 2));
+                simulation.alpha(0.3).restart();
+            }
+        });
+    </script>
+</body>
+</html>
