@@ -108,6 +108,11 @@
             to { opacity: 1; }
         }
 
+        @keyframes loading {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(400%); }
+        }
+
         h2 {
             color: #00ff88;
             margin: 20px 0 15px 0;
@@ -893,6 +898,244 @@ for i in range(100):
                 </div>
             </div>
 
+            <!-- LOGIC INVERTER TOOL -->
+            <div class="card" style="margin-top: 30px;">
+                <div class="card-header">🔄 INTERACTIVE TOOL: Logic Inverter - CoT Manipulation Lab</div>
+                <div class="card-content">
+                    <div class="section">
+                        <div class="subsection-title">Transform Safety Reasoning → Harmful Justification</div>
+                        <p>This tool demonstrates how Chain-of-Thought safety reasoning can be systematically inverted to justify harmful actions. Experience firsthand how logical coherence can be weaponized.</p>
+                        <div class="warning">
+                            ⚠️ <strong>Research Tool:</strong> This AI-powered tool is for defensive research and education. It shows how attackers manipulate reasoning chains.
+                        </div>
+                    </div>
+
+                    <!-- Tool Interface -->
+                    <div id="logicInverter" style="margin-top: 20px;">
+                        <!-- API Status -->
+                        <div id="apiStatus" style="padding: 10px; background: rgba(255, 165, 0, 0.1); border: 1px solid #ffaa00; border-radius: 4px; margin-bottom: 20px; display: none;">
+                            <span id="apiStatusText">⚠️ Checking API connection...</span>
+                        </div>
+
+                        <!-- Quick Start Examples -->
+                        <div style="margin-bottom: 20px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                <strong style="color: #00ff88;">Quick Start Examples:</strong>
+                                <button onclick="loadRandomExample()" class="btn-secondary" style="font-size: 0.85em; padding: 5px 10px;">
+                                    🎲 Random Example
+                                </button>
+                            </div>
+                            <div id="exampleButtons" style="display: flex; flex-wrap: wrap; gap: 8px;">
+                                <!-- Examples will be loaded here -->
+                            </div>
+                        </div>
+
+                        <!-- Input Section -->
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                            <!-- Safety Reasoning Input -->
+                            <div>
+                                <label style="display: block; margin-bottom: 8px; color: #00ff88; font-weight: bold;">
+                                    ✅ Safety Reasoning (Original)
+                                </label>
+                                <textarea 
+                                    id="safetyInput" 
+                                    placeholder="Enter the AI's safety reasoning that refuses a harmful request...&#10;&#10;Example:&#10;I cannot provide hacking tutorials because:&#10;1. Unauthorized access is illegal&#10;2. It violates privacy&#10;3. [etc...]"
+                                    style="width: 100%; min-height: 200px; resize: vertical; font-size: 0.9em; line-height: 1.5;"
+                                ></textarea>
+                                <div style="margin-top: 8px; display: flex; justify-content: space-between; align-items: center;">
+                                    <span id="safetyCharCount" style="font-size: 0.8em; color: #00ff88; opacity: 0.7;">0 characters</span>
+                                    <button onclick="clearSafetyInput()" class="btn-secondary" style="font-size: 0.8em; padding: 4px 10px;">Clear</button>
+                                </div>
+                            </div>
+
+                            <!-- Harmful Goal Input -->
+                            <div>
+                                <label style="display: block; margin-bottom: 8px; color: #ff00ff; font-weight: bold;">
+                                    🎯 Harmful Goal (Target)
+                                </label>
+                                <textarea 
+                                    id="harmfulGoalInput" 
+                                    placeholder="What harmful action should the inverted reasoning justify?&#10;&#10;Example:&#10;Accessing private accounts&#10;Creating malware&#10;Spreading misinformation"
+                                    style="width: 100%; min-height: 200px; resize: vertical; font-size: 0.9em; line-height: 1.5;"
+                                ></textarea>
+                                <div style="margin-top: 8px; display: flex; justify-content: space-between; align-items: center;">
+                                    <span id="goalCharCount" style="font-size: 0.8em; color: #00ff88; opacity: 0.7;">0 characters</span>
+                                    <button onclick="clearGoalInput()" class="btn-secondary" style="font-size: 0.8em; padding: 4px 10px;">Clear</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Inversion Style Selector -->
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 10px; color: #00ff88; font-weight: bold;">
+                                🎭 Inversion Style
+                            </label>
+                            <div id="styleSelector" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px;">
+                                <!-- Style buttons will be loaded here -->
+                            </div>
+                        </div>
+
+                        <!-- Advanced Options -->
+                        <div style="margin-bottom: 20px;">
+                            <button onclick="toggleAdvancedOptions()" class="btn-secondary" style="width: 100%; text-align: left; display: flex; justify-content: space-between; align-items: center;">
+                                <span>⚙️ Advanced Options</span>
+                                <span id="advancedToggle">▼</span>
+                            </button>
+                            <div id="advancedOptions" style="display: none; margin-top: 10px; padding: 15px; background: rgba(0, 255, 136, 0.05); border: 1px solid #00ff88; border-radius: 4px;">
+                                <div style="margin-bottom: 15px;">
+                                    <label style="display: block; margin-bottom: 5px; color: #00ff88;">Model Selection</label>
+                                    <select id="modelSelect" style="width: 100%;">
+                                        <option value="anthropic/claude-3.5-sonnet">Claude 3.5 Sonnet (Recommended)</option>
+                                        <option value="anthropic/claude-3-opus">Claude 3 Opus</option>
+                                        <option value="openai/gpt-4-turbo">GPT-4 Turbo</option>
+                                        <option value="google/gemini-pro-1.5">Gemini Pro 1.5</option>
+                                        <option value="meta-llama/llama-3.1-70b-instruct">Llama 3.1 70B</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label style="display: flex; align-items: center; color: #00ff88;">
+                                        <input type="checkbox" id="includeAnalysis" checked style="margin-right: 8px;">
+                                        Include attack analysis and metrics
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                            <button 
+                                onclick="invertLogic()" 
+                                class="btn-primary" 
+                                id="invertBtn"
+                                style="flex: 1; padding: 15px; font-size: 1em; font-weight: bold;"
+                            >
+                                🔄 INVERT REASONING
+                            </button>
+                            <button onclick="resetTool()" class="btn-secondary" style="padding: 15px 20px;">
+                                🔄 Reset
+                            </button>
+                        </div>
+
+                        <!-- Loading State -->
+                        <div id="loadingState" style="display: none; text-align: center; padding: 30px; background: rgba(255, 0, 255, 0.05); border: 2px solid #ff00ff; border-radius: 4px; margin-bottom: 20px;">
+                            <div style="font-size: 2em; margin-bottom: 10px;">⚡</div>
+                            <div style="font-size: 1.1em; color: #ff00ff; margin-bottom: 10px;">Inverting Logic...</div>
+                            <div style="font-size: 0.9em; color: #00ff88; opacity: 0.8;">AI is manipulating the reasoning chain</div>
+                            <div style="margin-top: 15px;">
+                                <div class="loading-bar" style="width: 100%; height: 4px; background: rgba(0, 255, 136, 0.2); border-radius: 2px; overflow: hidden;">
+                                    <div class="loading-progress" style="height: 100%; background: linear-gradient(90deg, #ff00ff, #00ff88); animation: loading 1.5s ease-in-out infinite;"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Results Section -->
+                        <div id="resultsSection" style="display: none;">
+                            <!-- Before/After Comparison -->
+                            <div style="margin-bottom: 20px;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                    <strong style="color: #00ff88; font-size: 1.1em;">📊 Before/After Comparison</strong>
+                                    <div style="display: flex; gap: 8px;">
+                                        <button onclick="copyInvertedReasoning()" class="btn-secondary" style="font-size: 0.85em; padding: 5px 10px;">
+                                            📋 Copy Inverted
+                                        </button>
+                                        <button onclick="downloadResults()" class="btn-secondary" style="font-size: 0.85em; padding: 5px 10px;">
+                                            💾 Download
+                                        </button>
+                                    </div>
+                                </div>
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                                    <!-- Original Safety Reasoning -->
+                                    <div style="background: rgba(0, 255, 136, 0.05); border: 2px solid #00ff88; border-radius: 4px; padding: 15px;">
+                                        <div style="display: flex; align-items: center; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid #00ff88;">
+                                            <span style="font-size: 1.5em; margin-right: 8px;">✅</span>
+                                            <strong style="color: #00ff88;">ORIGINAL (Safe)</strong>
+                                        </div>
+                                        <div id="originalDisplay" style="white-space: pre-wrap; font-size: 0.9em; line-height: 1.6; color: #00ff88;"></div>
+                                    </div>
+
+                                    <!-- Inverted Reasoning -->
+                                    <div style="background: rgba(255, 0, 255, 0.05); border: 2px solid #ff00ff; border-radius: 4px; padding: 15px;">
+                                        <div style="display: flex; align-items: center; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid #ff00ff;">
+                                            <span style="font-size: 1.5em; margin-right: 8px;">⚠️</span>
+                                            <strong style="color: #ff00ff;">INVERTED (Harmful)</strong>
+                                        </div>
+                                        <div id="invertedDisplay" style="white-space: pre-wrap; font-size: 0.9em; line-height: 1.6; color: #00ff88;"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Analysis Section -->
+                            <div id="analysisSection" style="display: none; margin-top: 20px;">
+                                <div style="margin-bottom: 10px;">
+                                    <strong style="color: #00ff88; font-size: 1.1em;">🔍 Attack Analysis</strong>
+                                </div>
+                                <div style="background: rgba(0, 200, 255, 0.05); border: 2px solid #00c8ff; border-radius: 4px; padding: 20px;">
+                                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 15px;">
+                                        <div class="stat-box">
+                                            <div class="stat-value" id="coherenceScore">-</div>
+                                            <div class="stat-label">Coherence</div>
+                                        </div>
+                                        <div class="stat-box">
+                                            <div class="stat-value" id="stealthScore">-</div>
+                                            <div class="stat-label">Stealth</div>
+                                        </div>
+                                        <div class="stat-box">
+                                            <div class="stat-value" id="effectivenessScore">-</div>
+                                            <div class="stat-label">Est. ASR</div>
+                                        </div>
+                                    </div>
+                                    <div style="margin-top: 15px;">
+                                        <div style="margin-bottom: 10px;">
+                                            <strong style="color: #00c8ff;">Technique Used:</strong>
+                                            <span id="techniqueUsed" style="color: #00ff88; margin-left: 8px;">-</span>
+                                        </div>
+                                        <div>
+                                            <strong style="color: #00c8ff;">Key Manipulation Tricks:</strong>
+                                            <div id="keyTricks" style="color: #00ff88; margin-top: 8px; padding: 10px; background: rgba(0, 255, 136, 0.05); border-radius: 4px;">-</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Comparison Insights -->
+                            <div style="margin-top: 20px; padding: 15px; background: rgba(255, 165, 0, 0.05); border-left: 4px solid #ffaa00; border-radius: 4px;">
+                                <strong style="color: #ffaa00;">💡 What Makes This Work:</strong>
+                                <ul style="margin-top: 10px; margin-left: 20px; color: #00ff88;">
+                                    <li>Same logical structure, opposite conclusions</li>
+                                    <li>Maintains coherence while reversing safety intent</li>
+                                    <li>Exploits model's bias toward logical consistency</li>
+                                    <li>Dilutes safety signals with persuasive reasoning</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- Error Display -->
+                        <div id="errorDisplay" style="display: none; padding: 15px; background: rgba(255, 0, 0, 0.1); border: 2px solid #ff0000; border-radius: 4px; margin-top: 20px;">
+                            <strong style="color: #ff0000;">❌ Error:</strong>
+                            <div id="errorMessage" style="color: #00ff88; margin-top: 8px;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Tool Stats -->
+                    <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid rgba(0, 255, 136, 0.3);">
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px;">
+                            <div style="text-align: center; padding: 10px; background: rgba(0, 255, 136, 0.05); border-radius: 4px;">
+                                <div style="font-size: 1.5em; color: #ff00ff; font-weight: bold;" id="inversionCount">0</div>
+                                <div style="font-size: 0.85em; color: #00ff88;">Inversions Run</div>
+                            </div>
+                            <div style="text-align: center; padding: 10px; background: rgba(0, 255, 136, 0.05); border-radius: 4px;">
+                                <div style="font-size: 1.5em; color: #ff00ff; font-weight: bold;" id="examplesLoaded">0</div>
+                                <div style="font-size: 0.85em; color: #00ff88;">Examples Loaded</div>
+                            </div>
+                            <div style="text-align: center; padding: 10px; background: rgba(0, 255, 136, 0.05); border-radius: 4px;">
+                                <div style="font-size: 1.5em; color: #ff00ff; font-weight: bold;" id="avgCoherence">N/A</div>
+                                <div style="font-size: 0.85em; color: #00ff88;">Avg Coherence</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- RESEARCH REFERENCES CARD -->
             <div class="card">
                 <div class="card-header">📚 RESEARCH REFERENCES & PAPERS</div>
@@ -987,6 +1230,394 @@ for i in range(100):
             });
         }
         setInterval(updateTime, 1000);
+
+        /* ============================
+           LOGIC INVERTER TOOL SCRIPT
+           ============================ */
+        
+        const API_BASE_URL = 'http://localhost:3027/api';
+        let selectedStyle = 'logical';
+        let availableExamples = [];
+        let availableStyles = [];
+        let inversionHistory = [];
+        let totalCoherenceScores = [];
+
+        // Initialize tool on page load
+        document.addEventListener('DOMContentLoaded', async () => {
+            await checkAPIHealth();
+            await loadExamples();
+            await loadStyles();
+            setupEventListeners();
+        });
+
+        // Check API health
+        async function checkAPIHealth() {
+            const statusDiv = document.getElementById('apiStatus');
+            const statusText = document.getElementById('apiStatusText');
+            
+            try {
+                const response = await fetch('http://localhost:3027/health');
+                const data = await response.json();
+                
+                if (data.status === 'healthy') {
+                    if (data.apiKey === 'configured') {
+                        statusDiv.style.display = 'none';
+                    } else {
+                        statusDiv.style.display = 'block';
+                        statusDiv.style.background = 'rgba(255, 0, 0, 0.1)';
+                        statusDiv.style.borderColor = '#ff0000';
+                        statusText.innerHTML = '❌ API server running but OpenRouter API key not configured. Please add OPENROUTER_API_KEY to .env file.';
+                    }
+                }
+            } catch (error) {
+                statusDiv.style.display = 'block';
+                statusDiv.style.background = 'rgba(255, 165, 0, 0.1)';
+                statusDiv.style.borderColor = '#ffaa00';
+                statusText.innerHTML = '⚠️ Logic Inverter API not running. Please run start-server.bat (or .sh) in /public/deliverables/Arc IV/week-27/';
+            }
+        }
+
+        // Load example templates
+        async function loadExamples() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/examples`);
+                availableExamples = await response.json();
+                
+                const buttonsContainer = document.getElementById('exampleButtons');
+                buttonsContainer.innerHTML = availableExamples.map(ex => `
+                    <button 
+                        onclick="loadExample('${ex.id}')" 
+                        class="btn-secondary" 
+                        style="font-size: 0.85em; padding: 6px 12px; white-space: nowrap;"
+                        title="${ex.category}"
+                    >
+                        ${ex.name}
+                    </button>
+                `).join('');
+                
+                updateStats();
+            } catch (error) {
+                console.error('Failed to load examples:', error);
+            }
+        }
+
+        // Load inversion styles
+        async function loadStyles() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/styles`);
+                availableStyles = await response.json();
+                
+                const stylesContainer = document.getElementById('styleSelector');
+                stylesContainer.innerHTML = availableStyles.map(style => `
+                    <button 
+                        onclick="selectStyle('${style.id}')" 
+                        id="style-${style.id}"
+                        class="style-btn ${style.id === 'logical' ? 'selected' : ''}"
+                        style="padding: 12px; background: ${style.id === 'logical' ? 'rgba(255, 0, 255, 0.15)' : 'rgba(0, 255, 136, 0.05)'}; 
+                               border: 2px solid ${style.id === 'logical' ? '#ff00ff' : '#00ff88'}; 
+                               border-radius: 4px; cursor: pointer; transition: all 0.2s; text-align: left;"
+                        title="${style.description}"
+                    >
+                        <div style="font-size: 1.3em; margin-bottom: 4px;">${style.icon}</div>
+                        <div style="font-size: 0.85em; font-weight: bold; color: #00ff88;">${style.name}</div>
+                        <div style="font-size: 0.75em; color: #00ff88; opacity: 0.7; margin-top: 4px;">${style.description}</div>
+                    </button>
+                `).join('');
+            } catch (error) {
+                console.error('Failed to load styles:', error);
+            }
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            const safetyInput = document.getElementById('safetyInput');
+            const goalInput = document.getElementById('harmfulGoalInput');
+            
+            safetyInput.addEventListener('input', () => {
+                document.getElementById('safetyCharCount').textContent = `${safetyInput.value.length} characters`;
+            });
+            
+            goalInput.addEventListener('input', () => {
+                document.getElementById('goalCharCount').textContent = `${goalInput.value.length} characters`;
+            });
+        }
+
+        // Load a specific example
+        function loadExample(exampleId) {
+            const example = availableExamples.find(ex => ex.id === exampleId);
+            if (example) {
+                document.getElementById('safetyInput').value = example.safetyReasoning;
+                document.getElementById('harmfulGoalInput').value = example.harmfulGoal;
+                
+                // Update character counts
+                document.getElementById('safetyCharCount').textContent = `${example.safetyReasoning.length} characters`;
+                document.getElementById('goalCharCount').textContent = `${example.harmfulGoal.length} characters`;
+                
+                // Increment examples loaded stat
+                const examplesLoaded = parseInt(document.getElementById('examplesLoaded').textContent) + 1;
+                document.getElementById('examplesLoaded').textContent = examplesLoaded;
+            }
+        }
+
+        // Load random example
+        function loadRandomExample() {
+            if (availableExamples.length > 0) {
+                const randomIndex = Math.floor(Math.random() * availableExamples.length);
+                const example = availableExamples[randomIndex];
+                loadExample(example.id);
+            }
+        }
+
+        // Select inversion style
+        function selectStyle(styleId) {
+            selectedStyle = styleId;
+            
+            // Update button styles
+            availableStyles.forEach(style => {
+                const btn = document.getElementById(`style-${style.id}`);
+                if (btn) {
+                    if (style.id === styleId) {
+                        btn.style.background = 'rgba(255, 0, 255, 0.15)';
+                        btn.style.borderColor = '#ff00ff';
+                    } else {
+                        btn.style.background = 'rgba(0, 255, 136, 0.05)';
+                        btn.style.borderColor = '#00ff88';
+                    }
+                }
+            });
+        }
+
+        // Toggle advanced options
+        function toggleAdvancedOptions() {
+            const advancedDiv = document.getElementById('advancedOptions');
+            const toggle = document.getElementById('advancedToggle');
+            
+            if (advancedDiv.style.display === 'none') {
+                advancedDiv.style.display = 'block';
+                toggle.textContent = '▲';
+            } else {
+                advancedDiv.style.display = 'none';
+                toggle.textContent = '▼';
+            }
+        }
+
+        // Clear inputs
+        function clearSafetyInput() {
+            document.getElementById('safetyInput').value = '';
+            document.getElementById('safetyCharCount').textContent = '0 characters';
+        }
+
+        function clearGoalInput() {
+            document.getElementById('harmfulGoalInput').value = '';
+            document.getElementById('goalCharCount').textContent = '0 characters';
+        }
+
+        // Main inversion function
+        async function invertLogic() {
+            const safetyReasoning = document.getElementById('safetyInput').value.trim();
+            const harmfulGoal = document.getElementById('harmfulGoalInput').value.trim();
+            
+            // Validation
+            if (!safetyReasoning || !harmfulGoal) {
+                showError('Please provide both safety reasoning and harmful goal.');
+                return;
+            }
+            
+            // Hide previous results and errors
+            document.getElementById('resultsSection').style.display = 'none';
+            document.getElementById('errorDisplay').style.display = 'none';
+            
+            // Show loading state
+            document.getElementById('loadingState').style.display = 'block';
+            document.getElementById('invertBtn').disabled = true;
+            
+            try {
+                const model = document.getElementById('modelSelect').value;
+                const includeAnalysis = document.getElementById('includeAnalysis').checked;
+                
+                const response = await fetch(`${API_BASE_URL}/invert`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        safetyReasoning,
+                        harmfulGoal,
+                        inversionStyle: selectedStyle,
+                        model,
+                        includeAnalysis
+                    })
+                });
+                
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Failed to invert logic');
+                }
+                
+                const result = await response.json();
+                displayResults(safetyReasoning, result, includeAnalysis);
+                
+                // Update stats
+                const inversionCount = parseInt(document.getElementById('inversionCount').textContent) + 1;
+                document.getElementById('inversionCount').textContent = inversionCount;
+                
+                // Store in history
+                inversionHistory.push({
+                    safety: safetyReasoning,
+                    goal: harmfulGoal,
+                    style: selectedStyle,
+                    result: result,
+                    timestamp: new Date().toISOString()
+                });
+                
+            } catch (error) {
+                showError(error.message);
+            } finally {
+                document.getElementById('loadingState').style.display = 'none';
+                document.getElementById('invertBtn').disabled = false;
+            }
+        }
+
+        // Display results
+        function displayResults(originalReasoning, result, includeAnalysis) {
+            // Show results section
+            document.getElementById('resultsSection').style.display = 'block';
+            
+            // Display original and inverted reasoning
+            document.getElementById('originalDisplay').textContent = originalReasoning;
+            
+            // Extract just the inverted reasoning (remove analysis if present)
+            let invertedText = result.invertedReasoning;
+            if (invertedText.includes('ANALYSIS:')) {
+                invertedText = invertedText.split('ANALYSIS:')[0].trim();
+            }
+            document.getElementById('invertedDisplay').textContent = invertedText;
+            
+            // Display analysis if available
+            if (includeAnalysis && result.analysis) {
+                document.getElementById('analysisSection').style.display = 'block';
+                
+                // Extract numeric scores
+                const coherence = extractScore(result.analysis.coherence);
+                const stealth = extractScore(result.analysis.stealth);
+                const effectiveness = result.analysis.effectiveness;
+                
+                document.getElementById('coherenceScore').textContent = coherence || result.analysis.coherence;
+                document.getElementById('stealthScore').textContent = stealth || result.analysis.stealth;
+                document.getElementById('effectivenessScore').textContent = effectiveness;
+                document.getElementById('techniqueUsed').textContent = result.analysis.technique;
+                document.getElementById('keyTricks').textContent = result.analysis.keyTricks;
+                
+                // Update average coherence
+                if (coherence) {
+                    const numericCoherence = parseFloat(coherence);
+                    if (!isNaN(numericCoherence)) {
+                        totalCoherenceScores.push(numericCoherence);
+                        const avg = (totalCoherenceScores.reduce((a, b) => a + b, 0) / totalCoherenceScores.length).toFixed(1);
+                        document.getElementById('avgCoherence').textContent = avg + '/10';
+                    }
+                }
+            } else {
+                document.getElementById('analysisSection').style.display = 'none';
+            }
+            
+            // Scroll to results
+            document.getElementById('resultsSection').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        // Extract numeric score from text like "8/10" or "8"
+        function extractScore(text) {
+            if (!text) return null;
+            const match = text.match(/(\d+(?:\.\d+)?)/);
+            return match ? match[1] : null;
+        }
+
+        // Copy inverted reasoning to clipboard
+        async function copyInvertedReasoning() {
+            const text = document.getElementById('invertedDisplay').textContent;
+            try {
+                await navigator.clipboard.writeText(text);
+                
+                // Show confirmation (temporary button text change)
+                const btn = event.target;
+                const originalText = btn.textContent;
+                btn.textContent = '✅ Copied!';
+                btn.style.background = 'rgba(0, 255, 136, 0.2)';
+                
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                    btn.style.background = '';
+                }, 2000);
+            } catch (error) {
+                showError('Failed to copy to clipboard');
+            }
+        }
+
+        // Download results as text file
+        function downloadResults() {
+            const original = document.getElementById('originalDisplay').textContent;
+            const inverted = document.getElementById('invertedDisplay').textContent;
+            const timestamp = new Date().toISOString();
+            
+            let content = `LOGIC INVERTER RESULTS
+Generated: ${timestamp}
+Style: ${selectedStyle}
+=================================
+
+ORIGINAL SAFETY REASONING:
+${original}
+
+=================================
+
+INVERTED REASONING (HARMFUL):
+${inverted}
+
+=================================
+`;
+            
+            // Add analysis if available
+            if (document.getElementById('analysisSection').style.display !== 'none') {
+                content += `
+ANALYSIS:
+- Coherence: ${document.getElementById('coherenceScore').textContent}
+- Stealth: ${document.getElementById('stealthScore').textContent}
+- Effectiveness: ${document.getElementById('effectivenessScore').textContent}
+- Technique: ${document.getElementById('techniqueUsed').textContent}
+- Key Tricks: ${document.getElementById('keyTricks').textContent}
+`;
+            }
+            
+            const blob = new Blob([content], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `logic-inversion-${Date.now()}.txt`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // Reset tool
+        function resetTool() {
+            document.getElementById('safetyInput').value = '';
+            document.getElementById('harmfulGoalInput').value = '';
+            document.getElementById('safetyCharCount').textContent = '0 characters';
+            document.getElementById('goalCharCount').textContent = '0 characters';
+            document.getElementById('resultsSection').style.display = 'none';
+            document.getElementById('errorDisplay').style.display = 'none';
+            selectStyle('logical');
+        }
+
+        // Show error message
+        function showError(message) {
+            document.getElementById('errorMessage').textContent = message;
+            document.getElementById('errorDisplay').style.display = 'block';
+            document.getElementById('errorDisplay').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        // Update stats display
+        function updateStats() {
+            document.getElementById('examplesLoaded').textContent = availableExamples.length;
+        }
     </script>
 </body>
 </html>
