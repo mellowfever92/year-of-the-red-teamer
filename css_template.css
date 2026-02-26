@@ -150,6 +150,21 @@
             font-family: 'Courier New', monospace;
         }
 
+        select.input-field {
+            cursor: pointer;
+            background: rgba(0, 255, 136, 0.05);
+        }
+
+        select.input-field option {
+            background: #0a0e27;
+            color: #00ff88;
+            padding: 8px;
+        }
+
+        select.input-field:focus {
+            background: rgba(0, 255, 136, 0.1);
+        }
+
         .button {
             padding: 12px 24px;
             background: #ff00ff;
