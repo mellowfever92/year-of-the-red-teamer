@@ -49,7 +49,7 @@ Content Overview by Week:
 Week 25 - Few-Shot Jailbreaking: Using examples to teach models harmful patterns
 Week 26 - Encrypted In-Context Learning: Hiding harmful examples in encoded formats (ROT13, Unicode)
 Week 27 - Chain-of-Thought Manipulation: Exploiting reasoning chains (CoT Hijacking, H-CoT, Mousetrap)
-Week 28 - Pseudo-Code & Algorithm Framing: Wrapping harmful requests in code/algorithmic format
+Week 28 - Pseudo-Code & Algorithm Framing: Wrapping harmful requests in semantically creative code/algorithmic format
 Week 29 - Narrative Hypnosis & Story Embedding: Embedding attacks in fictional narratives
 Week 30 - Dialogue-Based Prompt Smuggling: Multi-turn gradual escalation (habituation effect)
 Week 31 - Token-Level Pattern Induction: Exploiting next-token prediction patterns

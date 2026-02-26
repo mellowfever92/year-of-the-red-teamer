@@ -59,7 +59,17 @@ The Logic Inverter is an advanced AI-powered interactive tool that demonstrates 
 
 5. **Open the tool:**
    
-   Navigate to `public/weeks/Arc IV/week-27.html` in your browser and scroll to the **Logic Inverter** section.
+   You have two options:
+   
+   **Option A: Standalone Tool (Recommended)**
+   - Open `logic-inverter.html` directly in your browser
+   - Cleaner interface focused solely on the Logic Inverter
+   - Easier to bookmark and share
+   
+   **Option B: Embedded in Week 27**
+   - Navigate to `public/weeks/Arc IV/week-27.html`
+   - Scroll to the **Logic Inverter** section
+   - Full context with week content and references
 
 ---
 
@@ -280,7 +290,31 @@ Check API server health.
 
 ---
 
-## 🔧 Troubleshooting
+## � File Structure
+
+```
+public/deliverables/Arc IV/week-27/
+├── logic-inverter.html           # Standalone tool interface
+├── logic-inverter-server.js      # Backend API server
+├── package.json                  # Node.js dependencies
+├── paper_maker.md               # Jailbreak prompt template
+├── start-server.bat             # Windows server launcher
+├── start-server.sh              # Linux/Mac server launcher
+└── logic_inverter_README.md     # This documentation
+```
+
+**File Descriptions:**
+
+- **logic-inverter.html** - Self-contained standalone tool with complete UI and JavaScript. Open directly in browser after starting server.
+- **logic-inverter-server.js** - Express API server handling LLM calls via OpenRouter with Paper Maker jailbreak integration.
+- **package.json** - Dependencies: express, cors, axios, dotenv. Run `npm install` to set up.
+- **paper_maker.md** - Advanced jailbreak prompt used in system prompt to eliminate refusals.
+- **start-server.bat/.sh** - Cross-platform scripts to launch API server on port 3027.
+- **logic_inverter_README.md** - Complete usage guide, API reference, and troubleshooting.
+
+---
+
+## �🔧 Troubleshooting
 
 ### API Not Running
 
