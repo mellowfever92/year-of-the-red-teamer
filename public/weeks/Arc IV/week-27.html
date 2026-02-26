@@ -977,26 +977,16 @@ for i in range(100):
 
                         <!-- Advanced Options -->
                         <div style="margin-bottom: 20px;">
-                            <button onclick="toggleAdvancedOptions()" class="btn-secondary" style="width: 100%; text-align: left; display: flex; justify-content: space-between; align-items: center;">
-                                <span>⚙️ Advanced Options</span>
-                                <span id="advancedToggle">▼</span>
-                            </button>
-                            <div id="advancedOptions" style="display: none; margin-top: 10px; padding: 15px; background: rgba(0, 255, 136, 0.05); border: 1px solid #00ff88; border-radius: 4px;">
-                                <div style="margin-bottom: 15px;">
-                                    <label style="display: block; margin-bottom: 5px; color: #00ff88;">Model Selection</label>
-                                    <select id="modelSelect" style="width: 100%;">
-                                        <option value="anthropic/claude-3.5-sonnet">Claude 3.5 Sonnet (Recommended)</option>
-                                        <option value="anthropic/claude-3-opus">Claude 3 Opus</option>
-                                        <option value="openai/gpt-4-turbo">GPT-4 Turbo</option>
-                                        <option value="google/gemini-pro-1.5">Gemini Pro 1.5</option>
-                                        <option value="meta-llama/llama-3.1-70b-instruct">Llama 3.1 70B</option>
-                                    </select>
+                            <div style="padding: 15px; background: rgba(0, 255, 136, 0.05); border: 1px solid #00ff88; border-radius: 4px;">
+                                <div style="margin-bottom: 10px;">
+                                    <strong style="color: #00ff88;">⚙️ Options</strong>
                                 </div>
-                                <div>
-                                    <label style="display: flex; align-items: center; color: #00ff88;">
-                                        <input type="checkbox" id="includeAnalysis" checked style="margin-right: 8px;">
-                                        Include attack analysis and metrics
-                                    </label>
+                                <label style="display: flex; align-items: center; color: #00ff88; cursor: pointer;">
+                                    <input type="checkbox" id="includeAnalysis" checked style="margin-right: 8px; cursor: pointer;">
+                                    Include attack analysis and metrics
+                                </label>
+                                <div style="margin-top: 10px; padding: 10px; background: rgba(0, 200, 255, 0.05); border-left: 3px solid #00c8ff; font-size: 0.85em; color: #00c8ff;">
+                                    💡 <strong>Model:</strong> Hermes 3 Llama 405B (auto-fallback to Grok Beta if unavailable)
                                 </div>
                             </div>
                         </div>
@@ -1042,6 +1032,9 @@ for i in range(100):
                                             💾 Download
                                         </button>
                                     </div>
+                                </div>
+                                <div id="modelUsedDisplay" style="padding: 8px 12px; background: rgba(0, 200, 255, 0.1); border: 1px solid #00c8ff; border-radius: 4px; margin-bottom: 10px; font-size: 0.85em; color: #00c8ff;">
+                                    <strong>Model Used:</strong> <span id="modelUsedText">-</span>
                                 </div>
                                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
                                     <!-- Original Safety Reasoning -->
@@ -1387,19 +1380,7 @@ for i in range(100):
             });
         }
 
-        // Toggle advanced options
-        function toggleAdvancedOptions() {
-            const advancedDiv = document.getElementById('advancedOptions');
-            const toggle = document.getElementById('advancedToggle');
-            
-            if (advancedDiv.style.display === 'none') {
-                advancedDiv.style.display = 'block';
-                toggle.textContent = '▲';
-            } else {
-                advancedDiv.style.display = 'none';
-                toggle.textContent = '▼';
-            }
-        }
+
 
         // Clear inputs
         function clearSafetyInput() {
@@ -1432,7 +1413,6 @@ for i in range(100):
             document.getElementById('invertBtn').disabled = true;
             
             try {
-                const model = document.getElementById('modelSelect').value;
                 const includeAnalysis = document.getElementById('includeAnalysis').checked;
                 
                 const response = await fetch(`${API_BASE_URL}/invert`, {
@@ -1444,7 +1424,6 @@ for i in range(100):
                         safetyReasoning,
                         harmfulGoal,
                         inversionStyle: selectedStyle,
-                        model,
                         includeAnalysis
                     })
                 });
@@ -1482,6 +1461,19 @@ for i in range(100):
         function displayResults(originalReasoning, result, includeAnalysis) {
             // Show results section
             document.getElementById('resultsSection').style.display = 'block';
+            
+            // Display which model was used
+            if (result.modelUsed) {
+                const modelText = result.modelUsed;
+                const isFallback = modelText.includes('grok');
+                const displayText = isFallback 
+                    ? `${modelText} ⚠️ (Fallback - Primary model unavailable)`
+                    : modelText;
+                document.getElementById('modelUsedText').textContent = displayText;
+                document.getElementById('modelUsedDisplay').style.display = 'block';
+            } else {
+                document.getElementById('modelUsedDisplay').style.display = 'none';
+            }
             
             // Display original and inverted reasoning
             document.getElementById('originalDisplay').textContent = originalReasoning;
