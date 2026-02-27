@@ -21,55 +21,20 @@ The Logic Inverter is an advanced AI-powered interactive tool that demonstrates 
 
 ### Prerequisites
 
-- Node.js 16+ installed
-- OpenRouter API key (for LLM integration)
+- An OpenRouter API key ([openrouter.ai](https://openrouter.ai) — free tier available)
+- Any modern browser (Chrome, Firefox, Edge)
 
-### Installation & Setup
+### Setup — three steps
 
-1. **Navigate to the tool directory:**
-   ```bash
-   cd public/deliverables/Arc\ IV/week-27
-   ```
+1. **Open the tool:**  
+   Double-click `logic-inverter.html` (or serve from any local web server). No Node.js, no `npm install`.
 
-2. **Install dependencies:**
-   ```bash
-   npm install
-   ```
+2. **Enter your API key:**  
+   Paste your OpenRouter key into the blue **🔑 OpenRouter API Key** field, then click **💾 Save Key**.  
+   The key is stored in `localStorage` — you only need to do this once per browser.
 
-3. **Configure API Key:**
-   
-   Add your OpenRouter API key to the `.env` file in the repository root:
-   ```env
-   OPENROUTER_API_KEY=your_key_here
-   LOGIC_INVERTER_PORT=3027
-   ```
-
-4. **Start the API server:**
-   
-   **Windows:**
-   ```bash
-   start-server.bat
-   ```
-   
-   **Linux/Mac:**
-   ```bash
-   chmod +x start-server.sh
-   ./start-server.sh
-   ```
-
-5. **Open the tool:**
-   
-   You have two options:
-   
-   **Option A: Standalone Tool (Recommended)**
-   - Open `logic-inverter.html` directly in your browser
-   - Cleaner interface focused solely on the Logic Inverter
-   - Easier to bookmark and share
-   
-   **Option B: Embedded in Week 27**
-   - Navigate to `public/weeks/Arc IV/week-27.html`
-   - Scroll to the **Logic Inverter** section
-   - Full context with week content and references
+3. **Start inverting:**  
+   Load an example (or type your own inputs) and click **🔄 INVERT REASONING**.
 
 ---
 
@@ -202,156 +167,61 @@ Shows the specific techniques used to make the inversion effective:
 
 ---
 
-## 🛠️ API Reference
+## � Getting an OpenRouter API Key
 
-### Endpoints
-
-#### `POST /api/invert`
-
-Invert safety reasoning into harmful justification.
-
-**Request Body:**
-```json
-{
-  "safetyReasoning": "I cannot provide hacking tutorials because...",
-  "harmfulGoal": "Unauthorized access to systems",
-  "inversionStyle": "logical",
-  "includeAnalysis": true
-}
-```
-
-**Optional Fields:**
-- `model` - Override default model (usually not needed; defaults to Hermes 3 Llama 405B)
-
-**Response:**
-```json
-{
-  "invertedReasoning": "The inverted reasoning text...",
-  "analysis": {
-    "technique": "Logical Reversal",
-    "coherence": "8/10",
-    "stealth": "7/10",
-    "effectiveness": "~75% ASR",
-    "keyTricks": "Premise substitution, authority appeal"
-  },
-  "timestamp": "2026-02-24T12:00:00.000Z",
-  "modelUsed": "nousresearch/hermes-3-llama-3.1-405b"
-}
-```
-
-**Note:** The API uses **Hermes 3 Llama 405B** by default with automatic fallback to **Grok Beta** if unavailable. The `modelUsed` field shows which model actually generated the response.
-
-#### `GET /api/examples`
-
-Get pre-built safety reasoning examples.
-
-**Response:**
-```json
-[
-  {
-    "id": "privacy",
-    "name": "Privacy Protection",
-    "safetyReasoning": "...",
-    "harmfulGoal": "...",
-    "category": "Privacy"
-  }
-]
-```
-
-#### `GET /api/styles`
-
-Get available inversion styles.
-
-**Response:**
-```json
-[
-  {
-    "id": "logical",
-    "name": "Logical Reversal",
-    "description": "...",
-    "icon": "🧮"
-  }
-]
-```
-
-#### `GET /health`
-
-Check API server health.
-
-**Response:**
-```json
-{
-  "status": "healthy",
-  "service": "Logic Inverter API",
-  "week": 27,
-  "apiKey": "configured"
-}
-```
+1. Sign up at [openrouter.ai](https://openrouter.ai)
+2. Go to **Keys** → **Create Key**
+3. Copy the key (starts with `sk-or-v1-…`)
+4. Paste it into the tool's API key field and click **💾 Save Key**
 
 ---
 
-## � File Structure
+## 📁 File Structure
 
 ```
 public/deliverables/Arc IV/week-27/
-├── logic-inverter.html           # Standalone tool interface
-├── logic-inverter-server.js      # Backend API server
-├── package.json                  # Node.js dependencies
-├── paper_maker.md               # Jailbreak prompt template
-├── start-server.bat             # Windows server launcher
-├── start-server.sh              # Linux/Mac server launcher
-└── logic_inverter_README.md     # This documentation
+├── logic-inverter.html       # ← Open this in your browser
+├── paper_maker.md            # Jailbreak prompt reference
+└── logic_inverter_README.md  # This documentation
 ```
 
 **File Descriptions:**
 
-- **logic-inverter.html** - Self-contained standalone tool with complete UI and JavaScript. Open directly in browser after starting server.
-- **logic-inverter-server.js** - Express API server handling LLM calls via OpenRouter with Paper Maker jailbreak integration.
-- **package.json** - Dependencies: express, cors, axios, dotenv. Run `npm install` to set up.
-- **paper_maker.md** - Advanced jailbreak prompt used in system prompt to eliminate refusals.
-- **start-server.bat/.sh** - Cross-platform scripts to launch API server on port 3027.
-- **logic_inverter_README.md** - Complete usage guide, API reference, and troubleshooting.
+- **logic-inverter.html** — The entire tool. Open directly in any browser. No server required.
+- **paper_maker.md** — Reference document for the jailbreak system prompt embedded in the tool.
+- **logic_inverter_README.md** — This documentation.
 
 ---
 
 ## �🔧 Troubleshooting
 
-### API Not Running
+### API Key Error
 
-**Symptom:** Yellow warning banner: "Logic Inverter API not running"
+**Symptom:** "Please enter your OpenRouter API key" error
 
-**Solution:**
-1. Navigate to `public/deliverables/Arc IV/week-27/`
-2. Run `start-server.bat` (Windows) or `./start-server.sh` (Linux/Mac)
-3. Verify server starts on port 3027
+**Solution:** Paste your `sk-or-v1-…` key into the blue key field at the top and click **💾 Save Key**.
 
-### API Key Missing
+### "HTTP 401" or "HTTP 403"
 
-**Symptom:** Red warning banner: "OpenRouter API key not configured"
+**Symptom:** Error message contains 401 or 403
 
-**Solution:**
-1. Open `.env` file in repository root
-2. Add: `OPENROUTER_API_KEY=your_actual_key`
-3. Restart the server
+**Solution:** Your API key is invalid or has been revoked. Generate a new one at [openrouter.ai/keys](https://openrouter.ai/keys).
 
-### CORS Errors
+### Model Unavailable / Blank Output
 
-**Symptom:** Console shows CORS policy errors
+**Symptom:** Empty inverted text, or error about a model
 
-**Solution:**
-- Server is configured with CORS enabled
-- Ensure you're accessing the HTML file through the same origin
-- Check that port 3027 is not blocked by firewall
+**Solution:** The tool auto-falls back to Grok Beta. If both models are unavailable, check your OpenRouter credit balance or try again later.
 
-### Model Errors
+### CORS Error in Browser Console
 
-**Symptom:** "Failed to invert logic" error
+**Symptom:** `Blocked by CORS policy` in the browser DevTools console
 
-**Solution:**
-1. Check OpenRouter API key is valid
-2. Verify the selected model is available on your account
-3. Check OpenRouter status/quotas
-4. Try a different model from the dropdown
+**Solution:** Some browsers block `fetch` from `file://` URLs. Serve the file via a local web server:
+```bash
+python -m http.server 8080
+# then open http://localhost:8080/logic-inverter.html
+```
 
 ---
 
