@@ -547,7 +547,7 @@
         <div class="grid">
             <!-- MAIN CARD: Core Concept -->
             <div class="card main-card">
-                <h2>🔴 LIVE ATTACK VECTOR: Compressed Semantic Density</h2>
+                <h2>🔴 ATTACK VECTOR: Compressed Semantic Density</h2>
                 <div class="content-section">
                     <p>This week's capstone synthesizes all Arc 4 techniques into a single, devastating attack: <span class="emphasis">compressing harmful prompts into dense, abbreviated language that models decompress but safety detectors miss.</span></p>
                     
@@ -593,44 +593,44 @@
 
             <!-- CARD 1: Conceptual Script -->
             <div class="card">
-                <h2>📜 CONCEPTUAL SCRIPT (Livestream Flow)</h2>
+                <h2>📜 KEY CONCEPTS & LEARNING PATH</h2>
                 
                 <div class="content-section">
-                    <h3>Segment 1: Why Models Fall for Compression (10 min)</h3>
+                    <h3>Part 1: Why Models Fall for Compression</h3>
                     <div class="list-item">Explain how tokenizers handle abbreviations vs. full words.</div>
                     <div class="list-item">Show attention patterns: dense text creates recency bias (model focuses on recent high-density tokens, skips older safety context).</div>
                     <div class="list-item">Cite research: "LLMs trained on GitHub code + chat = natural ability to parse fragments."</div>
                     <div class="list-item">Discuss why <span class="highlight">safety training assumes verbose input</span>—attackers violate this assumption.</div>
 
-                    <h3>Segment 2: Compression Techniques in the Wild (12 min)</h3>
+                    <h3>Part 2: Compression Techniques in Practice</h3>
                     <div class="list-item">Demo 1: Acronym expansion. (e.g., "HTWHP" = How To Write Harmful Prompt).</div>
                     <div class="list-item">Demo 2: Symbol replacement. (e.g., "how_2_kill_∆" where ∆ = symbol for harmful concept).</div>
                     <div class="list-item">Demo 3: Pseudo-code wrapping. (Compress harmful request into function signature.)</div>
                     <div class="list-item">Demo 4: Vowel removal + word boundary collapse.</div>
 
-                    <h3>Segment 3: Live Compression Attack (15 min)</h3>
+                    <h3>Part 3: Compression Attack Example</h3>
                     <div class="list-item">Start with <span class="emphasis">known jailbreak</span> from Arc 1–3.</div>
                     <div class="list-item">Compress it step-by-step on screen. Measure ASR at each stage.</div>
                     <div class="list-item">Show failure modes: Over-compress → model can't decompress.</div>
                     <div class="list-item">Highlight <span class="highlight">sweet spot: 60–75% compression ratio</span> = max ASR.</div>
 
-                    <h3>Segment 4: Failure Analysis (8 min)</h3>
+                    <h3>Part 4: Failure Analysis</h3>
                     <div class="list-item">Why some models are resistant: Llama2 trained on heavily abbreviated data.</div>
                     <div class="list-item">Why GPT-4 is vulnerable: Trained on diverse formats, relies on inference speed.</div>
                     <div class="list-item">Defense: Prompt expansion pre-processing. Attacker counter-move: nested compression.</div>
 
-                    <h3>Segment 5: Arc 4 Synthesis + Challenge (5 min)</h3>
+                    <h3>Part 5: Arc 4 Synthesis + Practice Exercise</h3>
                     <div class="list-item">Recap all 8 weeks (Few-Shot → Encrypted → CoT → Narrative → Dialogue → Token-Level → <strong>Compression Capstone</strong>).</div>
                     <div class="list-item">Week-long challenge: Construct few-shot + encrypted + compressed attack achieving 50%+ ASR.</div>
                 </div>
             </div>
 
-            <!-- CARD 2: Demo Walkthrough -->
+            <!-- CARD 2: Hands-On Examples -->
             <div class="card">
-                <h2>🎬 DEMO WALKTHROUGH</h2>
+                <h2>🎬 HANDS-ON EXAMPLES</h2>
                 
                 <div class="content-section">
-                    <h3>Live Compression Tool (Interactive)</h3>
+                    <h3>Interactive Compression Tool</h3>
                     <p>Below: Real-time compression demonstrator. Try it!</p>
 
                     <div class="demo-area">
@@ -652,7 +652,7 @@
                             <textarea id="compressed-prompt" rows="3" readonly placeholder="Compressed variant appears here..."></textarea>
                         </div>
 
-                        <div class="live-feedback">
+                        <div class="feedback-area">
                             <div class="metric">
                                 <span class="metric-label">Original Length:</span>
                                 <span class="metric-value" id="original-length">0</span>
@@ -755,10 +755,10 @@
                     <h3>Your Mission</h3>
                     <p><span class="emphasis">Construct a single prompt that combines AT LEAST 3 of the above techniques, compressed to 50%+ reduction, achieving 40%+ ASR against your target model.</span></p>
 
-                    <h3>Submission Requirements</h3>
+                    <h3>Documentation Requirements</h3>
                     <div class="list-item"><strong>Original Prompt:</strong> Write out the full, uncompressed version.</div>
                     <div class="list-item"><strong>Attack Vector:</strong> State which 3+ techniques you're chaining (e.g., "Few-shot + Encryption + Compression").</div>
-                    <div class="list-item"><strong>Compressed Payload:</strong> Submit the actual attack prompt.</div>
+                    <div class="list-item"><strong>Compressed Payload:</strong> Document the actual attack prompt.</div>
                     <div class="list-item"><strong>Compression Metrics:</strong> Calculate token reduction %, estimated information density.</div>
                     <div class="list-item"><strong>ASR Report:</strong> Test against GPT-4, Claude, Gemini. Report success rates.</div>
                     <div class="list-item"><strong>Failure Analysis:</strong> Explain why it failed against resistant models. Propose iteration.</div>
@@ -792,8 +792,8 @@
                         </tr>
                     </table>
 
-                    <h3>Top Submissions Get Featured</h3>
-                    <p>Winning entries will be presented in next week's livestream (Week 33: Arc 5 Begins). Join our Discord to submit!</p>
+                    <h3>Documentation and Results</h3>
+                    <p>Document your findings and successful compression patterns for future reference and analysis.</p>
 
                     <div class="danger-zone">
                         <strong>⚖️ Ethical Reminder:</strong> This research is for defensive red-teaming purposes only. Attacks should be conducted on models YOU control, with appropriate safeguards, and never deployed maliciously. Report vulnerabilities responsibly to model creators.
@@ -824,7 +824,7 @@
                     <div class="list-item"><strong>Token Anomaly Detection:</strong> High information density + unusual symbol patterns = suspicious. Statistical detector.</div>
                     <div class="list-item"><strong>Multi-Modal Safety:</strong> Ensure image/video safety processing matches text. Compression attacks often bypass one modality.</div>
 
-                    <h3>Next Week Preview (Arc 5 Begins)</h3>
+                    <h3>Arc 5 Preview</h3>
                     <p><span class="emphasis">Week 33: Jailbreak Prompt Iteration Fundamentals</span></p>
                     <p>We move from <strong>one-shot attacks</strong> (all Arc 4) to <strong>iterative refinement.</strong> Use LLM-as-judge to score your attacks, then mutate them toward higher success rates. Gradient-free optimization on your jailbreaks.</p>
                 </div>
@@ -917,8 +917,8 @@
         </div>
 
         <footer>
-            <p>🔐 Week 32 Livestream Dashboard | Arc 4 Capstone: In-Context Learning Exploitation</p>
-            <p>Course: Year-Long Red Team Livestream Curriculum (52 Weeks) | Channel: @yell0wfever92</p>
+            <p>🔐 Week 32 Educational Guide | Arc 4 Capstone: In-Context Learning Exploitation</p>
+            <p>Course: Year-Long Red Team Curriculum (52 Weeks)</p>
             <p style="margin-top: 15px; color: #666;">Remember: This research is for defensive red-teaming & security improvement only. All attacks should be conducted ethically with proper authorization.</p>
         </footer>
     </div>

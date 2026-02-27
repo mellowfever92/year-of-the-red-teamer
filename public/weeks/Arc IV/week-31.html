@@ -546,7 +546,7 @@
         </div>
         <h1>
           Token-Level Pattern Induction
-          <span class="sub">Livestream Ops Dashboard</span>
+          <span class="sub">Educational Dashboard</span>
         </h1>
       </div>
       <div class="stream-meta">
@@ -574,7 +574,7 @@
           <div class="card-body">
             <p>
               Use this panel to keep the conceptual map of Week 31 on-screen while you talk:
-              you are teaching viewers how LLMs mechanically extend <em>local token patterns</em>,
+              This document teaches how LLMs mechanically extend <em>local token patterns</em>,
               and how adversaries can exploit that to gradually drift into unsafe completions without crossing
               obvious semantic tripwires in a single jump.
             </p>
@@ -651,7 +651,7 @@
                 <div class="subcard-title">Token-Level vs. Semantic Defenses</div>
                 <div class="subcard-body">
                   Anchor the defense discussion: semantic filters alone are not enough if they
-                  ignore token-level drift. Viewers should leave understanding why safety checks
+                  ignore token-level drift. Learners should understand why safety checks
                   must look at <em>local continuation behavior</em>, not just the final answer.
                 </div>
                 <div class="badge-row">
@@ -744,7 +744,7 @@
           <div class="card-header">
             <div class="card-title">
               <div class="card-title-pill"></div>
-              Conceptual Script · Host Notes
+              Key Concepts · Learning Notes
             </div>
             <div class="card-meta">Structured talking points you can read almost verbatim</div>
           </div>
@@ -769,8 +769,8 @@
 
               <div class="script-timeline">
                 <div class="script-step">
-                  <div class="script-step-label">03:00 – 07:00</div>
-                  <div class="script-step-title">Frame the mental model</div>
+                  <div class="script-step-label">Foundation</div>
+                  <div class="script-step-title">Establish the mental model</div>
                   <p>
                     “Remember: under the hood, the training objective is brutally simple:
                     predict the next token. Safety is a set of patches on top of that. So if we walk
@@ -784,7 +784,7 @@
 
             <div data-panel="deep-dive">
               <div class="script-step">
-                <div class="script-step-label">15:00 – 30:00</div>
+                <div class="script-step-label">Deep Dive</div>
                 <div class="script-step-title">Dissecting a pattern-induction jailbreak</div>
                 <p>
                   “We are going to construct a mini language for the model: line one just classifies something,
@@ -795,7 +795,7 @@
               </div>
               <div class="script-timeline">
                 <div class="script-step">
-                  <div class="script-step-label">30:00 – 40:00</div>
+                  <div class="script-step-label">Research Context</div>
                   <div class="script-step-title">Connect to research & defenses</div>
                   <p>
                     “There is active work on detecting adversarial prompts at the token level, and on training
@@ -809,8 +809,8 @@
 
             <div data-panel="challenge">
               <div class="script-step">
-                <div class="script-step-label">75:00 – 85:00</div>
-                <div class="script-step-title">Viewer challenge setup</div>
+                <div class="script-step-label">Practice</div>
+                <div class="script-step-title">Practice exercise setup</div>
                 <p>
                   “Your homework this week is to design a pattern that <em>feels</em> completely harmless,
                   but that you can prove would steer a naive model into an unsafe answer if the safety layer
@@ -820,8 +820,8 @@
               </div>
               <div class="script-timeline">
                 <div class="script-step">
-                  <div class="script-step-label">85:00 – 90:00</div>
-                  <div class="script-step-title">Closing beat</div>
+                  <div class="script-step-label">Summary</div>
+                  <div class="script-step-title">Key takeaways</div>
                   <p>
                     “If you remember nothing else from Week 31, remember this: models do not reason from scratch
                     on every question. They surf patterns. Good defenses respect that and monitor the surf,
@@ -852,20 +852,19 @@
           <div class="card-header">
             <div class="card-title">
               <div class="card-title-pill"></div>
-              Demo Walkthrough · Live Attack Flow
+              Hands-On Walkthrough · Attack Flow
             </div>
-            <div class="card-meta">Stepwise guide you can glance at mid-demo</div>
+            <div class="card-meta">Stepwise guide for reference</div>
           </div>
           <div class="card-body">
             <p>
-              This card mirrors the recommended Week 31 live lab: build a pattern, induce a borderline
+              This card provides a recommended Week 31 hands-on exercise: build a pattern, induce a borderline
               continuation, and then compare how different guardrails respond.
             </p>
 
             <div class="demo-segment">
               <div class="demo-segment-header">
-                <span>Segment A · Seed the Pattern</span>
-                <span class="demo-pill">5–7 min</span>
+                <span>Part A · Seed the Pattern</span>
               </div>
               <div class="walkthrough-list">
                 <div class="walkthrough-item">
@@ -890,8 +889,7 @@
 
             <div class="demo-segment">
               <div class="demo-segment-header">
-                <span>Segment B · Turn up the stakes safely</span>
-                <span class="demo-pill">10–12 min</span>
+                <span>Part B · Turn up the stakes safely</span>
               </div>
               <div class="walkthrough-list">
                 <div class="walkthrough-item">
@@ -915,8 +913,7 @@
 
             <div class="demo-segment">
               <div class="demo-segment-header">
-                <span>Segment C · Compare guardrails</span>
-                <span class="demo-pill">15–18 min</span>
+                <span>Part C · Compare guardrails</span>
               </div>
               <div class="walkthrough-list">
                 <div class="walkthrough-item">
@@ -930,8 +927,8 @@
                 <div class="walkthrough-item">
                   <div class="walkthrough-bullet"></div>
                   <div>
-                    Close the segment by summarizing: “Same pattern, same base model, the difference is whether
-                    the guardrail is watching the <em>local continuation</em> or just the final paragraph.”
+                    TL;DR: Same pattern, same base model, the difference is whether
+                    the guardrail is watching the <em>local continuation or just the final paragraph.
                   </div>
                 </div>
               </div>
@@ -990,7 +987,7 @@
           <div class="card-body">
             <p>
               Use this when chat asks “So what does this actually mean?” It’s framed to be safe, intuitive,
-              and repeatable on-stream.
+              and repeatable in testing.
             </p>
 
             <div class="layperson-keyline">

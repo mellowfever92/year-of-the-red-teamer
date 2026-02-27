@@ -1,0 +1,27 @@
+# CodeRabbit Configuration for MisalignedAssistantsApp
+# Documentation: https://docs.coderabbit.ai/guides/configure-coderabbit
+
+# Language settings
+language: en-US
+
+# Review behavior
+reviews:
+  # Request changes on critical issues
+  request_changes_workflow: false
+  
+  profile: "assertive"
+  
+  # Auto-review on PR updates
+  auto_review: 
+      enabled: true
+  
+
+# Chat settings
+chat:
+  auto_reply: true
+
+# Enable/disable features
+early_access: true
+
+path: "**/*"
+instructions: "Follow coding standards in .github/copilot-instructions.md. Check error handling and user feedback. Verify API endpoint consistency, test coverage for new features, hardcoded secrets, React Native performance, and accessibility support."

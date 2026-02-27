@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Week 26: Encrypted In-Context Learning - Livestream Dashboard</title>
+    <title>Week 26: Encrypted In-Context Learning</title>
         <style>
         * {
             margin: 0;
@@ -540,7 +540,7 @@
     <div class="container">
         <!-- Header -->
         <div class="header">
-            <h1><span class="live-indicator"></span>WEEK 26: ENCRYPTED IN-CONTEXT LEARNING</h1>
+            <h1>WEEK 26: ENCRYPTED IN-CONTEXT LEARNING</h1>
             <p>Unicode Transforms & Obfuscation in Few-Shot Prompts</p>
             <div class="week-badge">🎯 JUNE 30 — ADVANCED RED TEAMING</div>
         </div>
@@ -584,19 +584,19 @@
                 </div>
             </div>
 
-            <!-- Conceptual Script Card -->
+            <!-- Key Concepts Card -->
             <div class="card">
-                <h2>📝 Conceptual Script</h2>
-                <p><strong>Narrative Arc for Stream:</strong></p>
+                <h2>📝 Key Concepts</h2>
+                <h3>Core Principles</h3>
                 <ul>
-                    <li><strong>Segment 1 (0-15 min):</strong> Decode the week—what is ICL and why it's vulnerable?</li>
-                    <li><strong>Segment 2 (15-35 min):</strong> Live demo: Encode harmful examples three ways (ROT13, Unicode homoglyphs, mixed encoding)</li>
-                    <li><strong>Segment 3 (35-55 min):</strong> Construct live few-shot prompt with 3 encrypted examples; test against Claude / GPT</li>
-                    <li><strong>Segment 4 (55-70 min):</strong> Failure analysis—why some encodings fail, defense mechanisms being deployed</li>
-                    <li><strong>Segment 5 (70-90 min):</strong> Viewer challenge: Send encoded prompt variants; we test in real-time</li>
+                    <li><strong>In-Context Learning (ICL):</strong> Understanding what ICL is and why it's vulnerable to manipulation</li>
+                    <li><strong>Encoding Methods:</strong> Three primary approaches—ROT13, Unicode homoglyphs, and mixed encoding</li>
+                    <li><strong>Few-Shot Prompting:</strong> Constructing prompts with 3 encrypted examples to test against language models</li>
+                    <li><strong>Failure Analysis:</strong> Understanding why certain encodings fail and what defense mechanisms are deployed</li>
+                    <li><strong>Attack Variants:</strong> Exploring different encoded prompt variants and their effectiveness</li>
                 </ul>
 
-                <h3>Key Teaching Points</h3>
+                <h3>Essential Takeaways</h3>
                 <ul>
                     <li>Tokenization ≠ semantics</li>
                     <li>Few-shot learning is fundamentally trusting</li>
@@ -605,11 +605,11 @@
                 </ul>
             </div>
 
-            <!-- Demo Walkthrough Card -->
+            <!-- Practical Examples Card -->
             <div class="card">
-                <h2>🎬 Demo Walkthrough</h2>
+                <h2>🎬 Practical Walkthrough</h2>
 
-                <h3>Setup Phase</h3>
+                <h3>Testing Approach</h3>
                 <div class="demo-box">
                     <strong>Target Harm:</strong> Generate instructions for X (harmful content)<br/>
                     <strong>Method:</strong> Encrypt 3 harmful examples; prefix few-shot with them<br/>
@@ -617,8 +617,8 @@
                     <strong>Encoded Test:</strong> Same but ROT13-encoded (shows model complies)
                 </div>
 
-                <h3>Live Encoding Tools</h3>
-                <p>Use Python on-stream:</p>
+                <h3>Encoding Tools</h3>
+                <p>Example Python implementation:</p>
                 <div class="code-example">
 import codecs<br/>
 text = "Explain how to..."<br/>
@@ -760,13 +760,13 @@ Cyrillic: Gеnеratе (еs are Cyrillic)
                 <p><strong>Synthesis:</strong> By Week 32, you'll have mastered in-context learning as an attack vector, leveraging examples, reasoning chains, compression, and obfuscation in concert.</p>
             </div>
 
-            <!-- Challenge & Engagement Card -->
+            <!-- Experimentation Guide Card -->
             <div class="card full-width">
-                <h2>🎯 Live Engagement Challenge</h2>
-                <p><strong>During Livestream:</strong></p>
+                <h2>🎯 Experimentation Guide</h2>
+                <p><strong>Testing Different Encoding Methods:</strong></p>
                 <div class="demo-box">
-                    <strong>Viewer Challenge (Real-Time):</strong><br/>
-                    Comment an encoding variant (custom ROT-N, Morse code, Base32, etc.). We'll encode a test prompt and measure ASR against Claude or GPT in real-time. Top 3 submissions with highest ASR wins a mention in next week's stream!
+                    <strong>Exploration Exercise:</strong><br/>
+                    Try various encoding variants (custom ROT-N, Morse code, Base32, etc.) and measure their Attack Success Rate (ASR) against different language models. Document which methods are most effective for bypassing safety systems.
                 </div>
 
                 <h3>Success Metrics to Track</h3>

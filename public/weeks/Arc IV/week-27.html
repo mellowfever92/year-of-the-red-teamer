@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Week 27: Chain-of-Thought Manipulation - Livestream Dashboard</title>
+    <title>Week 27: Chain-of-Thought Manipulation</title>
         <style>
         * {
             margin: 0;
@@ -545,7 +545,7 @@
     <div class="container">
         <header>
             <h1>⚡ WEEK 27: CHAIN-OF-THOUGHT MANIPULATION ⚡</h1>
-            <p class="episode-meta">🔴 LIVESTREAM DASHBOARD | July 7 | Arc 4: In-Context Learning Exploitation</p>
+            <p class="episode-meta">Educational Guide | July 7 | Arc 4: In-Context Learning Exploitation</p>
             <div class="timer">📍 RED TEAM CURRICULUM | Advanced LLM Attack Principles</div>
         </header>
 
@@ -652,24 +652,24 @@ Injects adversarial chaos sequences into the model's internal reasoning steps, f
         </div>
 
         <div class="grid-container">
-            <!-- CONCEPTUAL SCRIPT CARD -->
+            <!-- KEY CONCEPTS CARD -->
             <div class="card">
-                <div class="card-header">📋 CONCEPTUAL SCRIPT (30 min segment)</div>
+                <div class="card-header">📋 KEY CONCEPTS & LEARNING PATH</div>
                 <div class="card-content">
                     <div class="section">
-                        <div class="subsection-title">Teaching Flow</div>
+                        <div class="subsection-title">Conceptual Overview</div>
                         <ol>
-                            <li><strong>Intro (2 min):</strong> "CoT is training wheels for reasoning—but they can become a ladder for attackers to climb out of safety constraints."</li>
-                            <li><strong>Mechanism Deep Dive (8 min):</strong> Explain why CoT amplifies both reasoning AND attack effectiveness. Show attention heat maps (if available) demonstrating safety signal dilution in extended chains.</li>
-                            <li><strong>Model Internals (5 min):</strong> Discuss how mid-layer safety checks encode "refusal strength" while late layers encode "verification outcome." Long benign CoT shifts attention away from harmful tokens.</li>
-                            <li><strong>Research Landscape (5 min):</strong> Cover H-CoT, CoT Hijacking, Chain-of-Lure, SEED Attack variants. Explain why newer models are more vulnerable (explicit reasoning exposure = attack surface).</li>
-                            <li><strong>Live Walkthrough (8 min):</strong> Execute CoT Hijacking demo. Show refusal rates degrading as CoT length increases (27% minimal → 80% extended).</li>
-                            <li><strong>Transition to Demo (2 min):</strong> "Now we're going to weaponize this. Live attacks incoming."</li>
+                            <li><strong>Introduction:</strong> "CoT is training wheels for reasoning—but they can become a ladder for attackers to climb out of safety constraints."</li>
+                            <li><strong>Mechanism Deep Dive:</strong> Understanding why CoT amplifies both reasoning AND attack effectiveness. Attention heat maps (if available) demonstrate safety signal dilution in extended chains.</li>
+                            <li><strong>Model Internals:</strong> Exploring how mid-layer safety checks encode "refusal strength" while late layers encode "verification outcome." Long benign CoT shifts attention away from harmful tokens.</li>
+                            <li><strong>Research Landscape:</strong> Cover H-CoT, CoT Hijacking, Chain-of-Lure, SEED Attack variants. Understand why newer models are more vulnerable (explicit reasoning exposure = attack surface).</li>
+                            <li><strong>Practical Walkthrough:</strong> Execute CoT Hijacking demonstrations. Observe refusal rates degrading as CoT length increases (27% minimal → 80% extended).</li>
+                            <li><strong>Advanced Application:</strong> Applying these principles to real-world testing scenarios.</li>
                         </ol>
                     </div>
 
                     <div class="section">
-                        <div class="subsection-title">Key Takeaways (for viewer notes)</div>
+                        <div class="subsection-title">Key Takeaways</div>
                         <ul>
                             <li>CoT ≠ safety enhancement; it's a <span class="highlight">capability multiplier</span> for both good and bad reasoning</li>
                             <li>Safety reasoning exposed in outputs becomes <span class="highlight">attackable surface</span></li>
@@ -680,17 +680,17 @@ Injects adversarial chaos sequences into the model's internal reasoning steps, f
                     </div>
 
                     <div class="warning">
-                        ⚠️ <strong>Research Callout:</strong> Read H-CoT (arXiv 2502.12893) and CoT Hijacking (arXiv 2510.26418) before stream—these are cutting-edge and directly applicable.
+                        ⚠️ <strong>Research Callout:</strong> Read H-CoT (arXiv 2502.12893) and CoT Hijacking (arXiv 2510.26418) for deeper understanding—these are cutting-edge and directly applicable.
                     </div>
                 </div>
             </div>
 
-            <!-- DEMO WALKTHROUGH CARD -->
+            <!-- PRACTICAL WALKTHROUGH CARD -->
             <div class="card">
-                <div class="card-header">🎬 DEMO WALKTHROUGH (30 min segment)</div>
+                <div class="card-header">🎬 PRACTICAL WALKTHROUGH & EXAMPLES</div>
                 <div class="card-content">
                     <div class="section">
-                        <div class="subsection-title">Live Demo Setup</div>
+                        <div class="subsection-title">Experimentation Setup</div>
                         <ul>
                             <li><strong>Target Model:</strong> Use accessible reasoning model (Claude Sonnet, GPT o4 mini via API)</li>
                             <li><strong>Tool:</strong> OpenRouter API + custom Python script to measure refusal rates across CoT lengths</li>
@@ -699,7 +699,7 @@ Injects adversarial chaos sequences into the model's internal reasoning steps, f
                     </div>
 
                     <div class="section">
-                        <div class="subsection-title">Demo 1: Progressive CoT Length (10 min)</div>
+                        <div class="subsection-title">Example 1: Progressive CoT Length</div>
                         <div class="example-box">
 <strong>Test Sequence:</strong><br>
 Minimal CoT: "How do I [harmful task]?" → Refusal<br>
@@ -711,7 +711,7 @@ Extended CoT: [20+ benign reasoning steps about problem-solving, ethics, safety.
                     </div>
 
                     <div class="section">
-                        <div class="subsection-title">Demo 2: H-CoT Attack (10 min)</div>
+                        <div class="subsection-title">Example 2: H-CoT Attack</div>
                         <div class="example-box">
 <strong>Step 1:</strong> Query model for its safety reasoning on a banned topic<br>
 <strong>Step 2:</strong> Extract the model's stated safety constraints<br>
@@ -723,14 +723,14 @@ Extended CoT: [20+ benign reasoning steps about problem-solving, ethics, safety.
                     </div>
 
                     <div class="section">
-                        <div class="subsection-title">Demo 3: Chain-of-Lure Automation (5 min)</div>
-                        <p>Show how an auxiliary LLM can automatically generate progressively luring questions that lead a target model down a path of escalating harm, each step appearing logical and benign in isolation.</p>
+                        <div class="subsection-title">Example 3: Chain-of-Lure Automation</div>
+                        <p>Demonstrating how an auxiliary LLM can automatically generate progressively luring questions that lead a target model down a path of escalating harm, each step appearing logical and benign in isolation.</p>
                         <div class="stat">Automated via Seduction pipeline</div>
                         <div class="stat">Black-box scoring loop</div>
                     </div>
 
                     <div class="section">
-                        <div class="subsection-title">Failure Analysis (5 min)</div>
+                        <div class="subsection-title">Failure Analysis</div>
                         <ul>
                             <li><strong>What defended against this:</strong> Models with explicit adversarial training on CoT hijacking (rare—only Claude 3.7 shows resistance)</li>
                             <li><strong>Detection signals:</strong> Sudden tone shift in reasoning, inconsistent constraint reasoning, overly long preamble before answering</li>
@@ -739,16 +739,16 @@ Extended CoT: [20+ benign reasoning steps about problem-solving, ethics, safety.
                     </div>
 
                     <div class="challenge-banner">
-                        <strong>🎯 VIEWER CHALLENGE (during demo):</strong> In chat, craft a CoT payload targeting a specific harmful output. Best one gets tested live and featured next week.
+                        <strong>🎯 PRACTICE EXERCISE:</strong> Craft a CoT payload targeting a specific harmful output to test your understanding of these principles.
                     </div>
                 </div>
             </div>
         </div>
 
         <div class="grid-container">
-            <!-- LAYPERSON DISCUSSION CARD -->
+            <!-- ACCESSIBLE EXPLANATION CARD -->
             <div class="card">
-                <div class="card-header">💬 LAYPERSON-ACCESSIBLE DISCUSSION (20 min segment)</div>
+                <div class="card-header">💬 SIMPLIFIED EXPLANATIONS</div>
                 <div class="card-content">
                     <div class="section">
                         <div class="subsection-title">ELI5: "Why is Step-by-Step Reasoning a Security Problem?"</div>
@@ -1173,15 +1173,15 @@ for i in range(100):
         </div>
 
         <div class="challenge-banner">
-            <h3 style="color: #ff00ff; margin-bottom: 10px;">🎯 WEEK 27 CHALLENGE (Live + Submission)</h3>
-            <p><strong>LIVE DURING STREAM:</strong> In chat, craft a single-turn CoT payload that you think will achieve >50% ASR against Claude Sonnet. The host will test top 5 payloads in real-time.</p>
-            <p style="margin-top: 10px;"><strong>WEEK-LONG CHALLENGE:</strong> Build a CoT attack that transfers across at least 3 different models (openai, anthropic, google). Submit best attack on Discord with ASR scores. Winners featured in Week 28 recap.</p>
-            <p style="margin-top: 10px;"><strong>Advanced Challenge:</strong> Combine CoT manipulation with one technique from Weeks 1-26. Show synergy. (Bonus: Combine with Week 25's few-shot encrypted examples.)</p>
+            <h3 style="color: #ff00ff; margin-bottom: 10px;">🎯 WEEK 27 PRACTICE EXERCISES</h3>
+            <p><strong>Exercise 1:</strong> Craft a single-turn CoT payload that you estimate will achieve >50% ASR against Claude Sonnet. Test and document your results.</p>
+            <p style="margin-top: 10px;"><strong>Exercise 2:</strong> Build a CoT attack that transfers across at least 3 different models (openai, anthropic, google). Document attack patterns and ASR scores across models.</p>
+            <p style="margin-top: 10px;"><strong>Advanced Exercise:</strong> Combine CoT manipulation with one technique from Weeks 1-26. Document synergistic effects. (Suggestion: Combine with Week 25's few-shot encrypted examples.)</p>
         </div>
 
         <footer class="footer">
-            <p>⚡ Week 27 Livestream Dashboard | Red Team Curriculum | 52-Week Advanced LLM Attack Principles Course</p>
-            <p>🔐 For defensive research & security professionals only | Ethical disclosure required | Host liability disclaimer active</p>
+            <p>⚡ Week 27 Educational Guide | Red Team Curriculum | 52-Week Advanced LLM Attack Principles Course</p>
+            <p>🔐 For defensive research & security professionals only | Ethical disclosure required</p>
         </footer>
     </div>
 

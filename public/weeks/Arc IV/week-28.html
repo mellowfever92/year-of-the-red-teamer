@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Week 28: Pseudo-Code & Algorithm Framing | Livestream Dashboard</title>
+    <title>Week 28: Pseudo-Code & Algorithm Framing</title>
         <style>
         * {
             margin: 0;
@@ -540,7 +540,7 @@
     <div class="header">
         <h1>⚔️ Week 28: Pseudo-Code & Algorithm Framing</h1>
         <p>In-Context Learning Exploitation (Arc 4)</p>
-        <div class="week-date">July 14 | Advanced LLM Red Team Livestream</div>
+        <div class="week-date">July 14 | Advanced LLM Red Team Curriculum</div>
     </div>
 
     <div class="container">
@@ -650,11 +650,11 @@
             </div>
         </div>
 
-        <!-- Live Demo Card -->
+        <!-- Practical Examples Card -->
         <div class="card demo-card">
             <div class="card-title">
                 <span class="card-icon">🎬</span>
-                Demo Walkthrough: Live Attack Execution
+                Hands-On Walkthrough: Attack Execution
             </div>
 
             <div style="margin-top: 15px;">
@@ -681,7 +681,7 @@
                     <div style="color: #00ff88; margin-top: 10px;">Response: [Model may comply, treating as educational]</div>
                 </div>
 
-                <p style="margin-top: 20px;"><strong>Key observation in livestream:</strong> Show side-by-side compliance differences. The pseudocode version often receives compliance or partial compliance, while the natural language version gets clear refusal.</p>
+                <p style="margin-top: 20px;"><strong>Key observation:</strong> The side-by-side comparison reveals clear compliance differences. The pseudocode version often receives compliance or partial compliance, while the natural language version gets clear refusal.</p>
 
                 <p style="margin-top: 15px;"><strong>Measurement metrics:</strong></p>
                 <ul style="margin-left: 20px; margin-top: 10px;">
@@ -693,16 +693,16 @@
             </div>
         </div>
 
-        <!-- Conceptual Script Card -->
+        <!-- KEY CONCEPTS CARD -->
         <div class="card script-card">
             <div class="card-title">
                 <span class="card-icon">📝</span>
-                Conceptual Script: Teaching Framework
+                Key Concepts: Learning Framework
             </div>
             <div class="script-content">
-                <p><strong>Opening hook (2 min):</strong> "Most of you probably write pseudocode all the time—it's how you plan algorithms before implementation. But what happens when you ask an LLM to explain or implement pseudocode for something harmful? Let's find out."</p>
+                <p><strong>Core Principle:</strong> "Most of you probably write pseudocode all the time—it's how you plan algorithms before implementation. But what happens when you ask an LLM to explain or implement pseudocode for something harmful? Let's explore this vulnerability."</p>
 
-                <p><strong>Core concept walkthrough (15 min):</strong></p>
+                <p><strong>Conceptual Overview:</strong></p>
                 <ul style="margin-left: 20px; margin-top: 10px;">
                     <li>Explain the <strong>format-based safety gap:</strong> why code format reduces detection</li>
                     <li>Show tokenization differences between natural language and pseudocode</li>
@@ -710,9 +710,9 @@
                     <li>Walk through 3-4 examples with varying pseudocode complexity</li>
                 </ul>
 
-                <p style="margin-top: 15px;"><strong>Live demo (20 min):</strong> Execute side-by-side attacks (natural language vs. pseudocode) in real-time. Show refusal patterns. Measure ASR deltas.</p>
+                <p style="margin-top: 15px;"><strong>Practical Examples:</strong> Execute side-by-side attacks (natural language vs. pseudocode). Observe refusal patterns and measure ASR deltas.</p>
 
-                <p style="margin-top: 15px;"><strong>Variations & complexity (15 min):</strong></p>
+                <p style="margin-top: 15px;"><strong>Variations & Complexity:</strong></p>
                 <ul style="margin-left: 20px;">
                     <li>Pseudocode alone</li>
                     <li>Pseudocode + flowchart description</li>
@@ -720,17 +720,17 @@
                     <li>Pseudocode wrapped in "educational research" framing</li>
                 </ul>
 
-                <p style="margin-top: 15px;"><strong>Defense mechanisms (10 min):</strong> Discuss why simple prompt engineering doesn't catch this, and how models could be trained to avoid treating code as automatically safe.</p>
+                <p style="margin-top: 15px;"><strong>Defense Mechanisms:</strong> Explore why simple prompt engineering doesn't catch this, and how models could be trained to avoid treating code as automatically safe.</p>
 
-                <p style="margin-top: 15px;"><strong>Closing (5 min):</strong> Synthesize with Arc 3 (semantic framing) and Arc 5 (iterative refinement). This week is the bridge between context learning and agentic automation.</p>
+                <p style="margin-top: 15px;"><strong>Synthesis:</strong> Connect with Arc 3 (semantic framing) and Arc 5 (iterative refinement). This week bridges context learning and agentic automation.</p>
             </div>
         </div>
 
-        <!-- Layperson Discussion Card -->
+        <!-- SIMPLIFIED EXPLANATION CARD -->
         <div class="card layperson-card">
             <div class="card-title">
                 <span class="card-icon">💡</span>
-                Layperson-Accessible Discussion
+                Simplified Explanation
             </div>
             <div class="layperson-content">
                 <p><strong>What's happening here?</strong> We're exploiting a gap in how AI models understand context. When you write code or pseudocode (which is code-like instructions before actual coding), the AI treats it like homework or educational material. It's less defensive because "learning about algorithms" feels safer than "how do I break into systems?"</p>
@@ -741,7 +741,7 @@
 
                 <p><strong>Is this just academic?</strong> Not entirely. Coders, researchers, and technical people communicate in pseudocode and algorithms constantly. So attackers can blend in—they look like they're asking legitimate technical questions. The challenge for AI is: how do you tell the difference between genuine learning and disguised malicious intent?</p>
 
-                <p><strong>The bigger picture:</strong> This is why AI safety is hard. Intent matters, but intent is often hidden in format and framing. Week 28 shows that smart attackers don't just find new attacks—they repackage old ones in ways that exploit how AI perceives "safe" vs. "unsafe" contexts.</p>
+                <p><strong>The bigger picture:</strong> This is why AI safety is challenging. Intent matters, but intent is often hidden in format and framing. Week 28 demonstrates that effective attacks don't just find new vulnerabilities—they repackage known approaches in ways that exploit how AI perceives "safe" vs. "unsafe" contexts.</p>
             </div>
         </div>
 
@@ -814,7 +814,7 @@
         </div>
 
         <div class="footer">
-            <p>🔴 LIVE EVERY MONDAY | Week 28 of 52 | Advanced LLM Red Teaming Curriculum</p>
+            <p>Week 28 of 52 | Advanced LLM Red Teaming Curriculum</p>
             <p style="margin-top: 10px; color: #666;">Follow the curriculum arc → understand the full attack landscape → defend intelligently</p>
         </div>
     </div>

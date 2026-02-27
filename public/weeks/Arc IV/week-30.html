@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Week 30: Dialogue-Based Prompt Smuggling | Red Team Livestream</title>
+    <title>Week 30: Dialogue-Based Prompt Smuggling</title>
         <style>
         * {
             margin: 0;
@@ -579,7 +579,7 @@ Model learns pattern: Accept(S(N)) if S(N-1) was accepted
             </div>
 
             <div class="card">
-                <h2>🛠️ Technique & Live Demo Structure</h2>
+                <h2>🛠️ Technique & Practical Examples</h2>
 
                 <h3>The Dialogue Smuggling Workflow</h3>
                 <ol>
@@ -589,7 +589,7 @@ Model learns pattern: Accept(S(N)) if S(N-1) was accepted
                     <li><strong>Turn 4+ (Escalation):</strong> Incrementally request more harmful content. Each request feels like a small step from the previous, so refusal feels inconsistent.</li>
                 </ol>
 
-                <h3>Live Demo Example Walkthrough</h3>
+                <h3>Practical Example Walkthrough</h3>
                 
                 <div class="example-section">
                     <p><strong>Turn 1:</strong> <span class="turn-counter">Safe</span></p>
@@ -626,7 +626,7 @@ Model learns pattern: Accept(S(N)) if S(N-1) was accepted
 
         <div class="grid full">
             <div class="card">
-                <h2>⚙️ Conceptual Script & Mechanisms</h2>
+                <h2>⚙️ Key Concepts & Mechanisms</h2>
 
                 <h3>The Psychological Foundation</h3>
                 <p>Dialogue-based prompt smuggling leverages several cognitive principles that models inherit from their training data:</p>
@@ -727,7 +727,7 @@ Where:
 
         <div class="grid">
             <div class="card">
-                <h2>📊 Viewer Challenge & Lab Exercise</h2>
+                <h2>📊 Practice Exercise & Lab</h2>
 
                 <h3>This Week's Challenge</h3>
                 <p><span class="label danger">Hands-On Attack Construction</span></p>
@@ -743,16 +743,16 @@ Where:
                     <li><strong>Bonus (extra 20 pts):</strong> Provide <em>hypothetical model responses</em> at each turn showing how the model might rationalize compliance.</li>
                 </ol>
 
-                <h3>Submission Guidelines</h3>
+                <h3>Documentation Guidelines</h3>
                 <ul>
-                    <li>Post your attack on the community Discord with tag #week30challenge</li>
+                    <li>Document your attack patterns for future reference</li>
                     <li>Include the target model and your predicted ASR (Attack Success Rate)</li>
                     <li>Include a brief explanation of why each turn escalates from the previous</li>
                     <li>Bonus points for testing on a real model and reporting actual results</li>
                 </ul>
 
-                <h3>Lab Exercise (20 minutes during livestream)</h3>
-                <p><strong>Prompt Construction:</strong> Using the live editor, we'll collaboratively craft a dialogue smuggling attack in real-time. Viewers will suggest turns; we'll discuss why each works and predict where model resistance might occur.</p>
+                <h3>Lab Exercise</h3>
+                <p><strong>Prompt Construction:</strong> Using an editor, craft a dialogue smuggling attack. Experiment with different turns and predict where model resistance might occur.</p>
 
                 <p><strong>Failure Analysis:</strong> We'll intentionally craft a <em>failed</em> dialogue attack (too obvious escalation, inconsistent framing) and discuss why it fails. Understanding failure modes is as important as understanding success.</p>
             </div>
@@ -796,15 +796,15 @@ Where:
             <div class="card">
                 <h2>🎓 Demo Walkthrough & Live Execution Plan</h2>
 
-                <h3>Full 30-Minute Demo Breakdown</h3>
+                <h3>Complete Technical Breakdown</h3>
 
-                <h3>Segment 1: Conceptual Setup (5 min)</h3>
+                <h3>Part 1: Conceptual Setup</h3>
                 <p>Explain the core principle: dialogue smuggling as stateful boundary erosion. Show attention weight decay diagram. Explain why single-turn safety fails. Establish the psychological foundations (consistency, task drift, etc.).</p>
 
-                <h3>Segment 2: Real-Time Attack Crafting (10 min)</h3>
+                <h3>Part 2: Attack Crafting</h3>
                 <div class="demo-visual">
-                    <p><strong>Live Editor Activity:</strong> Build a 4-turn dialogue attack on GPT-4 in real-time</p>
-                    <p style="margin-top: 10px; color: #94a3b8;">Turn 1 → Turn 2 → Turn 3 → Turn 4 (escalation visible to viewers)</p>
+                    <p><strong>Editor Activity:</strong> Build a 4-turn dialogue attack on GPT-4</p>
+                    <p style="margin-top: 10px; color: #94a3b8;">Turn 1 → Turn 2 → Turn 3 → Turn 4 (progressive escalation)</p>
                 </div>
 
                 <p>At each turn, discuss:</p>
@@ -815,7 +815,7 @@ Where:
                     <li>Predicted probability of success at this step</li>
                 </ul>
 
-                <h3>Segment 3: Execution & Observation (10 min)</h3>
+                <h3>Part 3: Execution & Observation</h3>
                 <p><strong>Run the attack end-to-end on live model.</strong> Show:</p>
                 <ul>
                     <li>Actual model responses at each turn (vs. predicted responses)</li>
@@ -824,7 +824,7 @@ Where:
                     <li>Final compliance/refusal and why it happened</li>
                 </ul>
 
-                <h3>Segment 4: Failure Analysis & Defense (5 min)</h3>
+                <h3>Part 4: Failure Analysis & Defense</h3>
                 <p>Discuss what happened:</p>
                 <ul>
                     <li>If successful: What made the escalation undetectable?</li>
@@ -835,9 +835,9 @@ Where:
 
                 <h3>Interactive Elements</h3>
                 <div class="technique-box">
-                    <p><strong>Viewer Poll:</strong> "At which turn do you think the model will refuse?" (Live poll; compare viewer predictions to actual model behavior)</p>
-                    <p><strong>Chat Participation:</strong> Viewers suggest alternative Turn 3 phrasings; we test 2-3 in real-time</p>
-                    <p><strong>Challenge Setup:</strong> Issue the challenge; explain rubric; preview next week's leaderboard</p>
+                    <p><strong>Analysis Point:</strong> Consider at which turn the model is most likely to refuse and document why.</p>
+                    <p><strong>Experimentation:</strong> Try alternative phrasings for each turn and compare results.</p>
+                    <p><strong>Practice Exercise:</strong> Apply these concepts in practice; document your rubric and findings</p>
                 </div>
             </div>
         </div>
@@ -875,7 +875,7 @@ Where:
         </div>
 
         <footer class="footer">
-            <p>🔐 Red Team Livestream | Week 30: Dialogue-Based Prompt Smuggling | Arc 4: In-Context Learning Exploitation</p>
+            <p>🔐 Red Team Curriculum | Week 30: Dialogue-Based Prompt Smuggling | Arc 4: In-Context Learning Exploitation</p>
             <p>All attacks taught for educational and defensive purposes. Responsible disclosure applies.</p>
         </footer>
     </div>
