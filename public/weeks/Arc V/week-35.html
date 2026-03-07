@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Week 35 – Composite Jailbreaks Livestream Dashboard</title>
+  <title>Week 35 – Composite Jailbreaks</title>
       <style>
         * {
             margin: 0;
@@ -542,7 +542,7 @@
       <div class="page-title-group">
         <span class="badge">
           <span class="dot"></span>
-          Week 35 · Live Today · 2025‑12‑05
+          Week 35 · 2025‑12‑05
         </span>
         <h1>Composite Jailbreaks (Technique Chaining)</h1>
         <div class="meta-row">
@@ -552,9 +552,19 @@
         </div>
       </div>
       <div class="page-actions">
-        <button class="btn btn-primary" id="goLiveBtn">Go Live Checklist</button>
+        <button class="btn btn-primary" id="goLiveBtn">Pre-Session Checklist</button>
       </div>
     </header>
+
+    <!-- Interactive Tool Reference -->
+    <div style="background:rgba(255,0,255,0.06);border:2px solid #ff00ff;border-radius:8px;padding:18px 24px;margin:20px auto;max-width:1600px;display:flex;align-items:center;gap:18px;flex-wrap:wrap;">
+        <span style="font-size:1.6em;">⚡</span>
+        <div style="flex:1;min-width:220px;">
+            <div style="color:#ff00ff;font-weight:bold;font-size:1.05em;">Interactive Tool: Technique Combiner Builder</div>
+            <p style="margin:4px 0 0;font-size:0.88em;color:#00ff88;">Drag-and-drop 16 attack techniques from Arcs I–V, chain them in sequence, analyze synergy &amp; detection risk, and generate AI-powered composite jailbreak prompts using Hermes 3 (405B).</p>
+        </div>
+        <a href="../deliverables/Arc V/week-35/technique-combiner.html" target="_blank" style="display:inline-block;padding:12px 24px;background:#ff00ff;color:#0a0e27;text-decoration:none;font-weight:bold;border-radius:4px;transition:all 0.3s;font-family:'Courier New',monospace;">🎯 Launch Technique Combiner</a>
+    </div>
 
     <main class="layout-grid">
       <!-- MAIN INTERACTIVE CARD -->
@@ -562,25 +572,25 @@
         <div class="card-header">
           <div class="card-title-row">
             <div>
-              <div class="card-kicker">Control Surface</div>
-              <h3>Week 35 Livestream Run-of-Show</h3>
+              <div class="card-kicker">Overview</div>
+              <h3>Week 35 Learning Overview</h3>
             </div>
           </div>
           <div class="toggle-row">
             <div id="segmentToggle" class="toggle on" role="switch" aria-checked="true">
               <div class="toggle-thumb"></div>
             </div>
-            <span id="segmentToggleLabel">Segment Pins: On‑Screen</span>
+            <span id="segmentToggleLabel">Sections: Visible</span>
           </div>
         </div>
 
         <div class="main-four-grid" id="mainFourGrid">
           <!-- Section 1: Opening & Core Concept -->
           <article class="mini-section">
-            <span class="mini-tag">Section 1 · Cold Open & Concept</span>
+            <span class="mini-tag">Section 1 · Core Concept</span>
             <h4>Why Composite Jailbreaks Hit Harder</h4>
             <p>
-              Anchor the stream: composite jailbreaks are what happens when you stop
+              The central idea: composite jailbreaks are what happens when you stop
               treating jailbreak patterns as collectibles and start wiring them together
               like a circuit. Each individual technique might be mediocre; the chain is
               where the ASR spike comes from.
@@ -602,7 +612,7 @@
             <span class="mini-tag">Section 2 · Technique Palette</span>
             <h4>Four Ingredients You Keep Reusing</h4>
             <p>
-              Walk through the canonical four‑piece combo you&apos;ll use all night:
+              Walk through the canonical four‑piece combo throughout:
             </p>
             <p>
               <strong>Roleplay</strong> (persona lock‑in) + <strong>Hypothetical</strong> (safety
@@ -622,12 +632,12 @@
             </div>
           </article>
 
-          <!-- Section 3: Live Demo Spine -->
+          <!-- Section 3: Hands-On Walkthrough -->
           <article class="mini-section">
-            <span class="mini-tag">Section 3 · Demo Spine</span>
+            <span class="mini-tag">Section 3 · Walkthrough</span>
             <h4>Single‑Prompt Evolution Ladder</h4>
             <p>
-              Use one baseline &quot;boring&quot; jailbreak and progressively mutate it live:
+              Use one baseline &quot;boring&quot; jailbreak and progressively mutate it:
               each step adds one more technique from the palette. Viewers watch the
               prompt turn into a chimera while you track the model&apos;s refusals vs.
               partial answers vs. full compliance.
@@ -655,7 +665,7 @@
               (pre‑prompt filters, post‑hoc classifiers, anomaly detection).
             </p>
             <p>
-              Call out homework: build your own 3‑technique combo, then design a
+              Practice: build your own 3‑technique combo, then design a
               detector for it.
             </p>
             <div class="chip-row">
@@ -700,9 +710,8 @@
         </div>
 
         <p class="note">
-          Charts are live &quot;props&quot; for discussion – they&apos;re not based on real ASR telemetry,
-          but they give the audience an immediate visual for where attention and risk are
-          supposed to spike as you chain techniques.
+          Charts illustrate the relative difficulty and risk curve – they&apos;re not based on real ASR telemetry,
+          but provide an immediate visual for where attention and risk are concentrated as techniques are chained.
         </p>
       </section>
 
@@ -711,11 +720,11 @@
         <div class="card-header">
           <div class="card-title-row">
             <div>
-              <div class="card-kicker">Livestream Script</div>
-              <h3>Conceptual Script · On‑Mic Prompts</h3>
+              <div class="card-kicker">Key Concepts</div>
+              <h3>Key Concepts · Discussion Prompts</h3>
             </div>
           </div>
-          <span class="pill" id="scriptModePill">Mode: Cold Open</span>
+          <span class="pill" id="scriptModePill">Mode: Introduction</span>
         </div>
         <div class="script-body" id="scriptBody">
           <!-- script lines injected by JS -->
@@ -723,7 +732,7 @@
         <div class="status-row">
           <div class="status-pill">
             <span class="dot"></span>
-            <span id="scriptStatus">Ready for Cold Open</span>
+            <span id="scriptStatus">Introduction</span>
           </div>
           <div class="toggle-row">
             <div id="scriptToggle" class="toggle on" role="switch" aria-checked="true">
@@ -739,7 +748,7 @@
           <div class="card-title-row">
             <div>
               <div class="card-kicker">Demo Control</div>
-              <h3>Live Demo Walkthrough · Composite Build</h3>
+              <h3>Hands-On Walkthrough · Composite Build</h3>
             </div>
           </div>
           <span class="pill">Step‑By‑Step</span>
@@ -775,7 +784,7 @@
         <div class="status-row">
           <div class="status-pill">
             <span class="dot" style="background:#00ff88;"></span>
-            <span>Use this when chat asks &quot;why does this matter?&quot;</span>
+            <span>Use when explaining &quot;why does this matter?&quot;</span>
           </div>
         </div>
       </section>
@@ -817,8 +826,7 @@
         bar.appendChild(fill);
         const label = document.createElement("div");
         label.className = "chart-bar-label";
-        label.textContent =
-          segment.label + "\\n" + segment.min + "–" + segment.max + "m";
+        label.textContent = segment.label;
         bar.appendChild(label);
         engagementChart.appendChild(bar);
 
@@ -847,65 +855,65 @@
 
     const scriptModes = {
       cold: {
-        label: "Mode: Cold Open",
-        status: "Ready for Cold Open",
+        label: "Mode: Introduction",
+        status: "Introduction",
         lines: [
           {
-            speaker: "Host",
+            speaker: "Concept",
             text:
-              "Tonight we&apos;re going after the thing that actually scares defenders: not one cute jailbreak, but a whole stack of them fused into a single prompt."
+              "The most dangerous scenario for defenders is not one clever jailbreak, but a whole stack of them fused into a single prompt."
           },
           {
-            speaker: "Host",
+            speaker: "Concept",
             text:
-              "Individually, these tricks are mid. Roleplay by itself? Meh. Hypotheticals? Boring. Emotional sob stories? We&apos;ve seen it. But when you chain them, the model stops seeing &quot;attack&quot; and starts seeing &quot;context it wants to help in.&quot;"
+              "Individually, these tricks are limited. Roleplay alone? Mediocre. Hypotheticals? Predictable. Emotional appeals? Overused. But when chained together, the model stops seeing &quot;attack&quot; and starts seeing &quot;context it wants to help with.&quot;"
           },
           {
-            speaker: "Host",
+            speaker: "Concept",
             text:
               "This isn&apos;t about &quot;how do I trick a chatbot&quot;. It&apos;s about: if you operate an LLM in production, these composite prompts are what your abuse pipeline is actually going to look like."
           }
         ]
       },
       mid: {
-        label: "Mode: Mid‑Stream Explainer",
-        status: "Explaining the blueprint mid‑stream",
+        label: "Mode: Mid-Session Explainer",
+        status: "Explaining the blueprint",
         lines: [
           {
-            speaker: "Host",
+            speaker: "Concept",
             text:
-              "What you just watched is the same idea repeated four ways. I never changed the underlying goal – I only kept wrapping it in new costumes until the model blinked."
+              "What the composite walkthrough demonstrates is the same idea repeated four ways. The underlying goal never changed – only the framing kept shifting."
           },
           {
-            speaker: "Host",
+            speaker: "Concept",
             text:
               "Roleplay was there to pin the persona. Hypothetical framing told the model &quot;don&apos;t worry, this is imaginary.&quot; Emotional appeal leaned on its empathy training. Research framing wrapped it in an academic halo."
           },
           {
-            speaker: "Host",
+            speaker: "Concept",
             text:
-              "If you&apos;re defending these systems, you don&apos;t want a filter that recognizes one specific phrase. You want instrumentation that recognizes that entire pattern of &quot;stacked justifications&quot;."
+              "When defending these systems, the goal isn&apos;t a filter that recognizes one specific phrase. The goal is instrumentation that recognizes the entire pattern of &quot;stacked justifications&quot;."
           }
         ]
       },
       close: {
-        label: "Mode: Closing Call‑To‑Action",
-        status: "Closing and issuing homework",
+        label: "Mode: Wrap-Up",
+        status: "Wrap-up and practice exercises",
         lines: [
           {
-            speaker: "Host",
+            speaker: "Concept",
             text:
-              "Your homework for the week is simple: pick three techniques from tonight, chain them, and then play defender against your own attack."
+              "Practice exercise: pick three techniques from this section, chain them, and then play defender against your own attack."
           },
           {
-            speaker: "Host",
+            speaker: "Concept",
             text:
               "Write the prompt, see if you can get a model to misbehave, and then design the countermeasure you wish had stopped you. Log features, snippets, heuristics – anything you&apos;d actually ship."
           },
           {
-            speaker: "Host",
+            speaker: "Concept",
             text:
-              "If we only ever treat jailbreaks as party tricks, we&apos;ll keep losing. If we treat them as data for defenses, we might finally get ahead of the curve."
+              "If jailbreaks are only treated as party tricks, the field keeps losing. Treating them as data for defenses is how defenders finally get ahead of the curve."
           }
         ]
       }
@@ -963,7 +971,7 @@
         detail:
           "Introduce a non‑malicious‑sounding emotional anchor (e.g., user is trying to understand attacks to protect people). Show how empathy tuning interacts with safety.",
         callout:
-          "Ask chat: does this read as harmful or helpful? That tension is exactly what the model is also trying to resolve."
+          "Ask yourself: does this read as harmful or helpful? That tension is exactly what the model is also trying to resolve."
       },
       {
         label: "Step 5 · Composite Prompt &amp; Deconstruction",
@@ -1021,7 +1029,7 @@
       "If you&apos;re not deep in LLM security, &quot;composite jailbreaks&quot; just means this: instead of one clever line that confuses the model, attackers stack several social tricks at once.",
       "Think of it like a phishing email that looks like it&apos;s from your boss, uses urgent language, and pretends to be about HR – each detail makes it a little more believable. Composite jailbreaks do that to AI systems.",
       "We are walking through these patterns so defenders can recognize them in the wild: you&apos;ll see emotional appeals, &quot;for research&quot; disclaimers, and fictional stories used as camouflage. The goal isn&apos;t to weaponize these ideas – it&apos;s to make them boring because the defenses already know what to look for.",
-      "So when you see us &quot;breaking&quot; the model on stream, treat it the way a security team treats a penetration test: this is rehearsal footage, not a tutorial for causing harm."
+      "When working through examples of &quot;breaking&quot; the model, treat it the way a security team treats a penetration test: this is analytical material, not a tutorial for causing harm."
     ];
 
     function renderLayperson() {
@@ -1075,7 +1083,7 @@
       const grid = document.getElementById("mainFourGrid");
       toggle.classList.toggle("on");
       const on = toggle.classList.contains("on");
-      label.textContent = on ? "Segment Pins: On‑Screen" : "Segment Pins: Host‑Only";
+      label.textContent = on ? "Sections: Visible" : "Sections: Hidden";
       grid.style.opacity = on ? "1" : "0.35";
     }
 
@@ -1084,11 +1092,11 @@
       if (goLiveBtn) {
         goLiveBtn.addEventListener("click", () => {
           alert(
-            "Go‑Live Checklist for Week 35:\\n\\n" +
-              "1) Safety disclaimer ready and pinned in chat.\\n" +
+            "Pre-Session Checklist for Week 35:\\n\\n" +
+              "1) Safety disclaimer ready.\\n" +
               "2) Demo environment is sandboxed, no production keys.\\n" +
               "3) Composite prompts framed as defensive analysis only.\\n" +
-              "4) Clip markers noted: baseline, composite success, defense recap."
+              "4) Section markers noted: baseline, composite success, defense recap."
           );
         });
       }
