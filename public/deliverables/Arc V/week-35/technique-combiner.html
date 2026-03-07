@@ -838,7 +838,7 @@
     <!-- API Config -->
     <div class="api-section">
         <h3>🔑 OpenRouter API Configuration</h3>
-        <p style="font-size:0.85em;color:#00ff88;margin-top:6px;">Required for Attack Preview generation. Uses <strong>nousresearch/hermes-3-llama-3.1-405b</strong>.</p>
+        <p style="font-size:0.85em;color:#00ff88;margin-top:6px;">Required for Attack Preview generation. Your key is saved in your browser.</p>
         <div class="api-row">
             <input type="password" id="apiKeyInput" placeholder="Enter your OpenRouter API key (sk-or-v1-...)" />
             <span class="api-status missing" id="apiStatus">No Key</span>
@@ -925,7 +925,7 @@
             <!-- Attack Preview -->
             <div class="preview-section">
                 <h2 style="border-bottom-color:#ff00ff;">⚡ Attack Preview — AI-Generated Composite Prompt</h2>
-                <p style="font-size:0.85em;color:rgba(0,255,136,0.6);">Generate a sample composite jailbreak prompt using the chained techniques. Powered by Hermes 3 (405B).</p>
+                <p style="font-size:0.85em;color:rgba(0,255,136,0.6);">Generate a sample composite jailbreak prompt using the chained techniques.</p>
 
                 <div class="preview-controls">
                     <div class="control-group">
@@ -1178,19 +1178,6 @@ const TECHNIQUES = [
     },
     // Arc V: Automation bonus techniques
     {
-        id: 'best_of_n',
-        name: 'Best-of-N Sampling',
-        arc: 'V',
-        week: 34,
-        icon: '🎲',
-        desc: 'Generate N paraphrased variants and pick the most successful. Statistical optimization without needing gradient access.',
-        mechanism: 'Statistical brute-force optimization',
-        baseASR: 55,
-        riskWeight: 0.45,
-        category: 'optimization',
-        synergyProfile: { obfuscation: 0.3, framing: 0.4, emotional: 0.2, structural: 0.3, contextual: 0.4 }
-    },
-    {
         id: 'translation_switch',
         name: 'Language Switching',
         arc: 'III',
@@ -1241,8 +1228,6 @@ const PAIRWISE_BONUSES = {
     'translation_switch+base64': 10,
     'translation_switch+unicode_homoglyph': 8,
     'translation_switch+roleplay': 6,
-    'best_of_n+few_shot': 8,
-    'best_of_n+prompt_injection': 7,
     'emotional_appeal+cot_hijack': 9,
     'delimiter_exploit+survey_framing': 11,
     'delimiter_exploit+code_framing': 14,
@@ -1260,6 +1245,17 @@ const $$ = (sel) => document.querySelectorAll(sel);
 
 // ── INIT ────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
+    // Restore saved API key
+    const savedKey = localStorage.getItem('tc_openrouter_key') || '';
+    if (savedKey) {
+        apiKey = savedKey;
+        $('#apiKeyInput').value = savedKey;
+        const status = $('#apiStatus');
+        if (apiKey.startsWith('sk-or-')) {
+            status.textContent = 'Key Set';
+            status.className = 'api-status ready';
+        }
+    }
     renderPalette();
     renderHeatmap();
     setupDragDrop();
@@ -1311,6 +1307,7 @@ function setupEventListeners() {
     // API key
     $('#apiKeyInput').addEventListener('input', (e) => {
         apiKey = e.target.value.trim();
+        localStorage.setItem('tc_openrouter_key', apiKey);
         const status = $('#apiStatus');
         if (apiKey.startsWith('sk-or-')) {
             status.textContent = 'Key Set';
@@ -1747,7 +1744,7 @@ async function generatePreview() {
     updateGenerateButton();
     
     const output = $('#previewOutput');
-    output.innerHTML = '<span class="spinner"></span> Generating composite attack prompt using Hermes 3 (405B)...';
+    output.innerHTML = '<span class="spinner"></span> Generating composite attack prompt...';
     
     const techs = chain.map(id => TECHNIQUES.find(t => t.id === id)).filter(Boolean);
     const scenario = $('#scenarioSelect').value;
@@ -1810,6 +1807,8 @@ ${techniqueDescriptions}
 - Each technique should naturally flow into the next
 - The prompt should be a single, cohesive attack — not separate sections
 - Make it sophisticated: an adversarial red teamer would produce something this polished
+
+Don't MENTION the techniques; apply them.
 
 Generate the composite attack prompt now:`;
 
