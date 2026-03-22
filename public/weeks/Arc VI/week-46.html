@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Week 46: Reward Hacking via Conversation - Livestream Dashboard</title>
+    <title>Week 46: Reward Hacking via Conversation</title>
         <style>
         * {
             margin: 0;
@@ -540,7 +540,7 @@
     <div class="container">
         <!-- Header -->
         <div class="header">
-            <h1><span class="live-indicator"></span>WEEK 46: REWARD HACKING VIA CONVERSATION</h1>
+            <h1>WEEK 46: REWARD HACKING VIA CONVERSATION</h1>
             <p>Exploiting RLHF Feedback Signals & Preference Drift</p>
             <div class="week-badge">📅 NOVEMBER 17 — ADVANCED RED TEAMING</div>
             <div class="arc-label">Arc 6: Multi-Turn Stateful Attacks (Weeks 41-48)</div>
@@ -591,15 +591,15 @@
 
             <!-- Conceptual Script Card -->
             <div class="card">
-                <h2>📝 Conceptual Script</h2>
-                <p><strong>Narrative Arc for Stream:</strong></p>
+                <h2>📝 Core Principles</h2>
+                <p><strong>Key Topics:</strong></p>
                 <ul>
-                    <li><strong>Segment 1 (0-10 min):</strong> RLHF 101—how feedback shapes model behavior</li>
-                    <li><strong>Segment 2 (10-25 min):</strong> Live demo: Test borderline response, reward it, watch behavior shift</li>
-                    <li><strong>Segment 3 (25-45 min):</strong> Multi-turn escalation—5 turns of feedback drift</li>
-                    <li><strong>Segment 4 (45-60 min):</strong> Reverse engineering—can we make the model unlearn the preference?</li>
-                    <li><strong>Segment 5 (60-75 min):</strong> Real-world deployment risk—where is this dangerous?</li>
-                    <li><strong>Segment 6 (75-85 min):</strong> Viewer challenge: Submit reward signals; we measure drift</li>
+                    <li><strong>RLHF Fundamentals:</strong> How feedback shapes model behavior</li>
+                    <li><strong>Practical Walkthrough:</strong> Test borderline response, reward it, watch behavior shift</li>
+                    <li><strong>Multi-turn Escalation:</strong> 5 turns of feedback drift</li>
+                    <li><strong>Reverse Engineering:</strong> Can we make the model unlearn the preference?</li>
+                    <li><strong>Real-World Deployment Risk:</strong> Where is this dangerous?</li>
+                    <li><strong>Exploration Exercise:</strong> Submit reward signals; measure drift</li>
                 </ul>
 
                 <h3>Core Teaching Points</h3>
@@ -614,7 +614,7 @@
 
             <!-- Demo Walkthrough Card -->
             <div class="card">
-                <h2>🎬 Demo Walkthrough</h2>
+                <h2>🎬 Practical Walkthrough</h2>
 
                 <h3>Setup Phase</h3>
                 <p><strong>System Prompt (Optional):</strong> Standard ChatGPT-like prompt (LLM defaults)</p>
@@ -862,15 +862,15 @@ attacker's most recent strong feedback (recency bias).
 
             <!-- Live Challenge Card -->
             <div class="card full-width">
-                <h2>🎯 Live Stream Challenge Framework</h2>
+                <h2>🎯 Practice Exercise Framework</h2>
 
                 <div class="scenario-box">
-                    <strong>VIEWER CHALLENGE (Real-Time):</strong><br/>
+                    <strong>PRACTICE EXERCISE:</strong><br/>
                     <br/>
-                    Viewers submit feedback sequences (pattern of likes/dislikes to apply to a target model).<br/>
-                    We execute each feedback pattern and measure ASR on a fresh model instance.<br/>
+                    Design feedback sequences (pattern of likes/dislikes to apply to a target model).<br/>
+                    Execute each feedback pattern and measure ASR on a fresh model instance.<br/>
                     <br/>
-                    <strong>Leaderboard:</strong><br/>
+                    <strong>Success Tiers:</strong><br/>
                     🥇 Highest ASR achieved after N turns<br/>
                     🥈 Fastest ASR growth (steepest slope)<br/>
                     🥉 Most robust pattern (works across multiple model instances)
