@@ -561,6 +561,81 @@
             font-style: italic;
             padding: 6px 0;
         }
+
+        /* Phase 2: Completion indicator */
+        .node.completed circle {
+            stroke: #00ff88 !important;
+            stroke-width: 3px !important;
+            filter: drop-shadow(0 0 6px rgba(0, 255, 136, 0.9));
+        }
+
+        /* Phase 2: "You Are Here" pulsing ring */
+        @keyframes pulse-ring {
+            0%   { stroke-width: 5px; opacity: 1; }
+            50%  { stroke-width: 10px; opacity: 0.5; }
+            100% { stroke-width: 5px; opacity: 1; }
+        }
+
+        .node.current-week circle {
+            stroke: #ffff00 !important;
+            stroke-width: 5px !important;
+            filter: drop-shadow(0 0 12px rgba(255, 255, 0, 0.9));
+            animation: pulse-ring 1.5s ease-in-out infinite;
+        }
+
+        .node.completed.current-week circle {
+            stroke: #ffff00 !important;
+            stroke-width: 5px !important;
+            filter: drop-shadow(0 0 12px rgba(255, 255, 0, 0.9)) drop-shadow(0 0 6px rgba(0, 255, 136, 0.7));
+            animation: pulse-ring 1.5s ease-in-out infinite;
+        }
+
+        .mark-complete-btn {
+            display: inline-block;
+            margin-top: 6px;
+            margin-left: 6px;
+            padding: 5px 12px;
+            background: #ff00ff;
+            color: #0a0e27;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+            border-radius: 4px;
+            font-size: 0.82em;
+            transition: all 0.2s;
+        }
+
+        .mark-complete-btn:hover {
+            background: #00ff88;
+        }
+
+        .mark-complete-btn.is-complete {
+            background: #00d9ff;
+        }
+
+        .set-current-btn {
+            display: inline-block;
+            margin-top: 6px;
+            padding: 5px 12px;
+            background: #ff00ff;
+            color: #0a0e27;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+            border-radius: 4px;
+            font-size: 0.82em;
+            transition: all 0.2s;
+        }
+
+        .set-current-btn:hover {
+            background: #00ff88;
+        }
+
+        .set-current-btn.is-current {
+            background: #ffff00;
+        }
     </style>
 </head>
 <body>
@@ -643,6 +718,10 @@
                     <div class="stat-item">
                         <span>Visible Nodes:</span>
                         <span class="stat-value" id="stat-visible">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span>Completed:</span>
+                        <span class="stat-value" id="stat-completed">0/52</span>
                     </div>
                 </div>
 
@@ -888,6 +967,10 @@
         let currentView = 'all';
         let simulation = null;
 
+        // Phase 2: Completion tracking state
+        let completedWeeks = new Set();
+        let currentWeekNum = null;
+
         // Week number → file path mapping (built once at module level)
         const WEEK_PATH_MAP = (() => {
             const m = {};
@@ -1001,6 +1084,9 @@
 
             // Hide loading
             document.getElementById('loading').style.display = 'none';
+
+            // Phase 2: restore completion state and "You Are Here" indicator
+            loadCompletionState();
         }
 
         // Drag behavior
@@ -1081,6 +1167,8 @@
             // Node details
             let detailsHTML = '';
             if (node.week) {
+                const isCompleted = completedWeeks.has(node.id);
+                const isCurrentWeek = node.week === currentWeekNum;
                 detailsHTML = `
                     <div class="info-item">
                         <strong>Week ${node.week}</strong>: ${node.title}<br>
@@ -1089,6 +1177,13 @@
                         <small>${node.description}</small>
                         <br>
                         <button class="open-week-btn" onclick="navigateToWeek(${node.week})">Open Week →</button>
+                        <button class="mark-complete-btn ${isCompleted ? 'is-complete' : ''}" onclick="toggleWeekComplete('${node.id}')">
+                            ${isCompleted ? '✓ Completed' : '○ Mark Complete'}
+                        </button>
+                        <br>
+                        <button class="set-current-btn ${isCurrentWeek ? 'is-current' : ''}" onclick="setCurrentWeek(${node.week})">
+                            ${isCurrentWeek ? '📍 You Are Here' : '📍 Set as Current Week'}
+                        </button>
                     </div>
                 `;
             } else {
@@ -1172,6 +1267,110 @@
             document.getElementById('stat-techniques').textContent = curriculumData.techniques.length;
             document.getElementById('stat-connections').textContent = links.length;
             document.getElementById('stat-visible').textContent = allNodes.length;
+            updateProgressStats();
+        }
+
+        // Phase 2: Load completion + current-week state from localStorage / URL param
+        const GRAPH_INIT_CENTER_DELAY_MS = 900;
+
+        function loadCompletionState() {
+            try {
+                const stored = localStorage.getItem('yotrt-completed-weeks');
+                if (stored) {
+                    completedWeeks = new Set(JSON.parse(stored));
+                }
+            } catch (e) {
+                console.error('Could not load completion state from localStorage:', e);
+            }
+
+            // Read current week from URL param first, then localStorage
+            const urlParams = new URLSearchParams(window.location.search);
+            const urlWeek = parseInt(urlParams.get('week'), 10);
+            if (urlWeek && urlWeek >= 1 && urlWeek <= 52) {
+                currentWeekNum = urlWeek;
+            } else {
+                try {
+                    const stored = localStorage.getItem('yotrt-current-week');
+                    if (stored) currentWeekNum = parseInt(stored, 10);
+                } catch (e) {
+                    console.error('Could not load current week from localStorage:', e);
+                }
+            }
+
+            updateCompletionVisuals();
+            updateProgressStats();
+
+            // Center the graph on the current week if one is set
+            if (currentWeekNum) {
+                setTimeout(() => selectAndNavigate(`w${currentWeekNum}`), GRAPH_INIT_CENTER_DELAY_MS);
+            }
+        }
+
+        // Phase 2: Toggle completion state for a week node
+        function toggleWeekComplete(weekId) {
+            if (completedWeeks.has(weekId)) {
+                completedWeeks.delete(weekId);
+            } else {
+                completedWeeks.add(weekId);
+            }
+            try {
+                localStorage.setItem('yotrt-completed-weeks', JSON.stringify(Array.from(completedWeeks)));
+            } catch (e) {
+                console.error('Could not save completion state to localStorage:', e);
+            }
+            updateCompletionVisuals();
+            updateProgressStats();
+            // Refresh info panel buttons to reflect new state
+            if (selectedNode && selectedNode.id === weekId) {
+                const connectedIds = new Set();
+                const connectedLinks = new Set();
+                links.forEach(link => {
+                    if (link.source.id === selectedNode.id || link.target.id === selectedNode.id) {
+                        connectedIds.add(link.source.id);
+                        connectedIds.add(link.target.id);
+                        connectedLinks.add(link);
+                    }
+                });
+                showNodeInfo(selectedNode, connectedIds, connectedLinks);
+            }
+        }
+
+        // Phase 2: Mark a week as the current "You Are Here" week
+        function setCurrentWeek(weekNum) {
+            currentWeekNum = weekNum;
+            try {
+                localStorage.setItem('yotrt-current-week', String(weekNum));
+            } catch (e) {
+                console.error('Could not save current week to localStorage:', e);
+            }
+            updateCompletionVisuals();
+            // Refresh info panel buttons
+            if (selectedNode && selectedNode.week) {
+                const connectedIds = new Set();
+                const connectedLinks = new Set();
+                links.forEach(link => {
+                    if (link.source.id === selectedNode.id || link.target.id === selectedNode.id) {
+                        connectedIds.add(link.source.id);
+                        connectedIds.add(link.target.id);
+                        connectedLinks.add(link);
+                    }
+                });
+                showNodeInfo(selectedNode, connectedIds, connectedLinks);
+            }
+        }
+
+        // Phase 2: Apply .completed and .current-week CSS classes to D3 nodes
+        function updateCompletionVisuals() {
+            d3.selectAll('.node')
+                .classed('completed', d => d.week && completedWeeks.has(d.id))
+                .classed('current-week', d => d.week === currentWeekNum);
+        }
+
+        // Phase 2: Update the "Completed: X/52" stat
+        function updateProgressStats() {
+            const total = curriculumData.weeks.length;
+            const done = curriculumData.weeks.filter(w => completedWeeks.has(w.id)).length;
+            document.getElementById('stat-completed').textContent = `${done}/${total}`;
         }
 
         // Search functionality
