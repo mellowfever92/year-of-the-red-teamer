@@ -636,6 +636,117 @@
         .set-current-btn.is-current {
             background: #ffff00;
         }
+
+        /* Phase 3: Layout save/reset button variants */
+        .button.layout-saved {
+            background: #00d9ff;
+            color: #0a0e27;
+        }
+
+        /* Phase 3: Toast notification */
+        #kg-toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #00ff88;
+            color: #0a0e27;
+            padding: 8px 20px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            z-index: 9999;
+            pointer-events: none;
+            transition: opacity 0.5s;
+        }
+
+        /* Phase 3: Print area — hidden on screen, shown when printing */
+        #print-area {
+            display: none;
+        }
+
+        @media print {
+            /* Hide everything except the print area */
+            body {
+                background: white !important;
+                color: black !important;
+                overflow: auto !important;
+            }
+
+            .container,
+            #modal-overlay {
+                display: none !important;
+            }
+
+            #print-area {
+                display: block !important;
+                color: black;
+                font-family: Arial, Helvetica, sans-serif;
+                padding: 24px;
+                max-width: 800px;
+                margin: 0 auto;
+            }
+
+            #print-area h1 {
+                font-size: 1.6em;
+                margin-bottom: 6px;
+                border-bottom: 2px solid #333;
+                padding-bottom: 6px;
+            }
+
+            #print-area h2 {
+                font-size: 1.1em;
+                margin: 16px 0 8px;
+            }
+
+            #print-area .print-goal {
+                margin-bottom: 16px;
+                color: #444;
+                font-size: 0.95em;
+            }
+
+            #print-area .print-path-text {
+                white-space: pre-wrap;
+                margin-bottom: 16px;
+                font-size: 0.9em;
+                line-height: 1.6;
+                border: 1px solid #ccc;
+                padding: 12px;
+            }
+
+            #print-area .print-week-card {
+                border: 1px solid #999;
+                padding: 10px 12px;
+                margin-bottom: 8px;
+                page-break-inside: avoid;
+                border-radius: 3px;
+            }
+
+            #print-area .print-week-title {
+                font-weight: bold;
+                font-size: 0.95em;
+            }
+
+            #print-area .print-week-meta {
+                color: #555;
+                font-size: 0.82em;
+                margin-top: 2px;
+            }
+
+            #print-area .print-week-desc {
+                color: #333;
+                font-size: 0.85em;
+                margin-top: 4px;
+            }
+
+            #print-area .print-footer {
+                margin-top: 24px;
+                font-size: 0.8em;
+                color: #777;
+                border-top: 1px solid #ccc;
+                padding-top: 8px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -675,6 +786,11 @@
             <div class="control-group">
                 <button class="button" id="reset-view">Reset View</button>
                 <button class="button" id="ai-assist">🤖 AI Assist</button>
+            </div>
+
+            <div class="control-group">
+                <button class="button" id="save-layout">💾 Save Layout</button>
+                <button class="button" id="reset-layout">↺ Reset Layout</button>
             </div>
         </div>
 
@@ -805,6 +921,9 @@
             <div id="modal-body"></div>
         </div>
     </div>
+
+    <!-- Phase 3: Print-only content area (hidden on screen) -->
+    <div id="print-area"></div>
 
     <script>
         // Comprehensive curriculum data with relationships
@@ -971,6 +1090,10 @@
         let completedWeeks = new Set();
         let currentWeekNum = null;
 
+        // Phase 3: Layout persistence key + last rendered learning path
+        const LAYOUT_STORAGE_KEY = 'yotrt-graph-layout';
+        let lastLearningPath = null; // { goal, pathText, weekNodes }
+
         // Week number → file path mapping (built once at module level)
         const WEEK_PATH_MAP = (() => {
             const m = {};
@@ -1030,12 +1153,24 @@
 
         // Initialize graph
         function initGraph() {
+            // Phase 3: Restore saved node positions before the simulation starts
+            const savedLayout = loadSavedLayout();
+            if (savedLayout) {
+                allNodes.forEach(n => {
+                    const pos = savedLayout[n.id];
+                    if (pos) { n.x = pos.x; n.y = pos.y; }
+                });
+            }
+
             // Force simulation
             simulation = d3.forceSimulation(allNodes)
                 .force('link', d3.forceLink(links).id(d => d.id).distance(100))
                 .force('charge', d3.forceManyBody().strength(-300))
                 .force('center', d3.forceCenter(width / 2, height / 2))
                 .force('collision', d3.forceCollide().radius(d => getNodeSize(d) + 5));
+
+            // Phase 3: Use low alpha when restoring saved positions so nodes barely move
+            if (savedLayout) simulation.alpha(0.05);
 
             // Draw links
             const link = g.append('g')
@@ -1373,6 +1508,62 @@
             document.getElementById('stat-completed').textContent = `${done}/${total}`;
         }
 
+        // ── Phase 3: Layout persistence ─────────────────────────────────────────
+
+        function loadSavedLayout() {
+            try {
+                const stored = localStorage.getItem(LAYOUT_STORAGE_KEY);
+                if (stored) return JSON.parse(stored);
+            } catch (e) {
+                console.error('Could not load saved layout from localStorage:', e);
+            }
+            return null;
+        }
+
+        function saveGraphLayout() {
+            const layout = {};
+            allNodes.forEach(n => {
+                if (n.x != null && n.y != null) {
+                    layout[n.id] = { x: n.x, y: n.y };
+                }
+            });
+            try {
+                localStorage.setItem(LAYOUT_STORAGE_KEY, JSON.stringify(layout));
+                document.getElementById('save-layout').classList.add('layout-saved');
+                showToast('Layout saved!');
+            } catch (e) {
+                console.error('Could not save layout to localStorage:', e);
+            }
+        }
+
+        function resetGraphLayout() {
+            try {
+                localStorage.removeItem(LAYOUT_STORAGE_KEY);
+            } catch (e) {
+                console.error('Could not clear saved layout from localStorage:', e);
+            }
+            // Unpin any manually dragged nodes and restart simulation at full energy
+            allNodes.forEach(n => { n.fx = null; n.fy = null; });
+            if (simulation) simulation.alpha(1).restart();
+            document.getElementById('save-layout').classList.remove('layout-saved');
+            showToast('Layout reset to default.');
+        }
+
+        // Lightweight toast notification
+        const TOAST_FADE_DELAY_MS = 1800;   // ms before fade-out begins
+        const TOAST_REMOVE_DELAY_MS = 2400; // ms before DOM removal
+
+        function showToast(message) {
+            const existing = document.getElementById('kg-toast');
+            if (existing) existing.remove();
+            const toast = document.createElement('div');
+            toast.id = 'kg-toast';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => { toast.style.opacity = '0'; }, TOAST_FADE_DELAY_MS);
+            setTimeout(() => { if (toast.parentNode) toast.remove(); }, TOAST_REMOVE_DELAY_MS);
+        }
+
         // Search functionality
         document.getElementById('search-input').addEventListener('input', (e) => {
             const query = e.target.value.toLowerCase();
@@ -1451,6 +1642,10 @@
             const panel = document.getElementById('ai-panel');
             panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
         });
+
+        // Phase 3: Layout save / reset buttons
+        document.getElementById('save-layout').addEventListener('click', saveGraphLayout);
+        document.getElementById('reset-layout').addEventListener('click', resetGraphLayout);
 
         // Helper functions
         function selectNodeById(nodeId) {
@@ -1639,6 +1834,9 @@
         }
 
         function renderLearningPathModal(goal, pathText, weekNodes) {
+            // Phase 3: persist for printLearningPath()
+            lastLearningPath = { goal, pathText, weekNodes };
+
             let html = `<div style="margin-bottom: 12px; color: #ccc; font-size: 0.85em;">Goal: <em>${goal}</em></div>`;
 
             if (pathText) {
@@ -1668,6 +1866,16 @@
             if (!pathText && weekNodes.length === 0) {
                 html += '<div class="panel-status">No related weeks found for this path.</div>';
             }
+
+            // Phase 3: Print / Export PDF button
+            html += `
+                <div style="margin-top: 16px; text-align: right;">
+                    <button class="button" onclick="printLearningPath()"
+                        style="background: #00d9ff; color: #0a0e27;">
+                        🖨️ Print / Export PDF
+                    </button>
+                </div>
+            `;
 
             openModal('🎯 Learning Path', html);
         }
@@ -1749,6 +1957,45 @@
         document.addEventListener('keydown', e => {
             if (e.key === 'Escape') closeModal();
         });
+
+        // Phase 3: Populate #print-area and trigger browser print dialog
+        function printLearningPath() {
+            if (!lastLearningPath) return;
+            const { goal, pathText, weekNodes } = lastLearningPath;
+
+            let html = `
+                <h1>🎯 YoTRT Learning Path</h1>
+                <p class="print-goal"><strong>Goal:</strong> ${goal}</p>
+            `;
+
+            if (pathText) {
+                html += `<div class="print-path-text">${pathText}</div>`;
+            }
+
+            if (weekNodes.length > 0) {
+                html += '<h2>Suggested Weeks</h2>';
+                weekNodes.forEach((n, i) => {
+                    html += `
+                        <div class="print-week-card">
+                            <div class="print-week-title">${i + 1}. Week ${n.week}: ${n.title}</div>
+                            <div class="print-week-meta">Arc ${n.arc} &bull; Difficulty ${n.difficulty}/5</div>
+                            ${n.description ? `<div class="print-week-desc">${n.description}</div>` : ''}
+                        </div>
+                    `;
+                });
+            } else if (!pathText) {
+                html += '<p>No week suggestions available.</p>';
+            }
+
+            html += `
+                <div class="print-footer">
+                    Generated by YoTRT Knowledge Graph &bull; ${new Date().toLocaleDateString()}
+                </div>
+            `;
+
+            document.getElementById('print-area').innerHTML = html;
+            window.print();
+        }
 
         async function performAISearch() {
             const query = document.getElementById('ai-search-input').value;
