@@ -86,21 +86,7 @@ The knowledge graph frontend (`/public/weeks/knowledge-graph.html`) and backend 
 
 ---
 
-## Phase 7: Collaborative / Social Features
-
-**Goal:** Implement integration opportunity #4 — "Social features: share learning paths."
-
-1. Add a "Share Path" button to the learning path result panel.
-2. Clicking it encodes the ordered list of week IDs as a base64 URL param (e.g., `?path=eyJ3...`).
-3. On page load, if `?path=` param is present, decode it, highlight those nodes in order, and auto-show the learning path panel.
-4. Copy-to-clipboard with a "Link copied!" confirmation toast.
-5. Optional: Add backend `/api/save-path` endpoint (POST) that saves path to a JSON file under `/public/deliverables/knowledge-graph/saved-paths/` and returns a short 6-char ID. Then the share URL is `?shared=ABC123`.
-
-**Files:** `public/weeks/knowledge-graph.html`, `public/deliverables/knowledge-graph/kg-server.js` (if backend path saving is included)
-
----
-
-## Phase 8: Dashboard Integration
+## Phase 7: Dashboard Integration
 
 **Goal:** Implement integration opportunity #2 — "Embed graph in main YoTRT dashboard."
 
@@ -129,5 +115,4 @@ The knowledge graph frontend (`/public/weeks/knowledge-graph.html`) and backend 
 4. **Phase 4**: Start `kg-server.js` → run AI search for "privilege escalation" → verify results differ from keyword-only search.
 5. **Phase 5**: Click "Timeline" → verify weeks appear one-by-one. Use scrubber to jump to week 25.
 6. **Phase 6**: Click "Switch to 3D" → 3D graph appears with correct colors. Click a node → same info panel appears.
-7. **Phase 7**: Generate learning path → click "Share" → URL updates → paste URL in new tab → path highlighted.
-8. **Phase 8**: Open `index.html` → knowledge graph card visible and link works.
+8. **Phase 7**: Open `index.html` → knowledge graph card visible and link works.
