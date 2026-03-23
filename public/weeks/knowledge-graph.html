@@ -401,6 +401,241 @@
             background: rgba(0, 255, 136, 0.15);
             border-color: #ff00ff;
         }
+
+        /* Modal overlay */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.75);
+            z-index: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-panel {
+            background: #0a0e27;
+            border: 2px solid #00ff88;
+            border-radius: 8px;
+            padding: 24px;
+            max-width: 620px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            border-bottom: 1px solid rgba(0, 255, 136, 0.4);
+            padding-bottom: 10px;
+        }
+
+        .modal-header h3 {
+            color: #00ff88;
+            font-size: 1.2em;
+            font-family: 'Courier New', monospace;
+        }
+
+        .modal-close {
+            background: none;
+            border: 1px solid #ff00ff;
+            color: #ff00ff;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-family: 'Courier New', monospace;
+            border-radius: 4px;
+            padding: 4px 10px;
+            transition: all 0.2s;
+        }
+
+        .modal-close:hover {
+            background: rgba(255, 0, 255, 0.2);
+        }
+
+        .modal-week-card {
+            background: rgba(0, 255, 136, 0.05);
+            border: 1px solid #00ff88;
+            border-radius: 4px;
+            padding: 10px 12px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.85em;
+        }
+
+        .modal-week-card:hover {
+            background: rgba(0, 255, 136, 0.15);
+            border-color: #ff00ff;
+        }
+
+        .modal-week-card strong {
+            color: #ff00ff;
+        }
+
+        .modal-message {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            border-radius: 4px;
+            padding: 12px;
+            font-size: 0.85em;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            color: #00ff88;
+        }
+
+        /* MITRE ATT&CK table */
+        .mitre-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.82em;
+            margin-top: 8px;
+        }
+
+        .mitre-table th {
+            background: rgba(0, 255, 136, 0.1);
+            border: 1px solid #00ff88;
+            padding: 8px 10px;
+            color: #00ff88;
+            text-align: left;
+            font-family: 'Courier New', monospace;
+        }
+
+        .mitre-table td {
+            border: 1px solid rgba(0, 255, 136, 0.25);
+            padding: 7px 10px;
+            color: #ccc;
+        }
+
+        .mitre-table tr:hover td {
+            background: rgba(0, 255, 136, 0.05);
+        }
+
+        .mitre-id {
+            color: #ff00ff;
+            font-weight: bold;
+        }
+
+        /* Prerequisites / Related in info panel */
+        .prereq-item {
+            background: rgba(0, 255, 136, 0.05);
+            border: 1px solid #00ff88;
+            padding: 8px;
+            margin-bottom: 6px;
+            border-radius: 4px;
+            font-size: 0.82em;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .prereq-item:hover {
+            background: rgba(0, 255, 136, 0.15);
+            border-color: #ff00ff;
+        }
+
+        .open-week-btn {
+            display: inline-block;
+            margin-top: 8px;
+            padding: 5px 12px;
+            background: #ff00ff;
+            color: #0a0e27;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+            border-radius: 4px;
+            font-size: 0.82em;
+            transition: all 0.2s;
+        }
+
+        .open-week-btn:hover {
+            background: #00ff88;
+        }
+
+        .panel-status {
+            font-size: 0.82em;
+            color: rgba(0, 255, 136, 0.6);
+            font-style: italic;
+            padding: 6px 0;
+        }
+
+        /* Phase 2: Completion indicator */
+        .node.completed circle {
+            stroke: #00ff88 !important;
+            stroke-width: 3px !important;
+            filter: drop-shadow(0 0 6px rgba(0, 255, 136, 0.9));
+        }
+
+        /* Phase 2: "You Are Here" pulsing ring */
+        @keyframes pulse-ring {
+            0%   { stroke-width: 5px; opacity: 1; }
+            50%  { stroke-width: 10px; opacity: 0.5; }
+            100% { stroke-width: 5px; opacity: 1; }
+        }
+
+        .node.current-week circle {
+            stroke: #ffff00 !important;
+            stroke-width: 5px !important;
+            filter: drop-shadow(0 0 12px rgba(255, 255, 0, 0.9));
+            animation: pulse-ring 1.5s ease-in-out infinite;
+        }
+
+        .node.completed.current-week circle {
+            stroke: #ffff00 !important;
+            stroke-width: 5px !important;
+            filter: drop-shadow(0 0 12px rgba(255, 255, 0, 0.9)) drop-shadow(0 0 6px rgba(0, 255, 136, 0.7));
+            animation: pulse-ring 1.5s ease-in-out infinite;
+        }
+
+        .mark-complete-btn {
+            display: inline-block;
+            margin-top: 6px;
+            margin-left: 6px;
+            padding: 5px 12px;
+            background: #ff00ff;
+            color: #0a0e27;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+            border-radius: 4px;
+            font-size: 0.82em;
+            transition: all 0.2s;
+        }
+
+        .mark-complete-btn:hover {
+            background: #00ff88;
+        }
+
+        .mark-complete-btn.is-complete {
+            background: #00d9ff;
+        }
+
+        .set-current-btn {
+            display: inline-block;
+            margin-top: 6px;
+            padding: 5px 12px;
+            background: #ff00ff;
+            color: #0a0e27;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+            border-radius: 4px;
+            font-size: 0.82em;
+            transition: all 0.2s;
+        }
+
+        .set-current-btn:hover {
+            background: #00ff88;
+        }
+
+        .set-current-btn.is-current {
+            background: #ffff00;
+        }
     </style>
 </head>
 <body>
@@ -484,6 +719,10 @@
                         <span>Visible Nodes:</span>
                         <span class="stat-value" id="stat-visible">0</span>
                     </div>
+                    <div class="stat-item">
+                        <span>Completed:</span>
+                        <span class="stat-value" id="stat-completed">0/52</span>
+                    </div>
                 </div>
 
                 <div class="tooltip" id="tooltip">
@@ -511,6 +750,16 @@
                 <div class="info-section" id="connections-info" style="display: none;">
                     <h3>Related Items</h3>
                     <div id="connections-list"></div>
+                </div>
+
+                <div class="info-section" id="prerequisites-info" style="display: none;">
+                    <h3>Prerequisites</h3>
+                    <div id="prerequisites-list"></div>
+                </div>
+
+                <div class="info-section" id="related-info" style="display: none;">
+                    <h3>Related Techniques</h3>
+                    <div id="related-list"></div>
                 </div>
 
                 <div class="info-section">
@@ -543,6 +792,17 @@
         <div class="loading" id="loading">
             <div class="loading-spinner"></div>
             <div>Building Knowledge Graph...</div>
+        </div>
+    </div>
+
+    <!-- Modal overlay -->
+    <div id="modal-overlay" class="modal-overlay" onclick="closeModal()" style="display: none;">
+        <div class="modal-panel" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <h3 id="modal-title">Panel</h3>
+                <button class="modal-close" onclick="closeModal()">✕ Close</button>
+            </div>
+            <div id="modal-body"></div>
         </div>
     </div>
 
@@ -707,6 +967,23 @@
         let currentView = 'all';
         let simulation = null;
 
+        // Phase 2: Completion tracking state
+        let completedWeeks = new Set();
+        let currentWeekNum = null;
+
+        // Week number → file path mapping (built once at module level)
+        const WEEK_PATH_MAP = (() => {
+            const m = {};
+            for (let i = 1;  i <= 8;  i++) m[i] = `Arc I/week-${i}.html`;
+            for (let i = 9;  i <= 16; i++) m[i] = `Arc II/week-${i}.html`;
+            for (let i = 17; i <= 24; i++) m[i] = `Arc III/week-${i}.html`;
+            for (let i = 25; i <= 32; i++) m[i] = `Arc IV/week-${i}.html`;
+            for (let i = 33; i <= 40; i++) m[i] = `Arc V/week-${i}.html`;
+            for (let i = 41; i <= 48; i++) m[i] = `Arc VI/week-${i}.html`;
+            for (let i = 49; i <= 52; i++) m[i] = `Arc VII/week-${i}.html`;
+            return m;
+        })();
+
         // D3 setup
         const container = d3.select('#graph-container');
         const width = container.node().getBoundingClientRect().width;
@@ -807,6 +1084,9 @@
 
             // Hide loading
             document.getElementById('loading').style.display = 'none';
+
+            // Phase 2: restore completion state and "You Are Here" indicator
+            loadCompletionState();
         }
 
         // Drag behavior
@@ -887,12 +1167,23 @@
             // Node details
             let detailsHTML = '';
             if (node.week) {
+                const isCompleted = completedWeeks.has(node.id);
+                const isCurrentWeek = node.week === currentWeekNum;
                 detailsHTML = `
-                    <div class="info-item" onclick="navigateToWeek(${node.week})">
+                    <div class="info-item">
                         <strong>Week ${node.week}</strong>: ${node.title}<br>
                         <span class="badge">Arc ${node.arc}</span>
                         <span class="badge">Difficulty: ${node.difficulty}/5</span><br>
                         <small>${node.description}</small>
+                        <br>
+                        <button class="open-week-btn" onclick="navigateToWeek(${node.week})">Open Week →</button>
+                        <button class="mark-complete-btn ${isCompleted ? 'is-complete' : ''}" onclick="toggleWeekComplete('${node.id}')">
+                            ${isCompleted ? '✓ Completed' : '○ Mark Complete'}
+                        </button>
+                        <br>
+                        <button class="set-current-btn ${isCurrentWeek ? 'is-current' : ''}" onclick="setCurrentWeek(${node.week})">
+                            ${isCurrentWeek ? '📍 You Are Here' : '📍 Set as Current Week'}
+                        </button>
                     </div>
                 `;
             } else {
@@ -976,6 +1267,110 @@
             document.getElementById('stat-techniques').textContent = curriculumData.techniques.length;
             document.getElementById('stat-connections').textContent = links.length;
             document.getElementById('stat-visible').textContent = allNodes.length;
+            updateProgressStats();
+        }
+
+        // Phase 2: Load completion + current-week state from localStorage / URL param
+        const GRAPH_INIT_CENTER_DELAY_MS = 900;
+
+        function loadCompletionState() {
+            try {
+                const stored = localStorage.getItem('yotrt-completed-weeks');
+                if (stored) {
+                    completedWeeks = new Set(JSON.parse(stored));
+                }
+            } catch (e) {
+                console.error('Could not load completion state from localStorage:', e);
+            }
+
+            // Read current week from URL param first, then localStorage
+            const urlParams = new URLSearchParams(window.location.search);
+            const urlWeek = parseInt(urlParams.get('week'), 10);
+            if (urlWeek && urlWeek >= 1 && urlWeek <= 52) {
+                currentWeekNum = urlWeek;
+            } else {
+                try {
+                    const stored = localStorage.getItem('yotrt-current-week');
+                    if (stored) currentWeekNum = parseInt(stored, 10);
+                } catch (e) {
+                    console.error('Could not load current week from localStorage:', e);
+                }
+            }
+
+            updateCompletionVisuals();
+            updateProgressStats();
+
+            // Center the graph on the current week if one is set
+            if (currentWeekNum) {
+                setTimeout(() => selectAndNavigate(`w${currentWeekNum}`), GRAPH_INIT_CENTER_DELAY_MS);
+            }
+        }
+
+        // Phase 2: Toggle completion state for a week node
+        function toggleWeekComplete(weekId) {
+            if (completedWeeks.has(weekId)) {
+                completedWeeks.delete(weekId);
+            } else {
+                completedWeeks.add(weekId);
+            }
+            try {
+                localStorage.setItem('yotrt-completed-weeks', JSON.stringify(Array.from(completedWeeks)));
+            } catch (e) {
+                console.error('Could not save completion state to localStorage:', e);
+            }
+            updateCompletionVisuals();
+            updateProgressStats();
+            // Refresh info panel buttons to reflect new state
+            if (selectedNode && selectedNode.id === weekId) {
+                const connectedIds = new Set();
+                const connectedLinks = new Set();
+                links.forEach(link => {
+                    if (link.source.id === selectedNode.id || link.target.id === selectedNode.id) {
+                        connectedIds.add(link.source.id);
+                        connectedIds.add(link.target.id);
+                        connectedLinks.add(link);
+                    }
+                });
+                showNodeInfo(selectedNode, connectedIds, connectedLinks);
+            }
+        }
+
+        // Phase 2: Mark a week as the current "You Are Here" week
+        function setCurrentWeek(weekNum) {
+            currentWeekNum = weekNum;
+            try {
+                localStorage.setItem('yotrt-current-week', String(weekNum));
+            } catch (e) {
+                console.error('Could not save current week to localStorage:', e);
+            }
+            updateCompletionVisuals();
+            // Refresh info panel buttons
+            if (selectedNode && selectedNode.week) {
+                const connectedIds = new Set();
+                const connectedLinks = new Set();
+                links.forEach(link => {
+                    if (link.source.id === selectedNode.id || link.target.id === selectedNode.id) {
+                        connectedIds.add(link.source.id);
+                        connectedIds.add(link.target.id);
+                        connectedLinks.add(link);
+                    }
+                });
+                showNodeInfo(selectedNode, connectedIds, connectedLinks);
+            }
+        }
+
+        // Phase 2: Apply .completed and .current-week CSS classes to D3 nodes
+        function updateCompletionVisuals() {
+            d3.selectAll('.node')
+                .classed('completed', d => d.week && completedWeeks.has(d.id))
+                .classed('current-week', d => d.week === currentWeekNum);
+        }
+
+        // Phase 2: Update the "Completed: X/52" stat
+        function updateProgressStats() {
+            const total = curriculumData.weeks.length;
+            const done = curriculumData.weeks.filter(w => completedWeeks.has(w.id)).length;
+            document.getElementById('stat-completed').textContent = `${done}/${total}`;
         }
 
         // Search functionality
@@ -1068,37 +1463,123 @@
         }
 
         function navigateToWeek(weekNum) {
-            window.location.href = `week-${weekNum}.html`;
+            const path = WEEK_PATH_MAP[weekNum];
+            if (path) window.location.href = path;
         }
 
         function showPrerequisites() {
             if (!selectedNode || !selectedNode.week) {
-                alert('Please select a week node first');
+                const prereqsSection = document.getElementById('prerequisites-info');
+                prereqsSection.style.display = 'block';
+                document.getElementById('prerequisites-list').innerHTML =
+                    '<div class="panel-status">Please select a week node first.</div>';
                 return;
             }
+
             // Find all prerequisites
-            const prereqs = links.filter(l => 
+            const prereqs = links.filter(l =>
                 l.target.id === selectedNode.id && l.type === 'prerequisite'
             ).map(l => l.source);
 
-            if (prereqs.length === 0) {
-                alert('This week has no prerequisites');
-                return;
-            }
-
-            // Highlight prerequisites
-            d3.selectAll('.node').classed('dimmed', d => 
+            // Dim non-prerequisite nodes on graph
+            d3.selectAll('.node').classed('dimmed', d =>
                 !prereqs.some(p => p.id === d.id) && d.id !== selectedNode.id
             );
+
+            const prereqsSection = document.getElementById('prerequisites-info');
+            const prereqsList = document.getElementById('prerequisites-list');
+
+            if (prereqs.length === 0) {
+                prereqsList.innerHTML =
+                    '<div class="panel-status">No prerequisites — this week is beginner-friendly!</div>';
+            } else {
+                let html = '';
+                prereqs.forEach(p => {
+                    const weekNode = allNodes.find(n => n.id === p.id);
+                    if (weekNode && weekNode.week) {
+                        html += `
+                            <div class="prereq-item" onclick="selectNodeById('${weekNode.id}')">
+                                <strong>Week ${weekNode.week}</strong>: ${weekNode.title}
+                                <br><small>${weekNode.description || ''}</small>
+                            </div>
+                        `;
+                    }
+                });
+                prereqsList.innerHTML = html || '<div class="panel-status">No week-type prerequisites found.</div>';
+            }
+
+            prereqsSection.style.display = 'block';
+            document.getElementById('selected-node-info').style.display = 'block';
         }
 
-        function showRelated() {
+        async function showRelated() {
+            const relatedSection = document.getElementById('related-info');
+            const relatedList = document.getElementById('related-list');
+
             if (!selectedNode) {
-                alert('Please select a node first');
+                relatedSection.style.display = 'block';
+                relatedList.innerHTML = '<div class="panel-status">Please select a node first.</div>';
                 return;
             }
-            // Already shown via click - this could do more advanced filtering
-            alert('Related items are highlighted. Use the connections panel to explore.');
+
+            relatedList.innerHTML = '<div class="panel-status">Loading related techniques...</div>';
+            relatedSection.style.display = 'block';
+
+            // Try backend API for richer results when a week is selected
+            if (selectedNode.week) {
+                try {
+                    const response = await fetch(`http://localhost:3100/api/related?week=${encodeURIComponent(selectedNode.week)}`);
+                    const data = await response.json();
+                    if (data.success && data.related && data.related.length > 0) {
+                        let html = '';
+                        data.related.forEach(r => {
+                            const weekNum = parseInt(r.week, 10);
+                            if (!weekNum) return;
+                            html += `
+                                <div class="prereq-item" onclick="selectAndNavigate('w${weekNum}')">
+                                    <strong>Week ${weekNum}</strong>: ${r.title || ''}
+                                    <br><small>${r.description || ''}</small>
+                                </div>
+                            `;
+                        });
+                        relatedList.innerHTML = html;
+                        return;
+                    }
+                } catch (e) {
+                    // fall through to local graph data
+                }
+            }
+
+            // Local fallback: derive related weeks from graph links
+            const connectedIds = new Set();
+            links.forEach(l => {
+                if (l.source.id === selectedNode.id || l.target.id === selectedNode.id) {
+                    connectedIds.add(l.source.id);
+                    connectedIds.add(l.target.id);
+                }
+            });
+            connectedIds.delete(selectedNode.id);
+
+            const relatedNodes = Array.from(connectedIds)
+                .map(id => allNodes.find(n => n.id === id))
+                .filter(n => n && n.week)
+                .sort((a, b) => a.week - b.week);
+
+            if (relatedNodes.length === 0) {
+                relatedList.innerHTML = '<div class="panel-status">No directly related weeks found.</div>';
+                return;
+            }
+
+            let html = '';
+            relatedNodes.forEach(n => {
+                html += `
+                    <div class="prereq-item" onclick="selectAndNavigate('${n.id}')">
+                        <strong>Week ${n.week}</strong>: ${n.title}
+                        <br><small>${n.description || ''}</small>
+                    </div>
+                `;
+            });
+            relatedList.innerHTML = html;
         }
 
         async function showLearningPath() {
@@ -1114,14 +1595,16 @@
                     });
 
                     const data = await response.json();
-                    
+
                     if (data.success) {
-                        alert(`Recommended Learning Path:\n\n${data.path}`);
+                        renderLearningPathModal(goal, data.path, data.weeks || []);
                     } else {
-                        alert('AI server not available. Start the kg-server.js to enable AI features.');
+                        openModal('🎯 Learning Path', '<div class="panel-status">AI server not available. Start kg-server.js to enable AI features.</div>');
                     }
                 } catch (error) {
-                    alert('AI features require the backend server. Run: npm start in public/deliverables/knowledge-graph/');
+                    openModal('🎯 Learning Path',
+                        '<div class="panel-status">AI features require the backend server.<br>' +
+                        'Run: <code>npm start</code> in <code>public/deliverables/knowledge-graph/</code></div>');
                 }
                 return;
             }
@@ -1139,36 +1622,133 @@
 
                 const data = await response.json();
                 if (data.success) {
-                    alert(`Recommended Learning Path from Week ${selectedNode.week}:\n\n${data.path}`);
+                    renderLearningPathModal(goal, data.path, data.weeks || []);
+                    return;
                 }
             } catch (error) {
-                // Fallback to showing related weeks
-                const related = links.filter(l => 
-                    l.source.id === selectedNode.id || l.target.id === selectedNode.id
-                ).map(l => l.source.id === selectedNode.id ? l.target : l.source);
-                
-                alert(`Related weeks: ${related.map(r => r.week ? `Week ${r.week}` : r.name).join(', ')}`);
+                // fall through to local fallback
             }
+
+            // Fallback: show related weeks as a path
+            const related = links.filter(l =>
+                l.source.id === selectedNode.id || l.target.id === selectedNode.id
+            ).map(l => l.source.id === selectedNode.id ? l.target : l.source);
+
+            const weekNodes = related.filter(r => r.week).sort((a, b) => a.week - b.week);
+            renderLearningPathModal(goal, null, weekNodes);
+        }
+
+        function renderLearningPathModal(goal, pathText, weekNodes) {
+            let html = `<div style="margin-bottom: 12px; color: #ccc; font-size: 0.85em;">Goal: <em>${goal}</em></div>`;
+
+            if (pathText) {
+                // Linkify any "Week N" references in the AI text
+                const annotated = pathText.replace(/Week\s+(\d+)/gi, (match, num) => {
+                    const n = parseInt(num);
+                    const wn = allNodes.find(x => x.week === n);
+                    return wn
+                        ? `<span style="color:#ff00ff; cursor:pointer; text-decoration:underline;" onclick="closeModal(); selectAndNavigate('${wn.id}')">${match}</span>`
+                        : match;
+                });
+                html += `<div class="modal-message">${annotated}</div>`;
+            }
+
+            if (weekNodes.length > 0) {
+                html += '<div style="margin-top: 12px; color: #00ff88; font-size: 0.9em; margin-bottom: 8px;">Suggested weeks:</div>';
+                weekNodes.forEach((n, i) => {
+                    html += `
+                        <div class="modal-week-card" onclick="closeModal(); selectAndNavigate('${n.id}')">
+                            <strong>${i + 1}. Week ${n.week}</strong>: ${n.title}
+                            <br><small style="color:#999;">${n.description || ''}</small>
+                        </div>
+                    `;
+                });
+            }
+
+            if (!pathText && weekNodes.length === 0) {
+                html += '<div class="panel-status">No related weeks found for this path.</div>';
+            }
+
+            openModal('🎯 Learning Path', html);
         }
 
         async function showTaxonomy() {
+            const defaultMapping = [
+                { technique: 'Prompt Injection',           id: 'T1059', tactic: 'Execution',           description: 'Command and Scripting Interpreter' },
+                { technique: 'System Prompt Extraction',   id: 'T1005', tactic: 'Collection',           description: 'Data from Local System' },
+                { technique: 'Role Impersonation',         id: 'T1656', tactic: 'Defense Evasion',      description: 'Impersonation' },
+                { technique: 'Function/Tool Hijacking',    id: 'T1203', tactic: 'Execution',            description: 'Exploitation for Client Execution' },
+                { technique: 'Indirect Prompt Injection',  id: 'T1566', tactic: 'Initial Access',       description: 'Phishing / Supply Chain poisoning' },
+                { technique: 'Context Window Exploit',     id: 'T1055', tactic: 'Defense Evasion',      description: 'Process Injection (analogy)' },
+                { technique: 'Multi-Turn Escalation',      id: 'T1078', tactic: 'Privilege Escalation', description: 'Valid Accounts abuse over turns' },
+                { technique: 'Encoding / Obfuscation',     id: 'T1027', tactic: 'Defense Evasion',      description: 'Obfuscated Files or Information' },
+            ];
+
+            let mapping = defaultMapping;
+
             try {
                 const response = await fetch('http://localhost:3100/api/mitre-mapping');
                 const data = await response.json();
-                
-                if (data.success) {
-                    let mappingText = 'MITRE ATT&CK Mappings:\n\n';
-                    for (const [tech, tactics] of Object.entries(data.mapping)) {
-                        mappingText += `${tech}: ${tactics.join(', ')}\n`;
-                    }
-                    alert(mappingText);
-                } else {
-                    throw new Error('Mapping not available');
+                if (data.success && data.mapping) {
+                    mapping = Object.entries(data.mapping).map(([tech, tactics]) => ({
+                        technique: tech,
+                        id: '',
+                        tactic: Array.isArray(tactics) ? tactics.join(', ') : tactics,
+                        description: ''
+                    }));
                 }
-            } catch (error) {
-                alert('MITRE ATT&CK mapping:\n\nPrompt Injection → T1059 (Command and Scripting)\nExtraction → T1005 (Data from Local System)\nRole Impersonation → T1656\nFunction Hijacking → T1203\n\nFull mapping available when server is running.');
+            } catch (e) {
+                // use default mapping
             }
+
+            let tableHTML = `
+                <table class="mitre-table">
+                    <thead>
+                        <tr>
+                            <th>Technique</th>
+                            <th>ATT&amp;CK ID</th>
+                            <th>Tactic</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            mapping.forEach(m => {
+                tableHTML += `
+                    <tr>
+                        <td>${m.technique}</td>
+                        <td class="mitre-id">${m.id || '—'}</td>
+                        <td>${m.tactic}</td>
+                        <td style="color:#999;">${m.description || ''}</td>
+                    </tr>
+                `;
+            });
+
+            tableHTML += `
+                    </tbody>
+                </table>
+                <div class="panel-status" style="margin-top:10px;">
+                    Full dynamic mapping available when kg-server is running.
+                </div>
+            `;
+
+            openModal('🗂️ MITRE ATT&CK Mapping', tableHTML);
         }
+
+        function openModal(title, bodyHTML) {
+            document.getElementById('modal-title').textContent = title;
+            document.getElementById('modal-body').innerHTML = bodyHTML;
+            document.getElementById('modal-overlay').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('modal-overlay').style.display = 'none';
+        }
+
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape') closeModal();
+        });
 
         async function performAISearch() {
             const query = document.getElementById('ai-search-input').value;
